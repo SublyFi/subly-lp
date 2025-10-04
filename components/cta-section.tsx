@@ -14,7 +14,7 @@ export function CTASection() {
             and let Subly handle the rest.
           </p>
 
-          <div className="flex justify-center mb-8">
+          <div className="flex justify-center">
             {/* <Button size="lg" className="bg-white text-teal-600 hover:bg-gray-100 text-lg px-8 py-4">
               Join Waitlist
             </Button> */}
@@ -30,6 +30,22 @@ export function CTASection() {
               href="https://prod-waitlist-widget.s3.us-east-2.amazonaws.com/getwaitlist.min.css"
             />
             <script src="https://prod-waitlist-widget.s3.us-east-2.amazonaws.com/getwaitlist.min.js"></script>
+          </div>
+          <div className="flex flex-col items-center gap-6">
+            <Button
+              size="lg"
+              variant="outline"
+              className="bg-white/10 text-white border-white/30 hover:bg-white/20 text-lg px-8 py-4"
+              asChild
+            >
+              <a
+                href="https://demo.sublyfi.com/"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Try Demo Site →
+              </a>
+            </Button>
           </div>
         </Card>
       </div>

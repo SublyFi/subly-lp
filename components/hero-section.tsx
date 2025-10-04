@@ -44,6 +44,20 @@ export function HeroSection() {
           />
           <script src="https://prod-waitlist-widget.s3.us-east-2.amazonaws.com/getwaitlist.min.js"></script>
         </div>
+        <Button
+          size="lg"
+          variant="outline"
+          className="bg-white/10 text-white border-white/30 hover:bg-white/20 text-lg px-8 py-4 mt-6"
+          asChild
+        >
+          <a
+            href="https://demo.sublyfi.com/"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Try Demo Site →
+          </a>
+        </Button>
       </div>
     </section>
   );
