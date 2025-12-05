@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 
 export function HeroSection() {
   return (
-    <section className="min-h-screen bg-gradient-to-br from-teal-500 to-teal-600 flex items-center justify-center text-white relative overflow-hidden">
+    <section className="min-h-screen bg-gradient-to-br from-[#8c52ff] via-[#6d2be3] to-[#2c1b69] flex items-center justify-center text-white relative overflow-hidden">
       {/* Background pattern */}
       <div className="absolute inset-0 opacity-10">
         <div className="absolute top-20 left-20 w-32 h-32 rounded-full border border-white/20" />
@@ -16,7 +16,7 @@ export function HeroSection() {
           <h1 className="text-5xl md:text-7xl lg:text-8xl font-black mb-4 text-balance tracking-tight">
             Subscribe Now,
           </h1>
-          <h1 className="text-5xl md:text-7xl lg:text-8xl font-black text-balance tracking-tight text-cyan-200">
+          <h1 className="text-5xl md:text-7xl lg:text-8xl font-black text-balance tracking-tight text-[#e7dcff]">
             Pay Never
           </h1>
         </div>
@@ -28,7 +28,7 @@ export function HeroSection() {
         </p>
 
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
-          {/* <Button size="lg" className="bg-white text-teal-600 hover:bg-gray-100 text-lg px-8 py-4">
+          {/* <Button size="lg" className="bg-white text-[#8c52ff] hover:bg-gray-100 text-lg px-8 py-4">
             Join Waitlist
           </Button> */}
           <div

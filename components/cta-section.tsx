@@ -3,7 +3,7 @@ import { Card } from "@/components/ui/card";
 
 export function CTASection() {
   return (
-    <section className="py-20 bg-gradient-to-br from-teal-500 to-teal-600 text-white">
+    <section className="py-20 bg-gradient-to-br from-[#8c52ff] via-[#6d2be3] to-[#2c1b69] text-white">
       <div className="container mx-auto px-4">
         <Card className="max-w-4xl mx-auto p-12 bg-white/10 backdrop-blur border-white/20 text-center">
           <h2 className="text-4xl md:text-5xl font-bold mb-6 text-balance text-white">
@@ -15,7 +15,7 @@ export function CTASection() {
           </p>
 
           <div className="flex justify-center">
-            {/* <Button size="lg" className="bg-white text-teal-600 hover:bg-gray-100 text-lg px-8 py-4">
+            {/* <Button size="lg" className="bg-white text-[#8c52ff] hover:bg-gray-100 text-lg px-8 py-4">
               Join Waitlist
             </Button> */}
             <div
