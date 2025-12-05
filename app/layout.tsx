@@ -31,9 +31,9 @@ export const metadata: Metadata = {
     "A privacy-first PayFi protocol for subscription apps. Turn DeFi yield into cash and pay for subscriptions automatically.",
   generator: "v0.app",
   icons: {
-    icon: "/subly-logo.png",
-    shortcut: "/subly-logo.png",
-    apple: "/subly-logo.png",
+    icon: "/subly-purple.png",
+    shortcut: "/subly-purple.png",
+    apple: "/subly-purple.png",
   },
 };
 
