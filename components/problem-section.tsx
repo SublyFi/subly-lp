@@ -2,12 +2,12 @@ import { Card } from "@/components/ui/card"
 
 export function ProblemSection() {
   const subscriptionServices = [
-    { name: "Video", icon: "🎬", color: "bg-[#8c52ff]" },
-    { name: "Music", icon: "🎵", color: "bg-[#6d2be3]" },
-    { name: "Fitness", icon: "💪", color: "bg-[#b38aff]" },
-    { name: "Cloud Storage", icon: "☁️", color: "bg-[#5f8cff]" },
-    { name: "News", icon: "📰", color: "bg-[#2f1f50]" },
-    { name: "Design Tools", icon: "🎨", color: "bg-[#9d6bff]" },
+    { name: "Video", icon: "🎬", color: "bg-[#5c1fd4]" },
+    { name: "Music", icon: "🎵", color: "bg-[#7a2cff]" },
+    { name: "Fitness", icon: "💪", color: "bg-[#e14fff]" },
+    { name: "Cloud Storage", icon: "☁️", color: "bg-[#4f8bff]" },
+    { name: "News", icon: "📰", color: "bg-[#2c1b69]" },
+    { name: "Design Tools", icon: "🎨", color: "bg-[#c58cff]" },
   ];
 
   return (
