@@ -5,10 +5,10 @@ type Tick = { label: string; value: string; status?: "live" | "ok" | "note" };
 const TICKS: Tick[] = [
   { label: "STATUS", value: "LIVE", status: "live" },
   { label: "TESTNET", value: "SOLANA DEVNET · 58 TESTS PASSING" },
-  { label: "X402", value: "V2 · PHASE 4 OF 6" },
+  { label: "RAIL", value: "x402 V2 · HTTP 402" },
   { label: "ARCIUM", value: "MAINNET ALPHA · PHASE 5 Q3 2026", status: "note" },
   { label: "YIELD", value: "VAULT · 8.42% APY (DEVNET SIM)" },
-  { label: "PAPER", value: "a402 · arXiv:2603.01179" },
+  { label: "TARGET", value: "AUTONOMOUS AI AGENTS" },
   { label: "AUTHOR", value: "SUBLYFI · BUILT FOR COLOSSEUM FRONTIER" },
 ];
 

@@ -90,8 +90,8 @@ export function CTASection() {
                 href="https://github.com/SublyFi"
               />
               <Social
-                label="Read the paper"
-                handle="arXiv:2603.01179"
+                label="Academic foundation"
+                handle="Li et al. · arXiv 2603.01179"
                 href="https://arxiv.org/abs/2603.01179"
               />
             </ul>

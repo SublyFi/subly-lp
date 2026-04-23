@@ -34,7 +34,7 @@ export function HeroSection() {
               Pay Never.
             </span>
             <span className="mt-4 block font-mono text-[12px] font-normal uppercase tracking-[0.3em] text-ink-muted md:text-[13px]">
-              Privacy protocol for agents · Solana · a402-svm
+              Privacy protocol for agents · Solana · USDC · x402
             </span>
           </h1>
 
@@ -90,7 +90,7 @@ export function HeroSection() {
             </div>
 
             <dl className="space-y-3 normal-case tracking-normal">
-              <Row label="Name" value="Subly · a402-svm-v1" />
+              <Row label="Product" value="Subly · v1" />
               <Row label="Target" value="Autonomous AI agents" />
               <Row label="Chain" value="Solana · devnet → mainnet" />
               <Row label="Rail" value="x402 · HTTP 402 · V2" />
@@ -99,7 +99,7 @@ export function HeroSection() {
               <Row label="Program" value="Anchor · 27 tests passing" />
               <Row label="Enclave" value="Rust/rustls · 25 tests" />
               <Row label="Watchtower" value="6 tests · force-settle ready" />
-              <Row label="Paper" value="arXiv 2603.01179" />
+              <Row label="Batch" value="Up to 20 settlements / tx" />
             </dl>
 
             <div className="mt-6 border-t border-rule pt-4">

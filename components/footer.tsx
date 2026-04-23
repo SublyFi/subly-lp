@@ -100,7 +100,7 @@ export function Footer() {
                   rel="noreferrer"
                   className="text-paper/80 hover:text-glow"
                 >
-                  paper · arXiv:2603.01179 ↗
+                  academic foundation ↗
                 </a>
               </li>
             </ul>

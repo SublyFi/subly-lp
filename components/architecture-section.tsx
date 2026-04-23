@@ -32,7 +32,7 @@ export function ArchitectureSection() {
         {/* ASCII-ish architecture diagram */}
         <div className="relative border border-ink bg-paper p-4 md:p-8 shadow-[6px_6px_0_0_var(--ink)]">
           <div className="mb-6 flex items-baseline justify-between font-mono text-[10px] uppercase tracking-[0.18em] text-ink-muted">
-            <span>fig. 01 · a402-svm-v1 topology</span>
+            <span>fig. 01 · Subly protocol topology</span>
             <span>§ read right to left as funds flow left to right</span>
           </div>
 
@@ -59,7 +59,7 @@ export function ArchitectureSection() {
             />
             <Box
               tier="SOLANA"
-              title="a402_vault program"
+              title="Subly vault program"
               notes={["Escrow PDA", "Batch settlement", "Force-settle"]}
               badge="ANCHOR · 27 TESTS"
             />
