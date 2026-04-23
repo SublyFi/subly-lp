@@ -4,32 +4,41 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { Suspense } from "react";
 
-import { Inter, JetBrains_Mono, Source_Serif_4 } from "next/font/google";
+import {
+  Fraunces,
+  Instrument_Serif,
+  JetBrains_Mono,
+} from "next/font/google";
+import { GeistSans } from "geist/font/sans";
 
-// Initialize fonts
-const inter = Inter({
+const fraunces = Fraunces({
   subsets: ["latin"],
-  variable: "--font-sans",
-  weight: ["100", "200", "300", "400", "500", "600", "700", "800", "900"],
+  variable: "--font-display",
+  axes: ["SOFT", "WONK", "opsz"],
+  display: "swap",
+});
+
+const instrumentSerif = Instrument_Serif({
+  subsets: ["latin"],
+  variable: "--font-serif",
+  weight: ["400"],
+  style: ["normal", "italic"],
+  display: "swap",
 });
 
 const jetbrainsMono = JetBrains_Mono({
   subsets: ["latin"],
   variable: "--font-mono",
-  weight: ["100", "200", "300", "400", "500", "600", "700", "800"],
+  weight: ["300", "400", "500", "600", "700"],
+  display: "swap",
 });
 
-const sourceSerif = Source_Serif_4({
-  subsets: ["latin"],
-  variable: "--font-serif",
-  weight: ["200", "300", "400", "500", "600", "700", "800", "900"],
-});
 
 export const metadata: Metadata = {
-  title: "Subly - Subscribe Now, Pay Never",
+  title: "Subly — Subscribe Now, Pay Never",
   description:
-    "A privacy-first PayFi protocol for subscription apps. Turn DeFi yield into cash and pay for subscriptions automatically.",
-  generator: "v0.app",
+    "A privacy-first PayFi protocol on Solana. Deposit once. Earn yield inside a TEE vault. Let the yield silently settle your subscriptions.",
+  generator: "subly.fi",
   icons: {
     icon: "/subly-purple.png",
     shortcut: "/subly-purple.png",
@@ -43,8 +52,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${inter.variable} ${jetbrainsMono.variable}`}>
-      <body className="font-sans antialiased">
+    <html
+      lang="en"
+      className={`${fraunces.variable} ${instrumentSerif.variable} ${jetbrainsMono.variable} ${GeistSans.variable}`}
+    >
+      <body className="font-sans antialiased bg-paper text-ink selection:bg-ink selection:text-paper">
         <Suspense>{children}</Suspense>
       </body>
     </html>

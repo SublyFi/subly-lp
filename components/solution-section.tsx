@@ -1,73 +1,144 @@
-import { Card } from "@/components/ui/card"
-
 export function SolutionSection() {
   return (
-    <section className="py-20 bg-gradient-to-br from-[#8c52ff] via-[#6d2be3] to-[#2c1b69] text-white">
-      <div className="container mx-auto px-4">
-        <div className="text-center mb-16">
-          <h2 className="text-4xl md:text-5xl font-bold mb-6 text-balance">Subly Solution</h2>
-          <p className="text-xl max-w-3xl mx-auto text-balance leading-relaxed opacity-90">
-            Turn DeFi yield into monthly cash payouts. You deposit once, and Subly earns yield for you.
-          </p>
+    <section id="how" className="relative border-b border-rule bg-paper">
+      <div className="mx-auto max-w-[1360px] px-6 py-20 md:px-10 md:py-28">
+        <div className="mb-16 grid gap-8 md:grid-cols-12">
+          <div className="md:col-span-4">
+            <div className="eyebrow mb-4">§ 03 · Mechanism</div>
+            <h2 className="font-display text-[52px] font-semibold leading-[0.95] tracking-[-0.03em] text-ink md:text-[72px]">
+              How the
+              <br />
+              <span className="font-serif-it font-normal">vault</span>
+              <br />
+              <span>pays you back.</span>
+            </h2>
+          </div>
+          <div className="md:col-span-7 md:col-start-6">
+            <p className="font-serif-it text-[26px] leading-[1.3] text-ink md:text-[32px]">
+              Three movements. One deposit. A yield curve that keeps you
+              paid up, month after month, without touching principal.
+            </p>
+            <p className="mt-6 font-sans text-[15px] leading-[1.7] text-ink-muted">
+              Everything between the deposit and the settlement happens
+              inside an AWS Nitro Enclave. The parent instance can see
+              ciphertexts; the vault signer lives only in attested memory.
+              Providers are paid in batches; observers see only aggregate
+              totals.
+            </p>
+          </div>
         </div>
 
-        <div className="max-w-6xl mx-auto">
-          <div className="grid md:grid-cols-3 gap-8 mb-12 items-stretch">
-            <Card className="p-6 bg-white/10 backdrop-blur border-white/20 text-center flex flex-col">
-              <div className="mb-4 flex justify-center h-20 items-center">
-                <img
-                  src="/deposit-icon.png"
-                  alt="Deposit icon showing hand with dollar sign and upload arrow"
-                  className="w-20 h-20"
-                />
-              </div>
-              <h3 className="text-xl font-semibold mb-3 text-white">Deposit Once</h3>
-              <p className="text-white/80 leading-relaxed flex-grow">
-                Make a single deposit in USDC and let Subly handle the rest
-              </p>
-            </Card>
+        {/* Timeline */}
+        <ol className="relative grid gap-0 md:grid-cols-3">
+          <span
+            className="hair-rule absolute left-0 right-0 top-[54px] hidden md:block"
+            aria-hidden
+          />
+          <Step
+            n="01"
+            tag="DEPOSIT"
+            title="Seed the vault"
+            body="Transfer USDC into the Subly program-derived vault. The Solana program mints a non-transferable deposit receipt. You can withdraw at any time — principal never leaves your custody envelope."
+            ornament="$"
+          />
+          <Step
+            n="02"
+            tag="EARN"
+            title="Yield accrues — silently"
+            body="The enclave allocates capital to a whitelisted senior DeFi vault (Kormos-class fractional reserve, or a plain Kamino/Marinade position). Ed25519 adaptor signatures keep every move atomic and auditable."
+            ornament="↻"
+            mid
+          />
+          <Step
+            n="03"
+            tag="SETTLE"
+            title="Pay without spending"
+            body="Providers quote in x402; Subly's facilitator signs a payment commitment inside the enclave and settles up to 20 payments in a single Solana transaction. Your bill disappears; your vault principal doesn't."
+            ornament="→"
+          />
+        </ol>
 
-            <Card className="p-6 bg-white/10 backdrop-blur border-white/20 text-center flex flex-col">
-              <div className="mb-4 flex justify-center h-20 items-center">
-                <img
-                  src="/earn-yield-icon.png"
-                  alt="Earn yield icon showing bar chart with upward arrow and dollar sign"
-                  className="w-20 h-20"
-                />
-              </div>
-              <h3 className="text-xl font-semibold mb-3 text-white">Earn Yield</h3>
-              <p className="text-white/80 leading-relaxed flex-grow">
-                Your funds automatically earn yield through secure DeFi protocols
-              </p>
-            </Card>
-
-            <Card className="p-6 bg-white/10 backdrop-blur border-white/20 text-center flex flex-col">
-              <div className="mb-4 flex justify-center items-center gap-4 h-20">
-                <img src="/paypal-symbol.svg" alt="PayPal symbol" className="w-16 h-16 object-contain" />
-                <img src="/usdc-logo.svg" alt="USDC logo" className="w-16 h-16 object-contain" />
-              </div>
-              <h3 className="text-xl font-semibold mb-3 text-white">Auto-Pay</h3>
-              <p className="text-white/80 leading-relaxed flex-grow">
-                Yield goes to your PayPal or paid directly in USDC to cover your subscriptions
-              </p>
-            </Card>
-          </div>
-
-          <Card className="p-8 bg-white/10 backdrop-blur border-white/20">
-            <div className="flex justify-center mb-8">
-              <img
-                src="/apy-diagram.png"
-                alt="APY 10% diagram showing Aug to Sep timeline with subscription service icons"
-                className="max-w-full h-auto"
-              />
-            </div>
-
-            <div className="text-center">
-              <p className="text-lg text-white/80">Your yield covers your subscriptions, so you don't have to pay</p>
-            </div>
-          </Card>
+        {/* Numeric ribbon */}
+        <div className="mt-20 grid grid-cols-2 gap-0 border-y border-ink md:grid-cols-4">
+          <Figure value="1×" label="Deposit required" />
+          <Figure value="20" label="Batch size / tx" divider />
+          <Figure value="120s" label="Settlement window" divider />
+          <Figure value="0" label="Principal spent" divider accent />
         </div>
       </div>
     </section>
-  )
+  );
+}
+
+function Step({
+  n,
+  tag,
+  title,
+  body,
+  ornament,
+  mid,
+}: {
+  n: string;
+  tag: string;
+  title: string;
+  body: string;
+  ornament: string;
+  mid?: boolean;
+}) {
+  return (
+    <li
+      className={`relative flex flex-col border-t border-rule px-0 py-10 md:border-t-0 md:px-8 ${
+        mid ? "md:border-x md:border-rule" : ""
+      }`}
+    >
+      <div className="mb-6 flex items-center gap-4">
+        <div className="relative flex h-[60px] w-[60px] items-center justify-center border border-ink bg-paper">
+          <span className="font-display text-[28px] font-semibold tracking-tight text-ink">
+            {ornament}
+          </span>
+          <span className="absolute -top-2 -right-2 border border-ink bg-paper-deep px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-[0.18em] text-ink">
+            {n}
+          </span>
+        </div>
+        <span className="font-mono text-[10px] uppercase tracking-[0.24em] text-subly">
+          {tag}
+        </span>
+      </div>
+      <h3 className="font-display text-[26px] font-semibold tracking-[-0.02em] text-ink md:text-[30px]">
+        {title}
+      </h3>
+      <p className="mt-4 text-[14px] leading-[1.7] text-ink-muted">{body}</p>
+    </li>
+  );
+}
+
+function Figure({
+  value,
+  label,
+  divider,
+  accent,
+}: {
+  value: string;
+  label: string;
+  divider?: boolean;
+  accent?: boolean;
+}) {
+  return (
+    <div
+      className={`flex flex-col items-start px-4 py-8 md:px-8 ${
+        divider ? "md:border-l md:border-rule" : ""
+      }`}
+    >
+      <span
+        className={`font-display text-[64px] font-semibold leading-none tracking-[-0.03em] md:text-[88px] ${
+          accent ? "text-subly" : "text-ink"
+        }`}
+      >
+        {value}
+      </span>
+      <span className="mt-3 font-mono text-[10px] uppercase tracking-[0.24em] text-ink-muted">
+        {label}
+      </span>
+    </div>
+  );
 }

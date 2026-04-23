@@ -4,99 +4,94 @@
 @custom-variant dark (&:is(.dark *));
 
 :root {
-  --background: #f7f3ff;
-  --foreground: #0f0a1f;
-  --card: #ffffff;
-  --card-foreground: #0f0a1f;
-  --popover: #ffffff;
-  --popover-foreground: #0f0a1f;
-  /* Updated primary colors to match Subly's purple brand */
-  --primary: #8c52ff;
-  --primary-foreground: #ffffff;
-  --secondary: #e8deff;
-  --secondary-foreground: #24124a;
-  --muted: #f1eaff;
-  --muted-foreground: #5b4a86;
-  --accent: #f6ecff;
-  --accent-foreground: #24124a;
-  --destructive: #e5484d;
+  /* Encrypted Almanac palette */
+  --paper: #f2ebdc;
+  --paper-deep: #e8dfc8;
+  --paper-warm: #ede4cf;
+  --ink: #1a0b2e;
+  --ink-soft: #3f2960;
+  --ink-muted: #6b5589;
+  --rule: #c9b99a;
+  --rule-soft: #d8cbb0;
+
+  /* Brand accents — used sparingly */
+  --subly: #8c52ff;
+  --subly-deep: #6d2be3;
+
+  /* System signal colors */
+  --glow: #d9ff3a;
+  --alert: #ff5a4c;
+  --ok: #3fb27f;
+
+  /* shadcn mappings */
+  --background: var(--paper);
+  --foreground: var(--ink);
+  --card: #fffaf0;
+  --card-foreground: var(--ink);
+  --popover: #fffaf0;
+  --popover-foreground: var(--ink);
+  --primary: var(--ink);
+  --primary-foreground: var(--paper);
+  --secondary: var(--paper-deep);
+  --secondary-foreground: var(--ink);
+  --muted: var(--paper-warm);
+  --muted-foreground: var(--ink-muted);
+  --accent: var(--subly);
+  --accent-foreground: #ffffff;
+  --destructive: var(--alert);
   --destructive-foreground: #ffffff;
-  --border: #d7c7f8;
-  --input: #d7c7f8;
-  --ring: #b38aff;
-  /* Added custom Subly brand colors */
-  --subly-purple: #8c52ff;
-  --subly-purple-dark: #6d2be3;
-  --subly-purple-light: #c3a1ff;
-  --chart-1: #8c52ff;
-  --chart-2: #c3a1ff;
-  --chart-3: #f29bff;
-  --chart-4: #6d2be3;
-  --chart-5: #5f8cff;
-  --radius: 1rem;
-  --sidebar: #f7f3ff;
-  --sidebar-foreground: #0f0a1f;
-  --sidebar-primary: #8c52ff;
-  --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent: #e8deff;
-  --sidebar-accent-foreground: #24124a;
-  --sidebar-border: #d7c7f8;
-  --sidebar-ring: #b38aff;
-  --font-sans: "Geist", "Geist Fallback";
-  --font-mono: "Geist Mono", "Geist Mono Fallback";
-  --font-serif: "Source Serif 4", "Source Serif 4 Fallback";
-  --shadow-x: 0px;
-  --shadow-y: 1px;
-  --shadow-blur: 2px;
-  --shadow-spread: 0px;
-  --shadow-opacity: 0.05;
-  --shadow-color: #000000;
+  --border: var(--rule);
+  --input: var(--rule-soft);
+  --ring: var(--subly);
+  --radius: 0.125rem;
 }
 
 .dark {
-  --background: #0f081f;
-  --foreground: #f7f3ff;
-  --card: #1a0f33;
-  --card-foreground: #f7f3ff;
-  --popover: #1a0f33;
-  --popover-foreground: #f7f3ff;
-  --primary: #c3a1ff;
-  --primary-foreground: #0f081f;
-  --secondary: #2b1a4a;
-  --secondary-foreground: #f7f3ff;
-  --muted: #201433;
-  --muted-foreground: #c8b8f7;
-  --accent: #2f1f50;
-  --accent-foreground: #f7f3ff;
-  --destructive: #ff6b6b;
-  --destructive-foreground: #0f081f;
-  --border: #3b2a58;
-  --input: #3b2a58;
-  --ring: #cba8ff;
-  --chart-1: #cba8ff;
-  --chart-2: #8c52ff;
-  --chart-3: #f29bff;
-  --chart-4: #6d2be3;
-  --chart-5: #5f8cff;
-  --sidebar: #0f081f;
-  --sidebar-foreground: #f7f3ff;
-  --sidebar-primary: #cba8ff;
-  --sidebar-primary-foreground: #0f081f;
-  --sidebar-accent: #2f1f50;
-  --sidebar-accent-foreground: #f7f3ff;
-  --sidebar-border: #3b2a58;
-  --sidebar-ring: #cba8ff;
-  --shadow-x: 0px;
-  --shadow-y: 1px;
-  --shadow-blur: 2px;
-  --shadow-spread: 0px;
-  --shadow-opacity: 0.05;
-  --shadow-color: #000000;
+  --paper: #110822;
+  --paper-deep: #1a0b2e;
+  --paper-warm: #1f1136;
+  --ink: #f2ebdc;
+  --ink-soft: #d6c9aa;
+  --ink-muted: #a89776;
+  --rule: #3f2960;
+  --rule-soft: #2d1d45;
+
+  --background: var(--paper);
+  --foreground: var(--ink);
+  --card: var(--paper-deep);
+  --card-foreground: var(--ink);
+  --primary: var(--ink);
+  --primary-foreground: var(--paper);
+  --secondary: var(--paper-deep);
+  --secondary-foreground: var(--ink);
+  --muted: var(--paper-warm);
+  --muted-foreground: var(--ink-muted);
+  --border: var(--rule);
+  --input: var(--rule-soft);
 }
 
 @theme inline {
-  --font-sans: "Geist", "Geist Fallback";
-  --font-mono: "Geist Mono", "Geist Mono Fallback";
+  --font-sans: var(--font-geist-sans), "Geist Fallback", ui-sans-serif, system-ui;
+  --font-display: var(--font-display), "Fraunces Fallback", ui-serif, Georgia;
+  --font-serif: var(--font-serif), "Instrument Serif Fallback", ui-serif,
+    Georgia;
+  --font-mono: var(--font-mono), "JetBrains Mono Fallback", ui-monospace,
+    Menlo;
+
+  --color-paper: var(--paper);
+  --color-paper-deep: var(--paper-deep);
+  --color-paper-warm: var(--paper-warm);
+  --color-ink: var(--ink);
+  --color-ink-soft: var(--ink-soft);
+  --color-ink-muted: var(--ink-muted);
+  --color-rule: var(--rule);
+  --color-rule-soft: var(--rule-soft);
+  --color-subly: var(--subly);
+  --color-subly-deep: var(--subly-deep);
+  --color-glow: var(--glow);
+  --color-alert: var(--alert);
+  --color-ok: var(--ok);
+
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
@@ -116,69 +111,160 @@
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
-  --color-chart-1: var(--chart-1);
-  --color-chart-2: var(--chart-2);
-  --color-chart-3: var(--chart-3);
-  --color-chart-4: var(--chart-4);
-  --color-chart-5: var(--chart-5);
-  --radius-sm: calc(var(--radius) - 4px);
-  --radius-md: calc(var(--radius) - 2px);
-  --radius-lg: var(--radius);
+  --radius-sm: calc(var(--radius) - 0px);
+  --radius-md: var(--radius);
+  --radius-lg: calc(var(--radius) + 2px);
   --radius-xl: calc(var(--radius) + 4px);
-  --color-sidebar: var(--sidebar);
-  --color-sidebar-foreground: var(--sidebar-foreground);
-  --color-sidebar-primary: var(--sidebar-primary);
-  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
-  --color-sidebar-accent: var(--sidebar-accent);
-  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
-  --color-sidebar-border: var(--sidebar-border);
-  --color-sidebar-ring: var(--sidebar-ring);
-  --font-serif: "Source Serif 4", "Source Serif 4 Fallback";
-  /* Added custom Subly brand color variables */
-  --color-subly-purple: var(--subly-purple);
-  --color-subly-purple-dark: var(--subly-purple-dark);
-  --color-subly-purple-light: var(--subly-purple-light);
-  /* computed shadow variables below - do not modify */
-  --shadow-2xs: var(--shadow-x) var(--shadow-y)
-    color-mix(in srgb, var(--shadow-color) calc(var(--shadow-opacity) * 100%), transparent);
-  --shadow-xs: var(--shadow-x) var(--shadow-y) var(--shadow-blur) var(--shadow-spread)
-    color-mix(in srgb, var(--shadow-color) calc(var(--shadow-opacity) * 100%), transparent);
-  --shadow-sm: var(--shadow-x) var(--shadow-y) calc(var(--shadow-blur) * 1.5) var(--shadow-spread)
-    color-mix(in srgb, var(--shadow-color) calc(var(--shadow-opacity) * 100%), transparent), var(--shadow-x)
-    var(--shadow-y) var(--shadow-blur) calc(var(--shadow-spread) - 1px)
-    color-mix(in srgb, var(--shadow-color) calc(var(--shadow-opacity) * 100%), transparent);
-  --shadow-md: calc(var(--shadow-x) * 2) calc(var(--shadow-y) * 2) calc(var(--shadow-blur) * 3)
-    calc(var(--shadow-spread) - 1px)
-    color-mix(in srgb, var(--shadow-color) calc(var(--shadow-opacity) * 100%), transparent), var(--shadow-x)
-    var(--shadow-y) calc(max(0px, var(--shadow-blur) * 2 - 2px)) calc(var(--shadow-spread) - 2px)
-    color-mix(in srgb, var(--shadow-color) calc(var(--shadow-opacity) * 100%), transparent);
-  --shadow-lg: calc(var(--shadow-x) * 4) calc(var(--shadow-y) * 4) calc(var(--shadow-blur) * 5)
-    calc(var(--shadow-spread) - 3px)
-    color-mix(in srgb, var(--shadow-color) calc(var(--shadow-opacity) * 100%), transparent), calc(var(--shadow-x) * 2)
-    calc(var(--shadow-y) * 2) calc(max(0px, var(--shadow-blur) * 3 - 4px)) calc(var(--shadow-spread) - 4px)
-    color-mix(in srgb, var(--shadow-color) calc(var(--shadow-opacity) * 100%), transparent);
-  --shadow-xl: calc(var(--shadow-x) * 6) calc(var(--shadow-y) * 6) calc(var(--shadow-blur) * 7)
-    calc(var(--shadow-spread) - 5px)
-    color-mix(in srgb, var(--shadow-color) calc(var(--shadow-opacity) * 100%), transparent), calc(var(--shadow-x) * 4)
-    calc(var(--shadow-y) * 4) calc(max(0px, var(--shadow-blur) * 5 - 6px)) calc(var(--shadow-spread) - 6px)
-    color-mix(in srgb, var(--shadow-color) calc(var(--shadow-opacity) * 100%), transparent);
-  --shadow-2xl: calc(var(--shadow-x) * 8) calc(var(--shadow-y) * 8) calc(max(0px, var(--shadow-blur) * 9 - 8px))
-    calc(var(--shadow-spread) - 12px)
-    color-mix(in srgb, var(--shadow-color) calc(var(--shadow-opacity) * 250%), transparent);
-  --shadow: var(--shadow-md);
-  --color-shadow-color: var(--shadow-color);
-  --shadow-opacity: var(--shadow-opacity);
-  --shadow-spread: var(--shadow-spread);
-  --shadow-blur: var(--shadow-blur);
-  --shadow-y: var(--shadow-y);
-  --shadow-x: var(--shadow-x);
 }
 
 @layer base {
   * {
-    @apply border-border outline-ring/50;
+    @apply border-border;
   }
   body {
-    @apply bg-background text-foreground;
+    @apply bg-paper text-ink font-sans antialiased;
+    font-feature-settings: "ss01", "ss02", "cv02", "cv11";
+    background-image:
+      /* subtle paper grain */ radial-gradient(
+        rgba(26, 11, 46, 0.035) 1px,
+        transparent 1px
+      ),
+      radial-gradient(rgba(26, 11, 46, 0.02) 1px, transparent 1px);
+    background-position:
+      0 0,
+      3px 3px;
+    background-size:
+      6px 6px,
+      6px 6px;
+  }
+
+  ::selection {
+    background: var(--ink);
+    color: var(--paper);
+  }
+}
+
+@layer utilities {
+  .font-display {
+    font-family: var(--font-display);
+    font-optical-sizing: auto;
+    font-variation-settings:
+      "opsz" 144,
+      "SOFT" 30,
+      "WONK" 0;
+    letter-spacing: -0.03em;
+  }
+  .font-display-wonk {
+    font-family: var(--font-display);
+    font-optical-sizing: auto;
+    font-variation-settings:
+      "opsz" 144,
+      "SOFT" 100,
+      "WONK" 1;
+    letter-spacing: -0.035em;
+  }
+  .font-serif-it {
+    font-family: var(--font-serif);
+    font-style: italic;
+    letter-spacing: -0.01em;
+  }
+  .font-mono {
+    font-family: var(--font-mono);
+    font-feature-settings: "ss02", "ss03";
+  }
+
+  .eyebrow {
+    @apply font-mono text-[10px] uppercase tracking-[0.22em] text-ink-muted;
+  }
+  .hair-rule {
+    background: linear-gradient(
+      to right,
+      transparent,
+      var(--rule) 12%,
+      var(--rule) 88%,
+      transparent
+    );
+    height: 1px;
+  }
+
+  .redact {
+    position: relative;
+    display: inline-block;
+    color: transparent;
+  }
+  .redact::after {
+    content: "";
+    position: absolute;
+    inset: 0.1em -0.08em 0.12em -0.08em;
+    background: var(--ink);
+    border-radius: 1px;
+    transform: skewX(-4deg);
+  }
+  .redact-reveal {
+    color: inherit;
+  }
+  .redact-reveal::after {
+    display: none;
+  }
+
+  .noise::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0.35;
+    mix-blend-mode: multiply;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23n)' opacity='0.45'/></svg>");
+  }
+
+  .gridlines {
+    background-image:
+      linear-gradient(to right, var(--rule-soft) 1px, transparent 1px),
+      linear-gradient(to bottom, var(--rule-soft) 1px, transparent 1px);
+    background-size: 64px 64px;
+  }
+
+  @keyframes marquee {
+    0% {
+      transform: translateX(0);
+    }
+    100% {
+      transform: translateX(-50%);
+    }
+  }
+  .marquee {
+    animation: marquee 42s linear infinite;
+  }
+
+  @keyframes blink {
+    0%,
+    49% {
+      opacity: 1;
+    }
+    50%,
+    100% {
+      opacity: 0.1;
+    }
+  }
+  .blink {
+    animation: blink 1.4s steps(2, end) infinite;
+  }
+
+  @keyframes sweep {
+    0% {
+      transform: scaleX(0);
+      transform-origin: left;
+    }
+    60% {
+      transform: scaleX(1);
+      transform-origin: left;
+    }
+    61% {
+      transform-origin: right;
+    }
+    100% {
+      transform: scaleX(0);
+      transform-origin: right;
+    }
   }
 }

@@ -1,39 +1,121 @@
+import { SublyLogo } from "./subly-logo";
+
 export function Footer() {
   return (
-    <footer className="bg-background border-t py-8">
-      <div className="container mx-auto px-4">
-        <div className="flex flex-col items-center space-y-6">
-          {/* Social Media Links */}
-          <div className="flex items-center space-x-6">
-            {/* X (Twitter) Link */}
-            <a
-              href="https://x.com/subly_fi"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-muted-foreground hover:text-foreground transition-colors"
-            >
-              <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
-              </svg>
-            </a>
-
-            {/* Telegram Link */}
-            <a
-              href="https://t.me/+hR5mDS-l7bBhNjFl"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-muted-foreground hover:text-foreground transition-colors"
-            >
-              <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z" />
-              </svg>
-            </a>
+    <footer className="relative border-t border-rule bg-ink text-paper">
+      <div className="mx-auto max-w-[1360px] px-6 py-16 md:px-10">
+        <div className="grid gap-12 md:grid-cols-12">
+          <div className="md:col-span-5">
+            <div className="flex items-center gap-3">
+              <SublyLogo className="h-7 w-7" />
+              <span className="font-display text-[22px] font-semibold tracking-tight">
+                Subly
+              </span>
+            </div>
+            <p className="mt-6 max-w-md font-serif-it text-[20px] leading-[1.35] text-paper/80">
+              A privacy-first PayFi protocol for the world that pays per
+              call — and the one that subscribes per month.
+            </p>
+            <p className="mt-6 max-w-md font-sans text-[13px] leading-[1.7] text-paper/60">
+              Built for Solana. Assembled inside enclaves. Audited by keys
+              you control. Subscribe Now, Pay Never.
+            </p>
           </div>
 
-          {/* Copyright */}
-          <p className="text-muted-foreground text-sm">© 2025 Subly All rights reserved.</p>
+          <div className="md:col-span-3">
+            <div className="mb-4 font-mono text-[10px] uppercase tracking-[0.24em] text-paper/60">
+              Navigate
+            </div>
+            <ul className="space-y-2 font-mono text-[12px] uppercase tracking-[0.16em]">
+              <li>
+                <a href="#thesis" className="text-paper/80 hover:text-glow">
+                  Thesis
+                </a>
+              </li>
+              <li>
+                <a href="#how" className="text-paper/80 hover:text-glow">
+                  How it works
+                </a>
+              </li>
+              <li>
+                <a href="#privacy" className="text-paper/80 hover:text-glow">
+                  Privacy
+                </a>
+              </li>
+              <li>
+                <a
+                  href="#architecture"
+                  className="text-paper/80 hover:text-glow"
+                >
+                  Architecture
+                </a>
+              </li>
+              <li>
+                <a href="#roadmap" className="text-paper/80 hover:text-glow">
+                  Roadmap
+                </a>
+              </li>
+            </ul>
+          </div>
+
+          <div className="md:col-span-4">
+            <div className="mb-4 font-mono text-[10px] uppercase tracking-[0.24em] text-paper/60">
+              Elsewhere
+            </div>
+            <ul className="space-y-2 font-mono text-[12px] uppercase tracking-[0.16em]">
+              <li>
+                <a
+                  href="https://x.com/subly_fi"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="text-paper/80 hover:text-glow"
+                >
+                  x.com/subly_fi ↗
+                </a>
+              </li>
+              <li>
+                <a
+                  href="https://t.me/+hR5mDS-l7bBhNjFl"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="text-paper/80 hover:text-glow"
+                >
+                  telegram group ↗
+                </a>
+              </li>
+              <li>
+                <a
+                  href="https://github.com/SublyFi"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="text-paper/80 hover:text-glow"
+                >
+                  github.com/SublyFi ↗
+                </a>
+              </li>
+              <li>
+                <a
+                  href="https://arxiv.org/abs/2603.01179"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="text-paper/80 hover:text-glow"
+                >
+                  paper · arXiv:2603.01179 ↗
+                </a>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <div className="mt-16 flex flex-col gap-4 border-t border-paper/15 pt-8 font-mono text-[10px] uppercase tracking-[0.22em] text-paper/50 md:flex-row md:items-center md:justify-between">
+          <div>© 2026 SublyFi · All rights reserved</div>
+          <div className="flex flex-wrap items-center gap-x-6 gap-y-2">
+            <span>Colophon: Fraunces + Instrument Serif + JetBrains Mono + Geist</span>
+            <span>·</span>
+            <span>Built for Colosseum Frontier</span>
+          </div>
         </div>
       </div>
     </footer>
-  )
+  );
 }
