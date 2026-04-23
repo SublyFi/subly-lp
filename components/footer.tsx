@@ -13,12 +13,12 @@ export function Footer() {
               </span>
             </div>
             <p className="mt-6 max-w-md font-serif-it text-[20px] leading-[1.35] text-paper/80">
-              A privacy-first PayFi protocol for the world that pays per
-              call — and the one that subscribes per month.
+              A privacy-first PayFi protocol for AI agents that would
+              rather not wait for a human to top them up.
             </p>
             <p className="mt-6 max-w-md font-sans text-[13px] leading-[1.7] text-paper/60">
               Built for Solana. Assembled inside enclaves. Audited by keys
-              you control. Subscribe Now, Pay Never.
+              you control. Use Now, Pay Never.
             </p>
           </div>
 

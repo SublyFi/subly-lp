@@ -28,35 +28,31 @@ export function HeroSection() {
             </span>
           </div>
 
-          <h1 className="font-display text-[14vw] font-black leading-[0.82] tracking-[-0.04em] text-ink md:text-[120px] lg:text-[160px]">
-            <span className="block">Subscribe</span>
-            <span className="relative inline-flex items-baseline gap-4">
-              <span>Now,</span>
-              <span
-                className="hidden text-[0.18em] font-mono uppercase tracking-[0.3em] text-ink-muted md:inline"
-                aria-hidden
-              >
-                ·01·
-              </span>
-            </span>
+          <h1 className="font-display text-[14vw] font-black leading-[0.82] tracking-[-0.04em] text-ink md:text-[120px] lg:text-[170px]">
+            <span className="block">Use Now,</span>
             <span className="block font-serif-it font-normal tracking-[-0.02em] text-subly">
               Pay Never.
+            </span>
+            <span className="mt-4 block font-mono text-[12px] font-normal uppercase tracking-[0.3em] text-ink-muted md:text-[13px]">
+              Privacy protocol for agents · Solana · a402-svm
             </span>
           </h1>
 
           <p className="mt-10 max-w-2xl font-serif-it text-2xl leading-snug text-ink-soft md:text-3xl">
-            Deposit once. Your capital stays put.{" "}
-            <span className="text-ink">The yield</span> — not your principal —
-            quietly settles every subscription you own, inside a vault no one
-            but you can read.
+            Your AI agent deposits once.{" "}
+            <span className="text-ink">The yield</span> — not the principal —
+            silently settles every x402 call it makes, inside a vault that no
+            provider, relay, or indexer can read.
           </p>
 
           <p className="mt-6 max-w-xl font-sans text-[15px] leading-relaxed text-ink-muted">
-            A privacy-first PayFi protocol on Solana. Built on the{" "}
-            <span className="text-ink">x402</span> payment standard, hardened
-            by AWS Nitro Enclaves, and preparing to move its yield &
-            application layers into <span className="text-ink">Arcium</span>{" "}
-            MPC as Confidential SPL lands in Q3 2026.
+            AI agents can already pay. Funding them is still a human chore.
+            Subly ends the top-up loop: a single USDC deposit, routed into
+            senior DeFi yield inside an AWS Nitro Enclave, pays for every API
+            call your agent makes via{" "}
+            <span className="text-ink">x402</span>. Yield and application
+            privacy move to <span className="text-ink">Arcium</span> MPC as
+            Confidential SPL lands in Q3 2026.
           </p>
 
           <div className="mt-10 flex flex-col items-start gap-4 md:flex-row md:items-center md:gap-6">
@@ -95,14 +91,15 @@ export function HeroSection() {
 
             <dl className="space-y-3 normal-case tracking-normal">
               <Row label="Name" value="Subly · a402-svm-v1" />
+              <Row label="Target" value="Autonomous AI agents" />
               <Row label="Chain" value="Solana · devnet → mainnet" />
+              <Row label="Rail" value="x402 · HTTP 402 · V2" />
               <Row label="TEE" value="AWS Nitro · PCR0 attested" />
               <Row label="MPC" value="Arcium MXE (Q3 2026)" />
-              <Row label="Program" value="ANC · 27 tests passing" />
+              <Row label="Program" value="Anchor · 27 tests passing" />
               <Row label="Enclave" value="Rust/rustls · 25 tests" />
               <Row label="Watchtower" value="6 tests · force-settle ready" />
               <Row label="Paper" value="arXiv 2603.01179" />
-              <Row label="Tagline" value="Lily Liu · PayFi · 2024-07" />
             </dl>
 
             <div className="mt-6 border-t border-rule pt-4">

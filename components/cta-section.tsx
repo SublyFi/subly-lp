@@ -27,17 +27,19 @@ export function CTASection() {
         </div>
 
         <h2 className="max-w-5xl font-display text-[14vw] font-black leading-[0.84] tracking-[-0.04em] text-ink md:text-[140px] lg:text-[180px]">
-          Close the{" "}
-          <span className="font-serif-it font-normal text-subly">tab.</span>
+          Stop topping{" "}
+          <span className="font-serif-it font-normal text-subly">up.</span>
           <br />
-          Keep the{" "}
-          <span className="font-serif-it font-normal">subscription.</span>
+          Start deploying agents{" "}
+          <span className="font-serif-it font-normal">
+            that pay themselves.
+          </span>
         </h2>
 
         <p className="mt-10 max-w-2xl font-serif-it text-[24px] leading-[1.35] text-ink-soft md:text-[28px]">
-          If you build agent infrastructure, run a SaaS business, or simply
-          resent the last five auto-debits you didn&apos;t notice — Subly is
-          written for you.
+          If you ship AI agents to production — research agents, trading
+          agents, autonomous DevOps, data-buying pipelines — Subly is the
+          funding layer you&apos;ve been manually impersonating.
         </p>
 
         <div className="mt-12 grid gap-10 border-t border-ink pt-10 md:grid-cols-12">
@@ -61,9 +63,9 @@ export function CTASection() {
               strategy="afterInteractive"
             />
             <p className="mt-4 max-w-md font-sans text-[13px] leading-[1.7] text-ink-muted">
-              We&apos;ll reach out with a devnet invite and the attestation
-              verifier. No spam; unsubscribe is one click. (Though if you
-              unsubscribe from too many things, maybe consider Subly.)
+              We&apos;ll reach out with a devnet invite, SDK access, and the
+              attestation verifier. Single deposit, zero cron jobs, your
+              agents keep running while you sleep.
             </p>
           </div>
 

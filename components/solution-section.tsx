@@ -15,15 +15,16 @@ export function SolutionSection() {
           </div>
           <div className="md:col-span-7 md:col-start-6">
             <p className="font-serif-it text-[26px] leading-[1.3] text-ink md:text-[32px]">
-              Three movements. One deposit. A yield curve that keeps you
-              paid up, month after month, without touching principal.
+              Three movements. One deposit. A yield curve that keeps your
+              agent paid up, call after call, without ever touching
+              principal.
             </p>
             <p className="mt-6 font-sans text-[15px] leading-[1.7] text-ink-muted">
-              Everything between the deposit and the settlement happens
-              inside an AWS Nitro Enclave. The parent instance can see
-              ciphertexts; the vault signer lives only in attested memory.
-              Providers are paid in batches; observers see only aggregate
-              totals.
+              Everything between the agent&apos;s deposit and the provider&apos;s
+              settlement happens inside an AWS Nitro Enclave. The parent
+              instance sees only ciphertexts; the vault signer lives in
+              attested memory. Providers are paid in batches; observers see
+              only aggregate totals.
             </p>
           </div>
         </div>
@@ -37,8 +38,8 @@ export function SolutionSection() {
           <Step
             n="01"
             tag="DEPOSIT"
-            title="Seed the vault"
-            body="Transfer USDC into the Subly program-derived vault. The Solana program mints a non-transferable deposit receipt. You can withdraw at any time — principal never leaves your custody envelope."
+            title="Seed the agent vault"
+            body="Your agent sends USDC into a Subly program-derived vault. The Solana program mints a non-transferable receipt bound to its pubkey. Withdrawal is one instruction — principal never leaves your custody envelope."
             ornament="$"
           />
           <Step
@@ -52,8 +53,8 @@ export function SolutionSection() {
           <Step
             n="03"
             tag="SETTLE"
-            title="Pay without spending"
-            body="Providers quote in x402; Subly's facilitator signs a payment commitment inside the enclave and settles up to 20 payments in a single Solana transaction. Your bill disappears; your vault principal doesn't."
+            title="Pay per call — invisibly"
+            body="Your agent pays providers via x402; Subly's facilitator signs each commitment inside the enclave and batch-settles up to 20 payments in a single Solana transaction. The agent never pauses; the ledger never reveals what it bought."
             ornament="→"
           />
         </ol>

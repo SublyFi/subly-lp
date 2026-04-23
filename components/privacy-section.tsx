@@ -30,15 +30,15 @@ export function PrivacySection() {
           </div>
           <div className="md:col-span-6 md:col-start-7">
             <p className="font-serif-it text-[26px] leading-[1.35] text-paper md:text-[30px]">
-              An onchain statement is a history of every habit, every tool,
-              every allegiance. We think you should get to choose what the
-              chain remembers about you.
+              Every x402 call your agent makes is a confession — what it
+              researched, who it traded with, which dataset it bought.
+              That&apos;s a strategy leak on a public ledger.
             </p>
             <p className="mt-6 max-w-md font-sans text-[14px] leading-[1.7] text-paper/70">
               Subly&apos;s facilitator signs inside an AWS Nitro Enclave.
-              Yield and application logic will move into Arcium&apos;s Mainnet
-              Alpha MXE as Confidential SPL lands. You still get an audit
-              trail — selectively disclosed, on your terms.
+              Yield routing and application logic move into Arcium&apos;s
+              Mainnet Alpha MXE as Confidential SPL lands. You still get an
+              audit trail — selectively disclosed, on your terms.
             </p>
           </div>
         </div>
@@ -50,12 +50,12 @@ export function PrivacySection() {
             status="plaintext · indexable · forever"
             statusColor="text-alert"
             rows={[
-              { t: "09:12", amt: "$17.99", note: "Streaming · Premium tier" },
-              { t: "09:12", amt: "$11.99", note: "Music · Family plan" },
-              { t: "09:13", amt: "$22.00", note: "Design SaaS · Annual billing" },
-              { t: "09:13", amt: "$20.00", note: "LLM API · research agent" },
-              { t: "09:14", amt: "$14.99", note: "Fitness · coaching" },
-              { t: "09:14", amt: "$9.99", note: "Cloud storage · 2TB" },
+              { t: "14:02", amt: "$0.40", note: "LLM API · competitor pricing analysis" },
+              { t: "14:03", amt: "$2.10", note: "Vector DB · M&A target shortlist query" },
+              { t: "14:03", amt: "$1.25", note: "Market data API · microcap alpha feed" },
+              { t: "14:04", amt: "$0.90", note: "Legal research · patent freedom-to-operate" },
+              { t: "14:05", amt: "$3.00", note: "Clinical dataset · rare-disease cohort" },
+              { t: "14:05", amt: "$0.15", note: "Geo API · supplier route reconnaissance" },
             ]}
           />
           <RedactedLedger
@@ -64,7 +64,7 @@ export function PrivacySection() {
             status="encrypted · aggregated · attested"
             statusColor="text-glow"
             rows={[
-              { t: "09:14", amt: "$102.96", note: "Settlement · batch #217 · 6 providers" },
+              { t: "14:06", amt: "$7.80", note: "Settlement · batch #4217 · 6 providers" },
             ]}
             footer
           />

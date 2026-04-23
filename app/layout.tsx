@@ -35,14 +35,29 @@ const jetbrainsMono = JetBrains_Mono({
 
 
 export const metadata: Metadata = {
-  title: "Subly — Subscribe Now, Pay Never",
+  title: "Subly — Use Now, Pay Never",
   description:
-    "A privacy-first PayFi protocol on Solana. Deposit once. Earn yield inside a TEE vault. Let the yield silently settle your subscriptions.",
+    "A privacy-first PayFi protocol for AI agents on Solana. Deposit once. Yield inside a TEE vault silently funds every x402 call your agents make — no manual top-ups, no leaked spend history.",
   generator: "subly.fi",
+  metadataBase: new URL("https://subly.fi"),
   icons: {
     icon: "/subly-purple.png",
     shortcut: "/subly-purple.png",
     apple: "/subly-purple.png",
+  },
+  openGraph: {
+    title: "Subly — Use Now, Pay Never",
+    description:
+      "Privacy-first PayFi for AI agents. Deposit once; yield funds every x402 call inside a TEE vault.",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    site: "@subly_fi",
+    creator: "@subly_fi",
+    title: "Subly — Use Now, Pay Never",
+    description:
+      "Privacy-first PayFi for AI agents. Deposit once; yield funds every x402 call inside a TEE vault.",
   },
 };
 
