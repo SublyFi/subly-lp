@@ -8,7 +8,7 @@ export function ArchitectureSection() {
         <div className="mb-16 grid gap-8 md:grid-cols-12">
           <div className="md:col-span-5">
             <div className="eyebrow mb-4">§ 05 · Architecture</div>
-            <h2 className="font-display text-[48px] font-semibold leading-[0.95] tracking-[-0.03em] text-ink md:text-[64px]">
+            <h2 className="font-display text-[48px] font-semibold leading-[0.95] tracking-normal text-ink md:text-[64px]">
               A <span className="font-serif-it font-normal">working</span>
               <br />
               protocol —
@@ -18,13 +18,12 @@ export function ArchitectureSection() {
           </div>
           <div className="md:col-span-6 md:col-start-7">
             <p className="font-sans text-[15px] leading-[1.75] text-ink-soft">
-              Six components, four phases shipped, fifty-eight passing
-              tests. The on-chain program and the enclave facilitator both
-              run against a local Solana validator today. The watchtower
-              writes force-settle challenges without human intervention.
-              Phase 5 (Arcium MXE) and Phase 6 (Token-2022 Confidential
-              Transfer on deposit) are scoped and sequenced against the
-              Arcium Mainnet Alpha roadmap.
+              Six components, four phases shipped, fifty-eight passing tests.
+              The on-chain program and the enclave facilitator both run against
+              a local Solana validator today. The watchtower writes force-settle
+              challenges without human intervention. Phase 5 (Arcium MXE) and
+              Phase 6 (Token-2022 Confidential Transfer on deposit) are scoped
+              and sequenced against the Arcium Mainnet Alpha roadmap.
             </p>
           </div>
         </div>
@@ -164,10 +163,10 @@ function Box({
         emphasis
           ? "border-ink bg-ink text-paper shadow-[4px_4px_0_0_var(--subly)]"
           : muted
-            ? "border-rule bg-paper-deep text-ink"
-            : ghost
-              ? "border-dashed border-ink/60 bg-paper text-ink-muted"
-              : "border-ink bg-paper text-ink",
+          ? "border-rule bg-paper-deep text-ink"
+          : ghost
+          ? "border-dashed border-ink/60 bg-paper text-ink-muted"
+          : "border-ink bg-paper text-ink",
       ].join(" ")}
     >
       <div className="flex items-center justify-between">
@@ -187,7 +186,7 @@ function Box({
         </span>
       </div>
       <div
-        className={`font-display text-[20px] font-semibold normal-case tracking-[-0.02em] ${
+        className={`font-display text-[20px] font-semibold normal-case tracking-normal ${
           emphasis ? "text-paper" : "text-ink"
         }`}
       >

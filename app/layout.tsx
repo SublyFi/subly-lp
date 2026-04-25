@@ -4,11 +4,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { Suspense } from "react";
 
-import {
-  Fraunces,
-  Instrument_Serif,
-  JetBrains_Mono,
-} from "next/font/google";
+import { Fraunces, Instrument_Serif, JetBrains_Mono } from "next/font/google";
 import { GeistSans } from "geist/font/sans";
 
 const fraunces = Fraunces({
@@ -33,11 +29,10 @@ const jetbrainsMono = JetBrains_Mono({
   display: "swap",
 });
 
-
 export const metadata: Metadata = {
   title: "Subly — Use Now, Pay Never",
   description:
-    "A privacy-first PayFi protocol for AI agents on Solana. Deposit once. Yield inside a TEE vault silently funds every x402 call your agents make — no manual top-ups, no leaked spend history.",
+    "A privacy-first PayFi protocol for AI agents on Solana. Try a live Subly402 devnet payment, faucet test USDC, and see how x402-style Buyer and Seller integrations work without API keys.",
   generator: "subly.fi",
   metadataBase: new URL("https://subly.fi"),
   icons: {
@@ -48,7 +43,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Subly — Use Now, Pay Never",
     description:
-      "Privacy-first PayFi for AI agents. Deposit once; yield funds every x402 call inside a TEE vault.",
+      "Privacy-first PayFi for AI agents. Try a live Subly402 devnet payment and see x402-style integrations without API keys.",
     type: "website",
   },
   twitter: {
@@ -57,7 +52,7 @@ export const metadata: Metadata = {
     creator: "@subly_fi",
     title: "Subly — Use Now, Pay Never",
     description:
-      "Privacy-first PayFi for AI agents. Deposit once; yield funds every x402 call inside a TEE vault.",
+      "Privacy-first PayFi for AI agents. Live Subly402 devnet payment demo, faucet, and x402-style integration snippets.",
   },
 };
 

@@ -2,6 +2,7 @@ import Link from "next/link";
 import { SublyLogo } from "./subly-logo";
 
 const NAV = [
+  { label: "Demo", href: "#demo" },
   { label: "Thesis", href: "#thesis" },
   { label: "How it works", href: "#how" },
   { label: "Privacy", href: "#privacy" },
@@ -47,13 +48,13 @@ export function Header() {
             x.com/subly_fi
           </a>
           <a
-            href="#waitlist"
+            href="#demo"
             className="group inline-flex items-center gap-2 border border-ink bg-ink px-3 py-2 text-paper transition-colors hover:bg-subly hover:border-subly"
           >
             <span className="relative inline-block h-1.5 w-1.5 rounded-full bg-glow">
               <span className="absolute inset-0 animate-ping rounded-full bg-glow/60" />
             </span>
-            Request access
+            Try demo
           </a>
         </div>
       </div>

@@ -50,21 +50,18 @@ export function RoadmapSection() {
         <div className="mb-16 grid gap-8 md:grid-cols-12">
           <div className="md:col-span-6">
             <div className="eyebrow mb-4">§ 06 · Calendar of intent</div>
-            <h2 className="font-display text-[52px] font-semibold leading-[0.95] tracking-[-0.03em] text-ink md:text-[72px]">
+            <h2 className="font-display text-[52px] font-semibold leading-[0.95] tracking-normal text-ink md:text-[72px]">
               Shipped, shipping,
               <br />
-              <span className="font-serif-it font-normal">
-                and scheduled.
-              </span>
+              <span className="font-serif-it font-normal">and scheduled.</span>
             </h2>
           </div>
           <div className="md:col-span-5 md:col-start-8">
             <p className="font-sans text-[15px] leading-[1.75] text-ink-soft">
-              Phases five and six are not vague promises — they are locked
-              to external milestones. Arcium Mainnet Alpha went live
-              2026-02; Confidential SPL ships Q1 2026; our Q3 + Q4 are
-              synchronized against them. Everything before that already
-              runs.
+              Phases five and six are not vague promises — they are locked to
+              external milestones. Arcium Mainnet Alpha went live 2026-02;
+              Confidential SPL ships Q1 2026; our Q3 + Q4 are synchronized
+              against them. Everything before that already runs.
             </p>
           </div>
         </div>
@@ -89,7 +86,7 @@ export function RoadmapSection() {
                   </span>
                 </div>
                 <div>
-                  <div className="font-display text-[20px] font-semibold tracking-[-0.02em] text-ink">
+                  <div className="font-display text-[20px] font-semibold tracking-normal text-ink">
                     {phase.label}
                   </div>
                   <div
@@ -97,8 +94,8 @@ export function RoadmapSection() {
                       phase.state === "done"
                         ? "text-ok"
                         : phase.state === "next"
-                          ? "text-subly"
-                          : "text-ink-muted"
+                        ? "text-subly"
+                        : "text-ink-muted"
                     }`}
                   >
                     {phase.window}

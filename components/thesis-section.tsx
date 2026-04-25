@@ -5,7 +5,7 @@ export function ThesisSection() {
         <div className="md:col-span-4">
           <div className="sticky top-8">
             <div className="eyebrow mb-4">§ 01 · Thesis</div>
-            <h2 className="font-display text-[44px] font-semibold leading-[0.95] tracking-[-0.03em] text-ink md:text-[56px]">
+            <h2 className="font-display text-[44px] font-semibold leading-[0.95] tracking-normal text-ink md:text-[56px]">
               A quieter economy,
               <br />
               <span className="font-serif-it font-normal">
@@ -19,13 +19,13 @@ export function ThesisSection() {
         </div>
 
         <div className="md:col-span-8">
-          <p className="font-display text-[22px] leading-[1.3] tracking-[-0.01em] text-ink md:text-[26px]">
+          <p className="font-display text-[22px] leading-[1.3] tracking-normal text-ink md:text-[26px]">
             <span className="float-left mr-3 font-display-wonk text-[96px] leading-[0.78] text-subly">
               A
             </span>
-            I agents can pay automatically. Funding them still cannot. A
-            human tops up the wallet, watches the balance, refills before the
-            agent stalls. That loop is the last missing piece between
+            I agents can pay automatically. Funding them still cannot. A human
+            tops up the wallet, watches the balance, refills before the agent
+            stalls. That loop is the last missing piece between
             &ldquo;autonomous&rdquo; and{" "}
             <em className="font-serif-it">actually autonomous</em>.
           </p>
@@ -33,15 +33,14 @@ export function ThesisSection() {
           <p className="mt-8 max-w-2xl font-sans text-[15px] leading-[1.7] text-ink-soft">
             Subly closes it. Lily Liu&apos;s PayFi thesis —{" "}
             <em className="font-serif-it">
-              on-chain yield settles consumption in real time so principal
-              never leaves the vault
+              on-chain yield settles consumption in real time so principal never
+              leaves the vault
             </em>{" "}
-            — is the right primitive for machines. An agent deposits once;
-            the vault earns; the{" "}
-            <span className="text-ink">x402 facilitator</span> signs payments
-            inside an enclave; providers get paid; observers see only an
-            aggregated balance. Privacy is what turns a yield-paying agent
-            wallet into something an institution will actually deploy.
+            — is the right primitive for machines. An agent deposits once; the
+            vault earns; the <span className="text-ink">x402 facilitator</span>{" "}
+            signs payments inside an enclave; providers get paid; observers see
+            only an aggregated balance. Privacy is what turns a yield-paying
+            agent wallet into something an institution will actually deploy.
           </p>
 
           <div className="mt-12 grid gap-6 border-y border-rule py-8 md:grid-cols-3">
@@ -65,7 +64,8 @@ export function ThesisSection() {
           <blockquote className="mt-12 max-w-2xl border-l-2 border-subly pl-6 font-serif-it text-[22px] leading-[1.35] text-ink">
             &ldquo;Standards like x402 aim to make AI agents full-fledged
             economic actors, pointing to a future where blockchains quietly
-            power applications that do not identify as &lsquo;crypto.&rsquo;&rdquo;
+            power applications that do not identify as
+            &lsquo;crypto.&rsquo;&rdquo;
             <cite className="mt-4 block font-mono text-[10px] not-italic uppercase tracking-[0.22em] text-ink-muted">
               Galaxy Research · 2026-01-07
             </cite>
@@ -90,7 +90,7 @@ function Pillar({
       <span className="mb-3 font-mono text-[10px] uppercase tracking-[0.24em] text-subly">
         {kicker}
       </span>
-      <h3 className="font-display text-[22px] font-semibold tracking-[-0.02em] text-ink">
+      <h3 className="font-display text-[22px] font-semibold tracking-normal text-ink">
         {title}
       </h3>
       <p className="mt-3 text-[14px] leading-[1.65] text-ink-muted">{body}</p>

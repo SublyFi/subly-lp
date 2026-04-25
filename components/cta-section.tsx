@@ -26,7 +26,7 @@ export function CTASection() {
           </span>
         </div>
 
-        <h2 className="max-w-5xl font-display text-[14vw] font-black leading-[0.84] tracking-[-0.04em] text-ink md:text-[140px] lg:text-[180px]">
+        <h2 className="max-w-5xl font-display text-[14vw] font-black leading-[0.84] tracking-normal text-ink md:text-[140px] lg:text-[180px]">
           Stop topping{" "}
           <span className="font-serif-it font-normal text-subly">up.</span>
           <br />
@@ -37,9 +37,9 @@ export function CTASection() {
         </h2>
 
         <p className="mt-10 max-w-2xl font-serif-it text-[24px] leading-[1.35] text-ink-soft md:text-[28px]">
-          If you ship AI agents to production — research agents, trading
-          agents, autonomous DevOps, data-buying pipelines — Subly is the
-          funding layer you&apos;ve been manually impersonating.
+          If you ship AI agents to production — research agents, trading agents,
+          autonomous DevOps, data-buying pipelines — Subly is the funding layer
+          you&apos;ve been manually impersonating.
         </p>
 
         <div className="mt-12 grid gap-10 border-t border-ink pt-10 md:grid-cols-12">
@@ -64,8 +64,8 @@ export function CTASection() {
             />
             <p className="mt-4 max-w-md font-sans text-[13px] leading-[1.7] text-ink-muted">
               We&apos;ll reach out with a devnet invite, SDK access, and the
-              attestation verifier. Single deposit, zero cron jobs, your
-              agents keep running while you sleep.
+              attestation verifier. Single deposit, zero cron jobs, your agents
+              keep running while you sleep.
             </p>
           </div>
 

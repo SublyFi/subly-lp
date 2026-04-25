@@ -1,11 +1,39 @@
 const LOG = [
-  { t: "02:14", event: "Agent halted · wallet balance $0.42 < $1.00", tone: "alert" as const },
-  { t: "02:14", event: "Paged on-call engineer · Slack · #agents-ops", tone: "note" as const },
-  { t: "02:31", event: "Human approved top-up · Ledger signer re-prompted", tone: "note" as const },
-  { t: "02:33", event: "USDC +$500 deposited · tx 4Zk…p6A", tone: "ok" as const },
-  { t: "02:34", event: "Agent resumed · 14 queued jobs retried", tone: "ok" as const },
-  { t: "07:19", event: "Agent halted · wallet balance $0.18 < $1.00", tone: "alert" as const },
-  { t: "07:22", event: "Human not available · work backlogs", tone: "alert" as const },
+  {
+    t: "02:14",
+    event: "Agent halted · wallet balance $0.42 < $1.00",
+    tone: "alert" as const,
+  },
+  {
+    t: "02:14",
+    event: "Paged on-call engineer · Slack · #agents-ops",
+    tone: "note" as const,
+  },
+  {
+    t: "02:31",
+    event: "Human approved top-up · Ledger signer re-prompted",
+    tone: "note" as const,
+  },
+  {
+    t: "02:33",
+    event: "USDC +$500 deposited · tx 4Zk…p6A",
+    tone: "ok" as const,
+  },
+  {
+    t: "02:34",
+    event: "Agent resumed · 14 queued jobs retried",
+    tone: "ok" as const,
+  },
+  {
+    t: "07:19",
+    event: "Agent halted · wallet balance $0.18 < $1.00",
+    tone: "alert" as const,
+  },
+  {
+    t: "07:22",
+    event: "Human not available · work backlogs",
+    tone: "alert" as const,
+  },
 ];
 
 export function ProblemSection() {
@@ -14,7 +42,7 @@ export function ProblemSection() {
       <div className="mx-auto grid max-w-[1360px] gap-12 px-6 py-20 md:grid-cols-12 md:px-10 md:py-24">
         <div className="md:col-span-5">
           <div className="eyebrow mb-4">§ 02 · The Top-Up Loop</div>
-          <h2 className="font-display text-[52px] font-semibold leading-[0.95] tracking-[-0.03em] text-ink md:text-[68px]">
+          <h2 className="font-display text-[52px] font-semibold leading-[0.95] tracking-normal text-ink md:text-[68px]">
             Autonomous until
             <br />
             <span className="font-serif-it font-normal">a human</span>
@@ -25,13 +53,13 @@ export function ProblemSection() {
             AI agents can already pay — via x402, via stablecoins, via MPC
             wallets. What they can&apos;t do is{" "}
             <em className="font-serif-it">fund themselves</em>. Every agent
-            runtime in production today ends the same way: a low-balance
-            alert, a paged engineer, a manual USDC transfer, a restart.
+            runtime in production today ends the same way: a low-balance alert,
+            a paged engineer, a manual USDC transfer, a restart.
           </p>
           <p className="mt-5 max-w-md font-sans text-[15px] leading-[1.7] text-ink-soft">
-            The more useful your agent gets, the more work it creates for
-            the human who was supposed to be replaced. That&apos;s not
-            autonomy. That&apos;s a pager on a different leash.
+            The more useful your agent gets, the more work it creates for the
+            human who was supposed to be replaced. That&apos;s not autonomy.
+            That&apos;s a pager on a different leash.
           </p>
         </div>
 
@@ -58,15 +86,15 @@ export function ProblemSection() {
                       entry.tone === "alert"
                         ? "text-alert"
                         : entry.tone === "ok"
-                          ? "text-ok"
-                          : "text-ink-muted"
+                        ? "text-ok"
+                        : "text-ink-muted"
                     }`}
                   >
                     {entry.tone === "alert"
                       ? "halt"
                       : entry.tone === "ok"
-                        ? "resume"
-                        : "note"}
+                      ? "resume"
+                      : "note"}
                   </span>
                   <span className="col-span-9 text-ink">{entry.event}</span>
                 </li>

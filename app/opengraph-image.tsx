@@ -25,8 +25,8 @@ export default async function Image() {
           height: "100%",
           display: "flex",
           flexDirection: "column",
-          background: "#F2EBDC",
-          color: "#1A0B2E",
+          background: "#F5F7F2",
+          color: "#101522",
           position: "relative",
           padding: "56px 72px",
           fontFamily: "Fraunces",
@@ -38,7 +38,7 @@ export default async function Image() {
             position: "absolute",
             inset: 0,
             backgroundImage:
-              "linear-gradient(to right, rgba(26,11,46,0.05) 1px, transparent 1px), linear-gradient(to bottom, rgba(26,11,46,0.05) 1px, transparent 1px)",
+              "linear-gradient(to right, rgba(16,21,34,0.05) 1px, transparent 1px), linear-gradient(to bottom, rgba(16,21,34,0.05) 1px, transparent 1px)",
             backgroundSize: "48px 48px",
             display: "flex",
           }}
@@ -54,8 +54,8 @@ export default async function Image() {
             fontSize: 18,
             letterSpacing: "0.24em",
             textTransform: "uppercase",
-            color: "#6B5589",
-            borderBottom: "1px solid #C9B99A",
+            color: "#667085",
+            borderBottom: "1px solid #B8C0B8",
             paddingBottom: 20,
             position: "relative",
           }}
@@ -65,12 +65,12 @@ export default async function Image() {
               style={{
                 width: 16,
                 height: 16,
-                background: "#8C52FF",
+                background: "#7C3AED",
                 transform: "rotate(45deg)",
                 display: "flex",
               }}
             />
-            <span style={{ color: "#1A0B2E", fontWeight: 600 }}>Subly</span>
+            <span style={{ color: "#101522", fontWeight: 600 }}>Subly</span>
             <span>· Vol. 01 · Edition α · 2026</span>
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
@@ -79,7 +79,7 @@ export default async function Image() {
                 width: 10,
                 height: 10,
                 borderRadius: 999,
-                background: "#FF5A4C",
+                background: "#FF5F57",
                 display: "flex",
               }}
             />
@@ -104,7 +104,7 @@ export default async function Image() {
               fontSize: 20,
               letterSpacing: "0.24em",
               textTransform: "uppercase",
-              color: "#6B5589",
+              color: "#667085",
               marginBottom: 20,
               display: "flex",
             }}
@@ -118,9 +118,9 @@ export default async function Image() {
               flexDirection: "column",
               fontSize: 140,
               lineHeight: 0.9,
-              letterSpacing: "-0.04em",
+              letterSpacing: "0",
               fontWeight: 900,
-              color: "#1A0B2E",
+              color: "#101522",
             }}
           >
             <span style={{ display: "flex" }}>Use Now,</span>
@@ -130,8 +130,8 @@ export default async function Image() {
                 fontFamily: "Instrument Serif",
                 fontStyle: "italic",
                 fontWeight: 400,
-                color: "#8C52FF",
-                letterSpacing: "-0.02em",
+                color: "#7C3AED",
+                letterSpacing: "0",
               }}
             >
               Pay Never.
@@ -145,13 +145,13 @@ export default async function Image() {
               fontStyle: "italic",
               fontSize: 28,
               lineHeight: 1.25,
-              color: "#3F2960",
+              color: "#263347",
               maxWidth: 1000,
               display: "flex",
             }}
           >
-            Agents deposit once. Yield settles every x402 call inside a
-            TEE vault.
+            Agents deposit once. Yield settles every x402 call inside a TEE
+            vault.
           </div>
         </div>
 
@@ -165,22 +165,22 @@ export default async function Image() {
             fontSize: 17,
             letterSpacing: "0.22em",
             textTransform: "uppercase",
-            color: "#1A0B2E",
-            borderTop: "1px solid #C9B99A",
+            color: "#101522",
+            borderTop: "1px solid #B8C0B8",
             paddingTop: 20,
             position: "relative",
           }}
         >
           <div style={{ display: "flex", alignItems: "center", gap: 28 }}>
             <span>Solana</span>
-            <span style={{ color: "#C9B99A" }}>·</span>
+            <span style={{ color: "#B8C0B8" }}>·</span>
             <span>Nitro Enclave</span>
-            <span style={{ color: "#C9B99A" }}>·</span>
+            <span style={{ color: "#B8C0B8" }}>·</span>
             <span>Arcium MPC</span>
-            <span style={{ color: "#C9B99A" }}>·</span>
+            <span style={{ color: "#B8C0B8" }}>·</span>
             <span>x402</span>
           </div>
-          <div style={{ color: "#6B5589", display: "flex" }}>
+          <div style={{ color: "#667085", display: "flex" }}>
             subly.fi · @subly_fi
           </div>
         </div>
@@ -208,6 +208,6 @@ export default async function Image() {
           weight: 400,
         },
       ],
-    },
+    }
   );
 }

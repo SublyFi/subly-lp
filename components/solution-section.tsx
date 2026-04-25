@@ -5,7 +5,7 @@ export function SolutionSection() {
         <div className="mb-16 grid gap-8 md:grid-cols-12">
           <div className="md:col-span-4">
             <div className="eyebrow mb-4">§ 03 · Mechanism</div>
-            <h2 className="font-display text-[52px] font-semibold leading-[0.95] tracking-[-0.03em] text-ink md:text-[72px]">
+            <h2 className="font-display text-[52px] font-semibold leading-[0.95] tracking-normal text-ink md:text-[72px]">
               How the
               <br />
               <span className="font-serif-it font-normal">vault</span>
@@ -15,15 +15,14 @@ export function SolutionSection() {
           </div>
           <div className="md:col-span-7 md:col-start-6">
             <p className="font-serif-it text-[26px] leading-[1.3] text-ink md:text-[32px]">
-              Three movements. One deposit. A yield curve that keeps your
-              agent paid up, call after call, without ever touching
-              principal.
+              Three movements. One deposit. A yield curve that keeps your agent
+              paid up, call after call, without ever touching principal.
             </p>
             <p className="mt-6 font-sans text-[15px] leading-[1.7] text-ink-muted">
-              Everything between the agent&apos;s deposit and the provider&apos;s
-              settlement happens inside an AWS Nitro Enclave. The parent
-              instance sees only ciphertexts; the vault signer lives in
-              attested memory. Providers are paid in batches; observers see
+              Everything between the agent&apos;s deposit and the
+              provider&apos;s settlement happens inside an AWS Nitro Enclave.
+              The parent instance sees only ciphertexts; the vault signer lives
+              in attested memory. Providers are paid in batches; observers see
               only aggregate totals.
             </p>
           </div>
@@ -105,7 +104,7 @@ function Step({
           {tag}
         </span>
       </div>
-      <h3 className="font-display text-[26px] font-semibold tracking-[-0.02em] text-ink md:text-[30px]">
+      <h3 className="font-display text-[26px] font-semibold tracking-normal text-ink md:text-[30px]">
         {title}
       </h3>
       <p className="mt-4 text-[14px] leading-[1.7] text-ink-muted">{body}</p>
@@ -131,7 +130,7 @@ function Figure({
       }`}
     >
       <span
-        className={`font-display text-[64px] font-semibold leading-none tracking-[-0.03em] md:text-[88px] ${
+        className={`font-display text-[64px] font-semibold leading-none tracking-normal md:text-[88px] ${
           accent ? "text-subly" : "text-ink"
         }`}
       >

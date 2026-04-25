@@ -1,6 +1,7 @@
 import { TickerBar } from "@/components/ticker-bar";
 import { Header } from "@/components/header";
 import { HeroSection } from "@/components/hero-section";
+import { DemoSection } from "@/components/demo-section";
 import { ThesisSection } from "@/components/thesis-section";
 import { ProblemSection } from "@/components/problem-section";
 import { SolutionSection } from "@/components/solution-section";
@@ -16,6 +17,7 @@ export default function Home() {
       <TickerBar />
       <Header />
       <HeroSection />
+      <DemoSection />
       <ThesisSection />
       <ProblemSection />
       <SolutionSection />

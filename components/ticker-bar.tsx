@@ -4,6 +4,7 @@ type Tick = { label: string; value: string; status?: "live" | "ok" | "note" };
 
 const TICKS: Tick[] = [
   { label: "STATUS", value: "LIVE", status: "live" },
+  { label: "DEMO", value: "BUTTON-CLICK DEVNET PAYMENT", status: "ok" },
   { label: "TESTNET", value: "SOLANA DEVNET · 58 TESTS PASSING" },
   { label: "RAIL", value: "x402 V2 · HTTP 402" },
   { label: "ARCIUM", value: "MAINNET ALPHA · PHASE 5 Q3 2026", status: "note" },
@@ -38,7 +39,7 @@ function Row() {
 export function TickerBar() {
   return (
     <div className="relative z-30 overflow-hidden border-b border-rule bg-ink text-paper">
-      <div className="flex whitespace-nowrap py-2 font-mono text-[10px] uppercase tracking-[0.18em] marquee [--ink-muted:#a89776] [--ink:#f2ebdc] [--alert:#ff5a4c] [--ok:#3fb27f] [--glow:#d9ff3a]">
+      <div className="flex whitespace-nowrap py-2 font-mono text-[10px] uppercase tracking-[0.18em] marquee [--ink-muted:#98a2b3] [--ink:#f5f7f2] [--alert:#ff5f57] [--ok:#14b885] [--glow:#d7ff4a]">
         <Row />
         <Row />
       </div>

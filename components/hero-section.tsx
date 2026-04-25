@@ -28,9 +28,9 @@ export function HeroSection() {
             </span>
           </div>
 
-          <h1 className="font-display text-[14vw] font-black leading-[0.82] tracking-[-0.04em] text-ink md:text-[120px] lg:text-[170px]">
+          <h1 className="font-display text-[14vw] font-black leading-[0.82] tracking-normal text-ink md:text-[120px] lg:text-[170px]">
             <span className="block">Use Now,</span>
-            <span className="block font-serif-it font-normal tracking-[-0.02em] text-subly">
+            <span className="block font-serif-it font-normal tracking-normal text-subly">
               Pay Never.
             </span>
             <span className="mt-4 block font-mono text-[12px] font-normal uppercase tracking-[0.3em] text-ink-muted md:text-[13px]">
@@ -49,10 +49,10 @@ export function HeroSection() {
             AI agents can already pay. Funding them is still a human chore.
             Subly ends the top-up loop: a single USDC deposit, routed into
             senior DeFi yield inside an AWS Nitro Enclave, pays for every API
-            call your agent makes via{" "}
-            <span className="text-ink">x402</span>. Yield and application
-            privacy move to <span className="text-ink">Arcium</span> MPC as
-            Confidential SPL lands in Q3 2026.
+            call your agent makes via <span className="text-ink">x402</span>.
+            Yield and application privacy move to{" "}
+            <span className="text-ink">Arcium</span> MPC as Confidential SPL
+            lands in Q3 2026.
           </p>
 
           <div className="mt-10 flex flex-col items-start gap-4 md:flex-row md:items-center md:gap-6">
@@ -62,6 +62,12 @@ export function HeroSection() {
               data-widget_type="WIDGET_2"
               className="subly-waitlist"
             />
+            <a
+              href="#demo"
+              className="inline-flex items-center gap-3 border border-ink bg-ink px-4 py-3 font-mono text-[11px] uppercase tracking-[0.18em] text-paper transition-colors hover:border-glow hover:bg-glow hover:text-ink"
+            >
+              Run live demo
+            </a>
             <a
               href="#how"
               className="group inline-flex items-center gap-3 font-mono text-[11px] uppercase tracking-[0.22em] text-ink transition-colors hover:text-subly"
@@ -93,9 +99,11 @@ export function HeroSection() {
               <Row label="Product" value="Subly · v1" />
               <Row label="Target" value="Autonomous AI agents" />
               <Row label="Chain" value="Solana · devnet → mainnet" />
-              <Row label="Rail" value="x402 · HTTP 402 · V2" />
+              <Row label="Rail" value="x402-style · HTTP 402" />
               <Row label="TEE" value="AWS Nitro · PCR0 attested" />
               <Row label="MPC" value="Arcium MXE (Q3 2026)" />
+              <Row label="Buyer" value="No API key · autoDeposit" />
+              <Row label="Seller" value="Wallet-only payout" />
               <Row label="Program" value="Anchor · 27 tests passing" />
               <Row label="Enclave" value="Rust/rustls · 25 tests" />
               <Row label="Watchtower" value="6 tests · force-settle ready" />

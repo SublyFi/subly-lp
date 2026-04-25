@@ -23,7 +23,7 @@ export function PrivacySection() {
             <div className="mb-4 font-mono text-[10px] uppercase tracking-[0.24em] text-glow">
               § 04 · Declassified
             </div>
-            <h2 className="font-display text-[56px] font-semibold leading-[0.92] tracking-[-0.03em] md:text-[88px]">
+            <h2 className="font-display text-[56px] font-semibold leading-[0.92] tracking-normal md:text-[88px]">
               Privacy is the{" "}
               <span className="font-serif-it font-normal">feature.</span>
             </h2>
@@ -35,10 +35,10 @@ export function PrivacySection() {
               That&apos;s a strategy leak on a public ledger.
             </p>
             <p className="mt-6 max-w-md font-sans text-[14px] leading-[1.7] text-paper/70">
-              Subly&apos;s facilitator signs inside an AWS Nitro Enclave.
-              Yield routing and application logic move into Arcium&apos;s
-              Mainnet Alpha MXE as Confidential SPL lands. You still get an
-              audit trail — selectively disclosed, on your terms.
+              Subly&apos;s facilitator signs inside an AWS Nitro Enclave. Yield
+              routing and application logic move into Arcium&apos;s Mainnet
+              Alpha MXE as Confidential SPL lands. You still get an audit trail
+              — selectively disclosed, on your terms.
             </p>
           </div>
         </div>
@@ -50,12 +50,36 @@ export function PrivacySection() {
             status="plaintext · indexable · forever"
             statusColor="text-alert"
             rows={[
-              { t: "14:02", amt: "$0.40", note: "LLM API · competitor pricing analysis" },
-              { t: "14:03", amt: "$2.10", note: "Vector DB · M&A target shortlist query" },
-              { t: "14:03", amt: "$1.25", note: "Market data API · microcap alpha feed" },
-              { t: "14:04", amt: "$0.90", note: "Legal research · patent freedom-to-operate" },
-              { t: "14:05", amt: "$3.00", note: "Clinical dataset · rare-disease cohort" },
-              { t: "14:05", amt: "$0.15", note: "Geo API · supplier route reconnaissance" },
+              {
+                t: "14:02",
+                amt: "$0.40",
+                note: "LLM API · competitor pricing analysis",
+              },
+              {
+                t: "14:03",
+                amt: "$2.10",
+                note: "Vector DB · M&A target shortlist query",
+              },
+              {
+                t: "14:03",
+                amt: "$1.25",
+                note: "Market data API · microcap alpha feed",
+              },
+              {
+                t: "14:04",
+                amt: "$0.90",
+                note: "Legal research · patent freedom-to-operate",
+              },
+              {
+                t: "14:05",
+                amt: "$3.00",
+                note: "Clinical dataset · rare-disease cohort",
+              },
+              {
+                t: "14:05",
+                amt: "$0.15",
+                note: "Geo API · supplier route reconnaissance",
+              },
             ]}
           />
           <RedactedLedger
@@ -64,7 +88,11 @@ export function PrivacySection() {
             status="encrypted · aggregated · attested"
             statusColor="text-glow"
             rows={[
-              { t: "14:06", amt: "$7.80", note: "Settlement · batch #4217 · 6 providers" },
+              {
+                t: "14:06",
+                amt: "$7.80",
+                note: "Settlement · batch #4217 · 6 providers",
+              },
             ]}
             footer
           />
@@ -190,9 +218,7 @@ function Pillar({
   dark?: boolean;
 }) {
   return (
-    <div
-      className={`flex flex-col gap-4 p-8 ${dark ? "bg-ink" : "bg-ink"}`}
-    >
+    <div className={`flex flex-col gap-4 p-8 ${dark ? "bg-ink" : "bg-ink"}`}>
       <div className="flex items-center justify-between">
         <span className="font-mono text-[10px] uppercase tracking-[0.24em] text-glow">
           {kicker}
@@ -208,7 +234,7 @@ function Pillar({
           </div>
         )}
       </div>
-      <h3 className="font-display text-[24px] font-semibold tracking-[-0.02em] text-paper">
+      <h3 className="font-display text-[24px] font-semibold tracking-normal text-paper">
         {title}
       </h3>
       <p className="text-[13px] leading-[1.65] text-paper/70">{body}</p>
