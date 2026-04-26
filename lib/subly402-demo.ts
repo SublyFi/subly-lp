@@ -1287,14 +1287,12 @@ async function runOfficialX402SellerFlow(args: {
     buyer: args.buyer,
     amountAtomic,
   });
-  const sellerTokenAccount = (
-    await createAssociatedTokenAccount(
-      args.rpc,
-      args.feePayer,
-      sellerWallet,
-      mint
-    )
-  ).tokenAccount;
+  // The public Seller host already exposes/owns this ATA. Creating it here can
+  // collide with deployments where the fee payer is also the seller wallet.
+  const sellerTokenAccount = await deriveAssociatedTokenAccount(
+    sellerWallet,
+    mint
+  );
   const buyerBefore = await fetchTokenAmountOrNull(
     args.rpc,
     buyerTokenAccount
