@@ -18,11 +18,20 @@ type AttestationState = {
   missing?: string[];
   facilitatorUrl?: string;
   network?: string;
+  x402Network?: string;
   usdcMint?: string;
   vaultConfig?: string;
+  vaultTokenAccount?: string;
+  attestationPolicyHash?: string;
+  sellerBaseUrl?: string;
   sellerTokenAccount?: string;
   paymentAmount?: string;
   faucetAmount?: string;
+  buyerMode?: string;
+  routes?: {
+    x402?: string;
+    subly402?: string;
+  };
   attestation?: {
     vaultConfig: string;
     vaultSigner: string;
@@ -55,38 +64,74 @@ type SettlementStatus = {
   txSignature?: string | null;
 };
 
-type RunResult = {
+type ChainEdge = {
+  label: string;
+  from: string;
+  to: string;
+  amount?: string;
+  tx?: string | null;
+  status?: string | null;
+};
+
+type FlowResult = {
   ok: boolean;
   mode: string;
   route: string;
+  network: string;
+  facilitatorUrl: string;
+  amount: string;
   buyer: string;
   buyerTokenAccount: string;
+  sellerWallet?: string;
   sellerTokenAccount: string;
-  providerId: string;
-  amount: string;
+  vaultTokenAccount?: string;
+  providerId?: string;
   faucetTx: string;
-  depositTx: string;
-  verification: {
-    verificationId: string;
-    reservationId: string;
-    providerId: string;
-    amount: string;
-  };
-  settlement: {
-    settlementId: string;
-    participantReceipt?: string;
-    providerCreditAmount: string;
-  };
-  settlementStatus?: SettlementStatus;
-  attestation: {
+  settlementTx?: string | null;
+  depositTx?: string;
+  depositAmount?: string;
+  paymentResponse?: Record<string, unknown> | null;
+  settlementStatus?: SettlementStatus | null;
+  attestation?: {
     vaultConfig: string;
     vaultSigner: string;
     attestationPolicyHash: string;
     snapshotSeqno?: number;
+    issuedAt?: string;
+    expiresAt?: string;
   };
-  privacy: {
-    visible: string[];
-    hidden: string[];
+  chainView: {
+    visibleNow: ChainEdge[];
+    hidden: ChainEdge[];
+    delayed?: ChainEdge[];
+    summary: string;
+  };
+};
+
+type RunResult = {
+  ok: boolean;
+  mode: string;
+  buyer: string;
+  seller: {
+    baseUrl: string;
+    metadataUrl: string;
+    wallet?: string;
+    tokenAccount?: string;
+    routes: {
+      x402: string;
+      subly402: string;
+    };
+  };
+  asset: {
+    mint: string;
+    symbol: string;
+    decimals: number;
+  };
+  x402: FlowResult;
+  subly402: FlowResult;
+  comparison: {
+    x402: string[];
+    subly402: string[];
   };
 };
 
@@ -97,61 +142,58 @@ type ApiError = {
   missing?: string[];
 };
 
-const sellerCode = `import express from "express";
-import {
-  Subly402FacilitatorClient,
-  Subly402ResourceServer,
-  Subly402ExactScheme,
-  paymentMiddleware,
-  captureSubly402RawBody,
-} from "subly402-express";
-
-const app = express();
-app.use(express.json({ verify: captureSubly402RawBody }));
-
-const facilitator = new Subly402FacilitatorClient({
-  url: process.env.SUBLY402_FACILITATOR_URL!,
-  assetMint: process.env.SUBLY402_USDC_MINT!,
-});
-
-const resourceServer = new Subly402ResourceServer(facilitator)
-  .register("solana:devnet", new Subly402ExactScheme());
-
-app.use(paymentMiddleware({
-  "GET /weather": {
+const sellerCode = `// Official x402 route
+app.use(x402PaymentMiddleware({
+  "GET /x402/weather": {
     accepts: [{
       scheme: "exact",
-      price: "$0.001",
+      network: "solana:EtWTRABZaYq6iMfeYKouRu166VU2xqa1",
+      payTo: process.env.SELLER_WALLET!,
+      price: {
+        asset: process.env.SUBLY402_USDC_MINT!,
+        amount: "1100000",
+      },
+    }],
+  },
+}, officialX402ResourceServer));
+
+// Subly402 route
+const sublyResourceServer = new Subly402ResourceServer(facilitator)
+  .register("solana:devnet", new Subly402ExactScheme());
+
+app.use(sublyPaymentMiddleware({
+  "GET /subly/weather": {
+    accepts: [{
+      scheme: "exact",
+      price: 1100000,
       network: "solana:devnet",
       sellerWallet: process.env.SELLER_WALLET!,
     }],
   },
-}, resourceServer));`;
+}, sublyResourceServer));`;
 
-const buyerCode = `import { Subly402Client, wrapFetchWithPayment } from "subly402-sdk";
-import { createKeyPairSignerFromBytes } from "@solana/kit";
+const buyerCode = `// Official x402 Buyer
+const x402Client = new X402Client()
+  .register(
+    "solana:EtWTRABZaYq6iMfeYKouRu166VU2xqa1",
+    new X402ExactSvmScheme(buyer, { rpcUrl })
+  );
+const x402Fetch = wrapX402FetchWithPayment(fetch, x402Client);
+await x402Fetch("http://seller.demo.sublyfi.com/x402/weather");
 
-const signer = await createKeyPairSignerFromBytes(secretKeyBytes, true);
-
+// Subly402 Buyer
 const client = new Subly402Client({
-  signer,
-  network: "solana:devnet",
   trustedFacilitators: ["https://api.demo.sublyfi.com"],
   autoDeposit: {
-    maxDepositPerRequest: "$0.05",
+    maxDepositPerRequest: "1100000",
     deposit: async ({ amountAtomic, details }) => {
-      await depositIntoSublyVault({
-        amountAtomic,
-        vaultConfig: details.vault.config,
-        mint: details.asset.mint,
-      });
+      await depositIntoSublyVault({ amountAtomic, details });
     },
   },
-  policy: { maxPaymentPerRequest: "$0.10" },
-});
-
-const paidFetch = wrapFetchWithPayment(fetch, client);
-const res = await paidFetch("https://seller.example/weather");`;
+  policy: { maxPaymentPerRequest: "1100000" },
+}).register("solana:*", new Subly402ExactScheme(buyer));
+const sublyFetch = wrapSublyFetchWithPayment(fetch, client);
+await sublyFetch("http://seller.demo.sublyfi.com/subly/weather");`;
 
 function short(value?: string | number | null) {
   const text = String(value || "");
@@ -194,24 +236,29 @@ export function DemoSection() {
   const [error, setError] = useState<ApiError | null>(null);
   const [copied, setCopied] = useState<string | null>(null);
 
+  const sublySettlementId = useMemo(() => {
+    const value = runResult?.subly402.paymentResponse?.settlementId;
+    return typeof value === "string" ? value : "";
+  }, [runResult]);
+
   const settlementReady =
-    runResult?.settlementStatus?.status === "BatchedOnchain" &&
-    runResult?.settlementStatus?.txSignature;
+    runResult?.subly402.settlementStatus?.status === "BatchedOnchain" &&
+    runResult?.subly402.settlementStatus?.txSignature;
 
   const privacyRows = useMemo(
     () => [
       {
-        label: "Visible",
-        value: "buyer token account -> Subly vault deposit",
+        label: "x402",
+        value: "buyer token account -> seller token account is visible on the settlement tx",
         tone: "text-alert",
       },
       {
-        label: "Hidden",
-        value: "direct buyer -> seller edge, route contents, request metadata",
+        label: "Subly402",
+        value: "buyer token account -> Subly vault deposit is visible; buyer -> seller is not",
         tone: "text-glow",
       },
       {
-        label: "Delayed",
+        label: "Payout",
         value: "vault -> seller payout appears after batch settlement",
         tone: "text-paper/80",
       },
@@ -268,7 +315,7 @@ export function DemoSection() {
   }
 
   async function refreshSettlementStatus() {
-    if (!runResult?.settlement?.settlementId) {
+    if (!sublySettlementId || !runResult?.subly402.providerId) {
       return;
     }
     setError(null);
@@ -277,11 +324,14 @@ export function DemoSection() {
       const status = await postJson<SettlementStatus>(
         "/api/demo/settlement-status",
         {
-          settlementId: runResult.settlement.settlementId,
-          providerId: runResult.providerId,
+          settlementId: sublySettlementId,
+          providerId: runResult.subly402.providerId,
         }
       );
-      setRunResult({ ...runResult, settlementStatus: status });
+      setRunResult({
+        ...runResult,
+        subly402: { ...runResult.subly402, settlementStatus: status },
+      });
     } catch (err) {
       setError(err as ApiError);
     } finally {
@@ -299,27 +349,26 @@ export function DemoSection() {
         <div className="mb-12 grid gap-8 md:grid-cols-12">
           <div className="md:col-span-5">
             <div className="mb-4 font-mono text-[10px] uppercase tracking-[0.24em] text-glow">
-              § 01 · Live x402-compatible demo
+              § 01 · x402 vs Subly402 live demo
             </div>
             <h2 className="font-display text-[54px] font-semibold leading-[0.94] text-paper md:text-[78px]">
               Click once.
               <br />
-              Watch a paid
+              Compare two
               <br />
-              request settle.
+              paid requests.
             </h2>
           </div>
           <div className="md:col-span-6 md:col-start-7">
             <p className="font-serif-it text-[26px] leading-[1.3] text-paper md:text-[32px]">
-              Subly402 keeps the x402 developer feel: Seller adds middleware,
-              Buyer wraps fetch, and no Subly API key or pre-registration is
-              required.
+              The hosted Buyer calls the same Seller host twice: once through
+              official x402, once through Subly402.
             </p>
             <p className="mt-6 max-w-xl text-[14px] leading-[1.7] text-paper/70">
-              The live demo creates a temporary devnet buyer, faucets test USDC,
-              deposits into the Subly vault, signs a payment reservation,
-              settles the seller off-chain, and returns the public transaction
-              ids. The seller payout can arrive after the batch window.
+              The result shows the public Solana devnet evidence. x402 settles
+              as a direct Buyer token account to Seller token account transfer.
+              Subly402 shows a Buyer deposit into the vault, with the Seller
+              payout delayed into a batch.
             </p>
           </div>
         </div>
@@ -333,7 +382,7 @@ export function DemoSection() {
                   Devnet payment console
                 </div>
                 <div className="mt-2 text-[13px] text-paper/60">
-                  Facilitator {short(attestation?.facilitatorUrl)} ·{" "}
+                  Seller {short(attestation?.sellerBaseUrl)} · hosted buyer ·{" "}
                   {attestation?.network || "solana:devnet"}
                 </div>
               </div>
@@ -348,35 +397,47 @@ export function DemoSection() {
                 ) : (
                   <Play className="h-4 w-4" />
                 )}
-                Run live payment
+                Run comparison
               </button>
             </div>
 
             <div className="grid border-b border-paper/15 md:grid-cols-3">
               <StepCell
                 n="01"
-                label="Faucet"
-                value={runResult ? runResult.amount : attestation?.faucetAmount}
+                label="x402 direct"
+                value={
+                  runResult?.x402.settlementTx
+                    ? short(runResult.x402.settlementTx)
+                    : attestation?.routes?.x402
+                      ? "seller route ready"
+                      : "pending"
+                }
                 active={runBusy}
-                done={Boolean(runResult?.faucetTx)}
+                done={Boolean(runResult?.x402.settlementTx)}
               />
               <StepCell
                 n="02"
-                label="Vault deposit"
-                value={runResult ? short(runResult.depositTx) : "pending"}
+                label="Subly deposit"
+                value={
+                  runResult?.subly402.depositTx
+                    ? short(runResult.subly402.depositTx)
+                    : attestation?.routes?.subly402
+                      ? "seller route ready"
+                      : "pending"
+                }
                 active={runBusy}
-                done={Boolean(runResult?.depositTx)}
+                done={Boolean(runResult?.subly402.depositTx)}
               />
               <StepCell
                 n="03"
-                label="Verify + settle"
+                label="Batch payout"
                 value={
-                  runResult?.settlementStatus?.status ||
-                  runResult?.settlement?.settlementId ||
+                  runResult?.subly402.settlementStatus?.status ||
+                  sublySettlementId ||
                   "pending"
                 }
                 active={runBusy}
-                done={Boolean(runResult?.settlement?.settlementId)}
+                done={Boolean(sublySettlementId)}
               />
             </div>
 
@@ -416,10 +477,23 @@ export function DemoSection() {
                 />
                 <DataRow
                   label="Policy"
-                  value={attestation?.attestation?.attestationPolicyHash}
+                  value={
+                    attestation?.attestation?.attestationPolicyHash ||
+                    attestation?.attestationPolicyHash
+                  }
                   copyKey="policy"
                   onCopy={copy}
                 />
+                <DataRow
+                  label="Vault ATA"
+                  value={attestation?.vaultTokenAccount}
+                  href={
+                    attestation?.vaultTokenAccount
+                      ? addressUrl(attestation.vaultTokenAccount)
+                      : undefined
+                  }
+                />
+                <DataRow label="Buyer" value={attestation?.buyerMode} />
                 <DataRow
                   label="Seqno"
                   value={attestation?.attestation?.snapshotSeqno}
@@ -431,8 +505,8 @@ export function DemoSection() {
                     </div>
                     <p className="mt-2">
                       Live attestation is reachable, but payment execution is
-                      disabled until the deployment has faucet and vault env
-                      values.
+                      disabled until the deployment has the hosted buyer,
+                      faucet, seller, and vault env values.
                     </p>
                   </div>
                 )}
@@ -443,9 +517,7 @@ export function DemoSection() {
                   Result
                 </div>
                 {runResult ? (
-                  <div className="space-y-3">
-                    <TxRow label="Faucet tx" signature={runResult.faucetTx} />
-                    <TxRow label="Deposit tx" signature={runResult.depositTx} />
+                  <div className="space-y-5">
                     <DataRow
                       label="Buyer"
                       value={runResult.buyer}
@@ -453,21 +525,31 @@ export function DemoSection() {
                     />
                     <DataRow
                       label="Seller"
-                      value={runResult.sellerTokenAccount}
-                      href={addressUrl(runResult.sellerTokenAccount)}
+                      value={runResult.seller.tokenAccount}
+                      href={
+                        runResult.seller.tokenAccount
+                          ? addressUrl(runResult.seller.tokenAccount)
+                          : undefined
+                      }
                     />
-                    <DataRow
-                      label="Verify"
-                      value={runResult.verification.verificationId}
+                    <FlowPanel
+                      title="Official x402"
+                      subtitle="direct settlement edge"
+                      flow={runResult.x402}
+                      onCopy={copy}
                     />
-                    <DataRow
-                      label="Settle"
-                      value={runResult.settlement.settlementId}
+                    <FlowPanel
+                      title="Subly402"
+                      subtitle="vault deposit, batched payout"
+                      flow={runResult.subly402}
+                      onCopy={copy}
                     />
                     {settlementReady ? (
                       <TxRow
                         label="Batch payout"
-                        signature={runResult.settlementStatus!.txSignature!}
+                        signature={
+                          runResult.subly402.settlementStatus!.txSignature!
+                        }
                       />
                     ) : (
                       <button
@@ -490,9 +572,9 @@ export function DemoSection() {
                     <div>
                       <ShieldCheck className="h-8 w-8 text-glow" />
                       <p className="mt-5 max-w-sm font-serif-it text-[22px] leading-[1.3] text-paper">
-                        A real devnet run returns the buyer, seller, vault
-                        deposit tx, verification id, settlement id, and batch
-                        payout tx when it lands.
+                        A real devnet run returns both Seller route calls,
+                        funding txs, the x402 settlement tx, the Subly vault
+                        deposit tx, and the Subly settlement id.
                       </p>
                     </div>
                     <div className="mt-8 font-mono text-[10px] uppercase tracking-[0.18em] text-paper/50">
@@ -710,6 +792,102 @@ function TxRow({
     return <DataRow label={label} value="pending" />;
   }
   return <DataRow label={label} value={signature} href={txUrl(signature)} />;
+}
+
+function FlowPanel({
+  title,
+  subtitle,
+  flow,
+  onCopy,
+}: {
+  title: string;
+  subtitle: string;
+  flow: FlowResult;
+  onCopy: (value: string, key: string) => void;
+}) {
+  const delayed = flow.chainView.delayed?.[0];
+  return (
+    <div className="border border-paper/15 bg-ink/35">
+      <div className="flex items-start justify-between gap-3 border-b border-paper/10 p-3">
+        <div>
+          <div className="font-display text-[22px] font-semibold text-paper">
+            {title}
+          </div>
+          <div className="mt-1 font-mono text-[9px] uppercase tracking-[0.16em] text-paper/45">
+            {subtitle}
+          </div>
+        </div>
+        <button
+          type="button"
+          onClick={() => onCopy(flow.route, `${flow.mode}-route`)}
+          className="text-paper/35 transition-colors hover:text-glow"
+          aria-label={`Copy ${title} route`}
+        >
+          <Clipboard className="h-3.5 w-3.5" />
+        </button>
+      </div>
+      <div className="p-3">
+        <DataRow label="Amount" value={flow.amount} />
+        <DataRow
+          label="Buyer ATA"
+          value={flow.buyerTokenAccount}
+          href={addressUrl(flow.buyerTokenAccount)}
+        />
+        <DataRow
+          label="Seller ATA"
+          value={flow.sellerTokenAccount}
+          href={addressUrl(flow.sellerTokenAccount)}
+        />
+        {flow.vaultTokenAccount && (
+          <DataRow
+            label="Vault ATA"
+            value={flow.vaultTokenAccount}
+            href={addressUrl(flow.vaultTokenAccount)}
+          />
+        )}
+        <TxRow label="Fund tx" signature={flow.faucetTx} />
+        {flow.settlementTx ? (
+          <TxRow label="Settle tx" signature={flow.settlementTx} />
+        ) : (
+          <TxRow label="Deposit tx" signature={flow.depositTx} />
+        )}
+        {delayed && (
+          <TxRow label="Payout tx" signature={delayed.tx || null} />
+        )}
+        <div className="mt-3 border-t border-paper/10 pt-3">
+          <div className="font-mono text-[9px] uppercase tracking-[0.18em] text-paper/45">
+            Chain excerpt
+          </div>
+          <div className="mt-2 space-y-2">
+            {flow.chainView.visibleNow.map((edge) => (
+              <EdgeRow key={`${edge.label}-${edge.tx || edge.to}`} edge={edge} />
+            ))}
+            {flow.chainView.hidden.map((edge) => (
+              <EdgeRow
+                key={`${edge.label}-${edge.to}`}
+                edge={edge}
+                hidden
+              />
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function EdgeRow({ edge, hidden }: { edge: ChainEdge; hidden?: boolean }) {
+  return (
+    <div className="text-[12px] leading-[1.5] text-paper/65">
+      <span className={hidden ? "text-alert" : "text-glow"}>
+        {hidden ? "hidden" : "visible"}
+      </span>{" "}
+      <span className="font-mono">{short(edge.from)}</span>
+      <span className="px-1 text-paper/35">-&gt;</span>
+      <span className="font-mono">{short(edge.to)}</span>
+      {edge.amount && <span className="ml-2 text-paper/45">{edge.amount}</span>}
+    </div>
+  );
 }
 
 function CodePanel({

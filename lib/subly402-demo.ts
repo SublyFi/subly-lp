@@ -1,5 +1,9 @@
 import { createHash, randomUUID } from "node:crypto";
 
+import { x402Client, x402HTTPClient } from "@x402/core/client";
+import type { Network } from "@x402/core/types";
+import { wrapFetchWithPayment as wrapX402FetchWithPayment } from "@x402/fetch";
+import { ExactSvmScheme as X402BuyerExactSvmScheme } from "@x402/svm/exact/client";
 import {
   AccountRole,
   address,
@@ -17,6 +21,7 @@ import {
   signTransactionMessageWithSigners,
 } from "@solana/kit";
 import {
+  fetchToken,
   fetchMint,
   findAssociatedTokenPda,
   getCreateAssociatedTokenIdempotentInstructionAsync,
@@ -27,8 +32,13 @@ import {
 
 const DEFAULT_FACILITATOR_URL = "https://api.demo.sublyfi.com";
 const DEFAULT_NETWORK = "solana:devnet";
+const DEFAULT_X402_NETWORK = "solana:EtWTRABZaYq6iMfeYKouRu166VU2xqa1";
+const DEFAULT_X402_FACILITATOR_URL = "https://x402.org/facilitator";
+const DEFAULT_SELLER_BASE_URL = "http://seller.demo.sublyfi.com";
 const DEFAULT_REQUEST_ORIGIN = "https://demo.sublyfi.com";
 const DEMO_ROUTE_PATH = "/weather";
+const X402_ROUTE_PATH = "/x402/weather";
+const SUBLY402_ROUTE_PATH = "/subly/weather";
 const DEMO_HTTP_METHOD = "GET";
 const DEMO_MIME_TYPE = "application/json";
 const USDC_DECIMALS = 6;
@@ -36,6 +46,8 @@ const CONFIRMATION_ATTEMPTS = 60;
 const CONFIRMATION_DELAY_MS = 1000;
 const BALANCE_SYNC_ATTEMPTS = 35;
 const BALANCE_SYNC_DELAY_MS = 1000;
+const SUBLY402_PAYMENT_RETRY_ATTEMPTS = 12;
+const SUBLY402_PAYMENT_RETRY_DELAY_MS = 1000;
 
 const DEPOSIT_DISCRIMINATOR = createHash("sha256")
   .update("global:deposit")
@@ -47,16 +59,23 @@ type EnvConfig = {
   rpcUrl: string;
   facilitatorUrl: string;
   network: string;
+  x402Network: string;
+  x402FacilitatorUrl: string;
   programId: string;
   vaultConfig: string;
   vaultTokenAccount: string;
+  attestationPolicyHash: string;
   usdcMint: string;
   sellerTokenAccount: string;
+  sellerBaseUrl: string;
+  x402SellerUrl: string;
+  subly402SellerUrl: string;
   requestOrigin: string;
   paymentAmountAtomic: bigint;
   depositAmountAtomic: bigint;
   faucetAmountAtomic: bigint;
   feePayerSecretJson?: string;
+  demoBuyerSecretJson?: string;
   mintAuthoritySecretJson?: string;
   sourceTokenAccount?: string;
   sourceOwnerSecretJson?: string;
@@ -79,6 +98,39 @@ type SettlementStatus = {
   status?: string;
   batchId?: number | null;
   txSignature?: string | null;
+};
+
+type PaymentRequiredResponse = {
+  accepts?: Array<Record<string, unknown>>;
+  [key: string]: unknown;
+};
+
+type SellerMetadata = {
+  ok?: boolean;
+  publicBaseUrl?: string;
+  sellerWallet?: string;
+  sellerTokenAccount?: string;
+  routes?: {
+    x402?: string;
+    subly402?: string;
+  };
+  asset?: {
+    mint?: string;
+    symbol?: string;
+    decimals?: number;
+  };
+  x402?: {
+    network?: string;
+    facilitatorUrl?: string;
+  };
+  subly402?: {
+    network?: string;
+    facilitatorUrl?: string;
+    attestation?: Partial<Attestation> & {
+      ok?: boolean;
+      tlsPublicKeySha256?: string;
+    };
+  };
 };
 
 type RateLimitEntry = {
@@ -145,7 +197,25 @@ function envBigInt(name: string, fallback: bigint) {
   return value;
 }
 
+function envBigIntAny(names: string[], fallback: bigint) {
+  for (const name of names) {
+    const raw = env(name);
+    if (raw) {
+      return envBigInt(name, fallback);
+    }
+  }
+  return fallback;
+}
+
+function normalizeBaseUrl(url: string) {
+  return url.replace(/\/$/, "");
+}
+
 function readConfig(): EnvConfig {
+  const sellerBaseUrl = normalizeBaseUrl(
+    env("SUBLY402_DEMO_SELLER_BASE_URL") || DEFAULT_SELLER_BASE_URL
+  );
+  const defaultPaymentAmount = BigInt(1_100_000);
   return {
     enabled: env("SUBLY402_DEMO_ENABLED") === "1",
     rpcUrl:
@@ -155,35 +225,69 @@ function readConfig(): EnvConfig {
       env("SUBLY402_PUBLIC_ENCLAVE_URL") ||
       DEFAULT_FACILITATOR_URL,
     network: env("SUBLY402_NETWORK") || DEFAULT_NETWORK,
+    x402Network: env("SUBLY402_X402_NETWORK") || DEFAULT_X402_NETWORK,
+    x402FacilitatorUrl:
+      env("SUBLY402_X402_FACILITATOR_URL") ||
+      DEFAULT_X402_FACILITATOR_URL,
     programId: env("SUBLY402_PROGRAM_ID") || "",
     vaultConfig: env("SUBLY402_VAULT_CONFIG") || "",
     vaultTokenAccount: env("SUBLY402_VAULT_TOKEN_ACCOUNT") || "",
+    attestationPolicyHash:
+      env("SUBLY402_ATTESTATION_POLICY_HASH_HEX") || "",
     usdcMint: env("SUBLY402_USDC_MINT") || "",
     sellerTokenAccount: env("SUBLY402_DEMO_SELLER_TOKEN_ACCOUNT") || "",
+    sellerBaseUrl,
+    x402SellerUrl:
+      env("SUBLY402_X402_SELLER_URL") ||
+      `${sellerBaseUrl}${X402_ROUTE_PATH}`,
+    subly402SellerUrl:
+      env("SUBLY402_SUBLY_SELLER_URL") ||
+      `${sellerBaseUrl}${SUBLY402_ROUTE_PATH}`,
     requestOrigin:
       env("SUBLY402_DEMO_REQUEST_ORIGIN") || DEFAULT_REQUEST_ORIGIN,
-    paymentAmountAtomic: envBigInt(
-      "SUBLY402_DEMO_PAYMENT_AMOUNT_ATOMIC",
-      BigInt(10_000)
+    paymentAmountAtomic: envBigIntAny(
+      [
+        "SUBLY402_DEMO_PAYMENT_AMOUNT_ATOMIC",
+        "SUBLY402_DEMO_PAYMENT_AMOUNT",
+        "SUBLY402_NITRO_E2E_PAYMENT_AMOUNT",
+      ],
+      defaultPaymentAmount
     ),
-    depositAmountAtomic: envBigInt(
-      "SUBLY402_DEMO_DEPOSIT_AMOUNT_ATOMIC",
-      BigInt(50_000)
+    depositAmountAtomic: envBigIntAny(
+      [
+        "SUBLY402_DEMO_DEPOSIT_AMOUNT_ATOMIC",
+        "SUBLY402_DEMO_DEPOSIT_AMOUNT",
+        "SUBLY402_NITRO_E2E_DEPOSIT_AMOUNT",
+      ],
+      defaultPaymentAmount
     ),
-    faucetAmountAtomic: envBigInt(
-      "SUBLY402_DEMO_FAUCET_AMOUNT_ATOMIC",
-      BigInt(100_000)
+    faucetAmountAtomic: envBigIntAny(
+      ["SUBLY402_DEMO_FAUCET_AMOUNT_ATOMIC", "SUBLY402_DEMO_FAUCET_AMOUNT"],
+      BigInt(1_500_000)
     ),
     feePayerSecretJson:
       env("SUBLY402_DEMO_FEE_PAYER_SECRET_JSON") ||
       env("SUBLY402_DEMO_FAUCET_SECRET_JSON"),
+    demoBuyerSecretJson: env("SUBLY402_DEMO_BUYER_SECRET_JSON"),
     mintAuthoritySecretJson: env("SUBLY402_DEMO_MINT_AUTHORITY_SECRET_JSON"),
     sourceTokenAccount: env("SUBLY402_DEMO_SOURCE_TOKEN_ACCOUNT"),
     sourceOwnerSecretJson: env("SUBLY402_DEMO_SOURCE_OWNER_SECRET_JSON"),
   };
 }
 
-function requiredConfig(config: EnvConfig) {
+function requiredConfig(
+  config: EnvConfig,
+  options: {
+    requireSeller?: boolean;
+    requireBuyer?: boolean;
+    requireAttestationPolicy?: boolean;
+  } = {}
+) {
+  const {
+    requireSeller = true,
+    requireBuyer = true,
+    requireAttestationPolicy = true,
+  } = options;
   const missing: string[] = [];
   if (!config.enabled) {
     missing.push("SUBLY402_DEMO_ENABLED=1");
@@ -200,14 +304,20 @@ function requiredConfig(config: EnvConfig) {
   if (!config.vaultTokenAccount) {
     missing.push("SUBLY402_VAULT_TOKEN_ACCOUNT");
   }
+  if (requireAttestationPolicy && !config.attestationPolicyHash) {
+    missing.push("SUBLY402_ATTESTATION_POLICY_HASH_HEX");
+  }
   if (!config.usdcMint) {
     missing.push("SUBLY402_USDC_MINT");
   }
-  if (!config.sellerTokenAccount) {
+  if (requireSeller && !config.sellerTokenAccount) {
     missing.push("SUBLY402_DEMO_SELLER_TOKEN_ACCOUNT");
   }
   if (!config.feePayerSecretJson) {
     missing.push("SUBLY402_DEMO_FEE_PAYER_SECRET_JSON");
+  }
+  if (requireBuyer && !config.demoBuyerSecretJson) {
+    missing.push("SUBLY402_DEMO_BUYER_SECRET_JSON");
   }
   if (!config.mintAuthoritySecretJson && !config.sourceTokenAccount) {
     missing.push(
@@ -242,11 +352,20 @@ export function getDemoPublicConfig() {
     missing,
     facilitatorUrl: config.facilitatorUrl,
     network: config.network,
+    x402Network: config.x402Network,
     usdcMint: config.usdcMint,
     vaultConfig: config.vaultConfig,
+    vaultTokenAccount: config.vaultTokenAccount,
+    attestationPolicyHash: config.attestationPolicyHash,
+    sellerBaseUrl: config.sellerBaseUrl,
+    routes: {
+      x402: config.x402SellerUrl,
+      subly402: config.subly402SellerUrl,
+    },
     sellerTokenAccount: config.sellerTokenAccount,
     paymentAmount: formatUsdcAtomic(config.paymentAmountAtomic),
     faucetAmount: formatUsdcAtomic(config.faucetAmountAtomic),
+    buyerMode: config.demoBuyerSecretJson ? "hosted" : "missing",
   };
 }
 
@@ -371,6 +490,176 @@ async function createAssociatedTokenAccount(
   });
   const signature = await sendInstructions(rpc, feePayer, [instruction]);
   return { tokenAccount: ata.toString(), signature };
+}
+
+async function deriveAssociatedTokenAccount(owner: string, mint: string) {
+  const [ata] = await findAssociatedTokenPda({
+    mint: address(mint),
+    owner: address(owner),
+    tokenProgram: TOKEN_PROGRAM_ADDRESS,
+  });
+  return ata.toString();
+}
+
+async function fetchTokenAmountOrNull(
+  rpc: ReturnType<typeof createSolanaRpc>,
+  tokenAccount: string
+) {
+  try {
+    const account = await fetchToken(rpc, address(tokenAccount));
+    return account.data.amount;
+  } catch {
+    return null;
+  }
+}
+
+async function demoBuyerFromConfig(config: EnvConfig) {
+  if (!config.demoBuyerSecretJson) {
+    throw new DemoError(
+      "demo_not_configured",
+      "Hosted comparison demo requires a server-side buyer wallet.",
+      503,
+      ["SUBLY402_DEMO_BUYER_SECRET_JSON"]
+    );
+  }
+  return signerFromSecret(
+    config.demoBuyerSecretJson,
+    "SUBLY402_DEMO_BUYER_SECRET_JSON"
+  );
+}
+
+function decodeJsonHeader<T>(value: string, headerName: string): T {
+  const encodings: BufferEncoding[] = ["base64", "base64url"];
+  let lastError: unknown;
+  for (const encoding of encodings) {
+    try {
+      return JSON.parse(Buffer.from(value, encoding).toString("utf8")) as T;
+    } catch (error) {
+      lastError = error;
+    }
+  }
+  const reason =
+    lastError instanceof Error ? lastError.message : "invalid encoded JSON";
+  throw new DemoError(
+    "invalid_payment_header",
+    `Invalid ${headerName} header: ${reason}`,
+    502
+  );
+}
+
+async function paymentRequiredFromResponse(
+  response: Response
+): Promise<PaymentRequiredResponse> {
+  const raw =
+    response.headers.get("PAYMENT-REQUIRED") ||
+    response.headers.get("payment-required");
+  const decoded = raw
+    ? decodeJsonHeader<PaymentRequiredResponse>(raw, "PAYMENT-REQUIRED")
+    : {};
+
+  try {
+    const body = (await response.clone().json()) as PaymentRequiredResponse;
+    return { ...body, ...decoded };
+  } catch {
+    return decoded;
+  }
+}
+
+function paymentResponseFromHeaders(headers: Headers) {
+  const raw =
+    headers.get("PAYMENT-RESPONSE") || headers.get("payment-response") || "";
+  return raw
+    ? decodeJsonHeader<Record<string, unknown>>(raw, "PAYMENT-RESPONSE")
+    : null;
+}
+
+function selectOfficialX402Details(
+  paymentRequired: PaymentRequiredResponse,
+  network: string
+) {
+  return paymentRequired.accepts?.find(
+    (accept) => accept.scheme === "exact" && accept.network === network
+  );
+}
+
+function selectSubly402Details(
+  paymentRequired: PaymentRequiredResponse,
+  network: string
+) {
+  return paymentRequired.accepts?.find(
+    (accept) =>
+      accept.scheme === "subly402-svm-v1" && accept.network === network
+  );
+}
+
+function stringField(value: unknown, key: string) {
+  if (!value || typeof value !== "object") {
+    return null;
+  }
+  const field = (value as Record<string, unknown>)[key];
+  return typeof field === "string" && field ? field : null;
+}
+
+function nestedRecord(value: unknown, key: string) {
+  if (!value || typeof value !== "object") {
+    return null;
+  }
+  const field = (value as Record<string, unknown>)[key];
+  return field && typeof field === "object"
+    ? (field as Record<string, unknown>)
+    : null;
+}
+
+function amountFromDetails(details: Record<string, unknown>) {
+  const value = details.amount || details.maxAmountRequired;
+  if (typeof value !== "string" && typeof value !== "number") {
+    throw new DemoError(
+      "invalid_payment_details",
+      "Seller payment details did not include an amount.",
+      502
+    );
+  }
+  return BigInt(value.toString());
+}
+
+function assetMintFromDetails(details: Record<string, unknown>) {
+  const asset = details.asset;
+  if (typeof asset === "string") {
+    return asset;
+  }
+  if (asset && typeof asset === "object") {
+    const mint = (asset as Record<string, unknown>).mint;
+    if (typeof mint === "string" && mint) {
+      return mint;
+    }
+  }
+  throw new DemoError(
+    "invalid_payment_details",
+    "Seller payment details did not include an SPL token mint.",
+    502
+  );
+}
+
+async function readJsonResponse(response: Response) {
+  const text = await response.text();
+  if (!text) {
+    return null;
+  }
+  try {
+    return JSON.parse(text) as unknown;
+  } catch {
+    return text;
+  }
+}
+
+async function fetchSellerMetadata(config: EnvConfig) {
+  const response = await fetch(`${config.sellerBaseUrl}/.well-known/subly402.json`, {
+    cache: "no-store",
+  }).catch(() => null);
+  if (!response?.ok) {
+    return null;
+  }
+  return (await response.json()) as SellerMetadata;
 }
 
 async function resolveFundingSource(
@@ -629,6 +918,136 @@ function buildPayment(args: {
   return { requestContext, paymentDetails, unsignedPayload };
 }
 
+function requestContextFromUrl(url: string, method = DEMO_HTTP_METHOD) {
+  const parsed = new URL(url);
+  return {
+    method: method.toUpperCase(),
+    origin: parsed.origin,
+    pathAndQuery: `${parsed.pathname}${parsed.search}`,
+    bodySha256: sha256hex(""),
+  };
+}
+
+async function buildSublyPaymentPayload(args: {
+  url: string;
+  details: Record<string, unknown>;
+  clientSigner: Awaited<ReturnType<typeof generateKeyPairSigner>>;
+}) {
+  const vault = nestedRecord(args.details, "vault");
+  const providerId = stringField(args.details, "providerId");
+  const payTo = stringField(args.details, "payTo");
+  const network = stringField(args.details, "network");
+  const vaultConfig = stringField(vault, "config");
+  if (!providerId || !payTo || !network || !vaultConfig) {
+    throw new DemoError(
+      "invalid_payment_details",
+      "Subly402 payment details are missing providerId, payTo, network, or vault config.",
+      502
+    );
+  }
+
+  const amount = amountFromDetails(args.details).toString();
+  const assetMint = assetMintFromDetails(args.details);
+  const requestContext = requestContextFromUrl(args.url);
+  const paymentDetailsHash = computePaymentDetailsHash(args.details);
+  const requestHash = computeRequestHash(requestContext, paymentDetailsHash);
+  const unsignedPayload = {
+    version: 1,
+    scheme: "subly402-svm-v1",
+    paymentId: `pay_lp_${randomUUID()}`,
+    client: args.clientSigner.address.toString(),
+    vault: vaultConfig,
+    providerId,
+    payTo,
+    network,
+    assetMint,
+    amount,
+    requestHash,
+    paymentDetailsHash,
+    expiresAt: new Date(Date.now() + 30 * 60 * 1000).toISOString(),
+    nonce: Date.now().toString(),
+  };
+  return {
+    requestContext,
+    paymentDetailsHash,
+    paymentPayload: {
+      ...unsignedPayload,
+      clientSig: await signPaymentPayload(args.clientSigner, unsignedPayload),
+    },
+  };
+}
+
+async function verifySublyAttestationForDetails(
+  config: EnvConfig,
+  details: Record<string, unknown>
+) {
+  const attestation = await fetchAttestation(config);
+  const vault = nestedRecord(details, "vault");
+  const detailsVaultConfig = stringField(vault, "config");
+  const detailsVaultSigner = stringField(vault, "signer");
+  const detailsPolicyHash = stringField(vault, "attestationPolicyHash");
+
+  if (attestation.vaultConfig !== detailsVaultConfig) {
+    throw new DemoError(
+      "attestation_mismatch",
+      "Live attestation vaultConfig does not match the seller payment details.",
+      502
+    );
+  }
+  if (attestation.vaultSigner !== detailsVaultSigner) {
+    throw new DemoError(
+      "attestation_mismatch",
+      "Live attestation vaultSigner does not match the seller payment details.",
+      502
+    );
+  }
+  if (
+    !detailsPolicyHash ||
+    attestation.attestationPolicyHash.toLowerCase() !==
+      detailsPolicyHash.toLowerCase()
+  ) {
+    throw new DemoError(
+      "attestation_mismatch",
+      "Live attestation policy hash does not match the seller payment details.",
+      502
+    );
+  }
+  if (
+    config.attestationPolicyHash &&
+    attestation.attestationPolicyHash.toLowerCase() !==
+      config.attestationPolicyHash.toLowerCase()
+  ) {
+    throw new DemoError(
+      "attestation_mismatch",
+      "Live attestation policy hash does not match this LP deployment.",
+      502
+    );
+  }
+  if (attestation.expiresAt && Date.parse(attestation.expiresAt) <= Date.now()) {
+    throw new DemoError(
+      "attestation_expired",
+      "Live attestation is expired.",
+      502
+    );
+  }
+  return attestation;
+}
+
+function isRetryableSubly402(paymentRequired: PaymentRequiredResponse) {
+  const code = paymentRequired.facilitatorError || paymentRequired.error;
+  if (code === "deposit_sync_in_progress" || code === "insufficient_balance") {
+    return true;
+  }
+  const message =
+    typeof paymentRequired.message === "string"
+      ? paymentRequired.message.toLowerCase()
+      : "";
+  return (
+    message.includes("deposit synchronization") ||
+    message.includes("insufficient")
+  );
+}
+
 async function postJson<T>(
   baseUrl: string,
   route: string,
@@ -744,11 +1163,10 @@ export async function getLiveAttestation() {
 
 export async function requestFaucet(recipient: string, amountAtomic?: bigint) {
   const config = readConfig();
-  requiredConfig({
-    ...config,
-    // A public faucet only needs funding config, not the demo seller.
-    sellerTokenAccount:
-      config.sellerTokenAccount || "11111111111111111111111111111111",
+  requiredConfig(config, {
+    requireSeller: false,
+    requireBuyer: false,
+    requireAttestationPolicy: false,
   });
   address(recipient);
   const amount = amountAtomic || config.faucetAmountAtomic;
@@ -791,6 +1209,397 @@ export async function requestFaucet(recipient: string, amountAtomic?: bigint) {
   };
 }
 
+async function prepareBuyerTokenAccount(args: {
+  rpc: ReturnType<typeof createSolanaRpc>;
+  config: EnvConfig;
+  feePayer: Awaited<ReturnType<typeof generateKeyPairSigner>>;
+  buyer: Awaited<ReturnType<typeof generateKeyPairSigner>>;
+  amountAtomic: bigint;
+}) {
+  const buyerAta = await createAssociatedTokenAccount(
+    args.rpc,
+    args.feePayer,
+    args.buyer.address.toString(),
+    args.config.usdcMint
+  );
+  const faucetTx = await faucetToTokenAccount({
+    rpc: args.rpc,
+    config: args.config,
+    feePayer: args.feePayer,
+    destinationTokenAccount: buyerAta.tokenAccount,
+    amountAtomic: args.amountAtomic,
+  });
+  return { buyerTokenAccount: buyerAta.tokenAccount, faucetTx };
+}
+
+async function runOfficialX402SellerFlow(args: {
+  config: EnvConfig;
+  rpc: ReturnType<typeof createSolanaRpc>;
+  feePayer: Awaited<ReturnType<typeof generateKeyPairSigner>>;
+  buyer: Awaited<ReturnType<typeof generateKeyPairSigner>>;
+}) {
+  const preflight = await fetch(args.config.x402SellerUrl, {
+    method: DEMO_HTTP_METHOD,
+    cache: "no-store",
+  });
+  if (preflight.status !== 402) {
+    throw new DemoError(
+      "seller_route_unexpected_status",
+      `Expected x402 seller to return 402 before payment, got ${preflight.status}.`,
+      502
+    );
+  }
+  const paymentRequired = await paymentRequiredFromResponse(preflight);
+  const details = selectOfficialX402Details(
+    paymentRequired,
+    args.config.x402Network
+  );
+  if (!details) {
+    throw new DemoError(
+      "payment_details_missing",
+      "x402 seller did not return an official exact/SVM payment option for the configured network.",
+      502
+    );
+  }
+
+  const mint = assetMintFromDetails(details);
+  if (mint !== args.config.usdcMint) {
+    throw new DemoError(
+      "asset_mismatch",
+      `x402 seller requires asset ${mint}, but LP is configured for ${args.config.usdcMint}.`,
+      502
+    );
+  }
+  const amountAtomic = amountFromDetails(details);
+  const sellerWallet = stringField(details, "payTo");
+  if (!sellerWallet) {
+    throw new DemoError(
+      "payment_details_missing",
+      "x402 seller did not return a payTo wallet.",
+      502
+    );
+  }
+
+  const { buyerTokenAccount, faucetTx } = await prepareBuyerTokenAccount({
+    rpc: args.rpc,
+    config: args.config,
+    feePayer: args.feePayer,
+    buyer: args.buyer,
+    amountAtomic,
+  });
+  const sellerTokenAccount = (
+    await createAssociatedTokenAccount(
+      args.rpc,
+      args.feePayer,
+      sellerWallet,
+      mint
+    )
+  ).tokenAccount;
+  const buyerBefore = await fetchTokenAmountOrNull(
+    args.rpc,
+    buyerTokenAccount
+  );
+  const sellerBefore = await fetchTokenAmountOrNull(
+    args.rpc,
+    sellerTokenAccount
+  );
+
+  const buyerClient = new x402Client().register(
+    args.config.x402Network as Network,
+    new X402BuyerExactSvmScheme(args.buyer, { rpcUrl: args.config.rpcUrl })
+  );
+  const fetchWithPayment = wrapX402FetchWithPayment(fetch, buyerClient);
+  const response = await fetchWithPayment(args.config.x402SellerUrl, {
+    method: DEMO_HTTP_METHOD,
+    cache: "no-store",
+  });
+  const body = await readJsonResponse(response);
+  if (!response.ok) {
+    throw new DemoError(
+      "x402_request_failed",
+      `Official x402 request failed with ${response.status}: ${JSON.stringify(
+        body
+      )}`,
+      502
+    );
+  }
+
+  const httpClient = new x402HTTPClient(buyerClient);
+  let settleResponse: Record<string, unknown> | null = null;
+  try {
+    settleResponse = httpClient.getPaymentSettleResponse((name) =>
+      response.headers.get(name)
+    ) as unknown as Record<string, unknown>;
+  } catch {
+    settleResponse = null;
+  }
+  const rawPaymentResponse = paymentResponseFromHeaders(response.headers);
+  const settlementTx =
+    stringField(settleResponse, "transaction") ||
+    stringField(rawPaymentResponse, "transaction") ||
+    stringField(rawPaymentResponse, "txSignature");
+  const buyerAfter = await fetchTokenAmountOrNull(args.rpc, buyerTokenAccount);
+  const sellerAfter = await fetchTokenAmountOrNull(
+    args.rpc,
+    sellerTokenAccount
+  );
+
+  return {
+    ok: true,
+    mode: "official-x402-direct",
+    route: args.config.x402SellerUrl,
+    network: args.config.x402Network,
+    facilitatorUrl: args.config.x402FacilitatorUrl,
+    amountAtomic: amountAtomic.toString(),
+    amount: formatUsdcAtomic(amountAtomic),
+    buyer: args.buyer.address.toString(),
+    buyerTokenAccount,
+    sellerWallet,
+    sellerTokenAccount,
+    faucetTx,
+    settlementTx,
+    response: body,
+    paymentRequired,
+    paymentResponse: rawPaymentResponse || settleResponse,
+    balances: {
+      buyerBefore: buyerBefore?.toString() || null,
+      buyerAfter: buyerAfter?.toString() || null,
+      sellerBefore: sellerBefore?.toString() || null,
+      sellerAfter: sellerAfter?.toString() || null,
+    },
+    chainView: {
+      visibleNow: [
+        {
+          label: "direct USDC transfer",
+          from: buyerTokenAccount,
+          to: sellerTokenAccount,
+          amount: formatUsdcAtomic(amountAtomic),
+          tx: settlementTx,
+        },
+      ],
+      hidden: [],
+      summary:
+        "Public chain shows the paid request as a direct Buyer token account -> Seller token account transfer.",
+    },
+  };
+}
+
+async function runSubly402SellerFlow(args: {
+  config: EnvConfig;
+  rpc: ReturnType<typeof createSolanaRpc>;
+  feePayer: Awaited<ReturnType<typeof generateKeyPairSigner>>;
+  buyer: Awaited<ReturnType<typeof generateKeyPairSigner>>;
+}) {
+  const preflight = await fetch(args.config.subly402SellerUrl, {
+    method: DEMO_HTTP_METHOD,
+    cache: "no-store",
+  });
+  if (preflight.status !== 402) {
+    throw new DemoError(
+      "seller_route_unexpected_status",
+      `Expected Subly402 seller to return 402 before payment, got ${preflight.status}.`,
+      502
+    );
+  }
+  const paymentRequired = await paymentRequiredFromResponse(preflight);
+  const details = selectSubly402Details(paymentRequired, args.config.network);
+  if (!details) {
+    throw new DemoError(
+      "payment_details_missing",
+      "Subly402 seller did not return a subly402-svm-v1 payment option for the configured network.",
+      502
+    );
+  }
+  const mint = assetMintFromDetails(details);
+  if (mint !== args.config.usdcMint) {
+    throw new DemoError(
+      "asset_mismatch",
+      `Subly402 seller requires asset ${mint}, but LP is configured for ${args.config.usdcMint}.`,
+      502
+    );
+  }
+
+  const amountAtomic = amountFromDetails(details);
+  const depositAmount =
+    args.config.depositAmountAtomic > amountAtomic
+      ? args.config.depositAmountAtomic
+      : amountAtomic;
+  const sellerTokenAccount = stringField(details, "payTo");
+  const providerId = stringField(details, "providerId");
+  if (!sellerTokenAccount || !providerId) {
+    throw new DemoError(
+      "payment_details_missing",
+      "Subly402 seller did not return payTo or providerId.",
+      502
+    );
+  }
+
+  const attestation = await verifySublyAttestationForDetails(
+    args.config,
+    details
+  );
+  const { buyerTokenAccount, faucetTx } = await prepareBuyerTokenAccount({
+    rpc: args.rpc,
+    config: args.config,
+    feePayer: args.feePayer,
+    buyer: args.buyer,
+    amountAtomic: depositAmount,
+  });
+  const sellerBefore = await fetchTokenAmountOrNull(
+    args.rpc,
+    sellerTokenAccount
+  );
+
+  const depositTx = await sendInstructions(args.rpc, args.feePayer, [
+    buildDepositInstruction({
+      programId: args.config.programId,
+      client: args.buyer,
+      vaultConfig: args.config.vaultConfig,
+      clientTokenAccount: buyerTokenAccount,
+      vaultTokenAccount: args.config.vaultTokenAccount,
+      amountAtomic: depositAmount,
+    }),
+  ]);
+
+  const balance = await waitForBalance({
+    config: args.config,
+    client: args.buyer,
+    minimumAtomic: amountAtomic,
+  });
+
+  let paidResponse: Response | null = null;
+  let last402: PaymentRequiredResponse | null = null;
+  for (let attempt = 0; attempt < SUBLY402_PAYMENT_RETRY_ATTEMPTS; attempt += 1) {
+    const payment = await buildSublyPaymentPayload({
+      url: args.config.subly402SellerUrl,
+      details,
+      clientSigner: args.buyer,
+    });
+    const response = await fetch(args.config.subly402SellerUrl, {
+      method: DEMO_HTTP_METHOD,
+      cache: "no-store",
+      headers: {
+        "PAYMENT-SIGNATURE": Buffer.from(
+          JSON.stringify(payment.paymentPayload)
+        ).toString("base64"),
+      },
+    });
+    if (response.status !== 402) {
+      paidResponse = response;
+      break;
+    }
+    last402 = await paymentRequiredFromResponse(response).catch(() => null);
+    if (!last402 || !isRetryableSubly402(last402)) {
+      paidResponse = response;
+      break;
+    }
+    await sleep(SUBLY402_PAYMENT_RETRY_DELAY_MS);
+  }
+
+  if (!paidResponse) {
+    throw new DemoError(
+      "subly402_request_failed",
+      `Subly402 seller kept returning 402 after deposit: ${JSON.stringify(
+        last402
+      )}`,
+      504
+    );
+  }
+  const body = await readJsonResponse(paidResponse);
+  if (!paidResponse.ok) {
+    throw new DemoError(
+      "subly402_request_failed",
+      `Subly402 request failed with ${paidResponse.status}: ${JSON.stringify(
+        body
+      )}`,
+      502
+    );
+  }
+
+  const paymentResponse = paymentResponseFromHeaders(paidResponse.headers);
+  const settlementId = stringField(paymentResponse, "settlementId");
+  const settlementStatus =
+    settlementId && providerId
+      ? await getSettlementStatus(settlementId, providerId).catch((error) => ({
+          ok: false,
+          settlementId,
+          providerId,
+          status: error instanceof Error ? error.message : "status unavailable",
+          txSignature: null,
+        }))
+      : null;
+  const sellerAfter = await fetchTokenAmountOrNull(
+    args.rpc,
+    sellerTokenAccount
+  );
+
+  return {
+    ok: true,
+    mode: "subly-private-x402",
+    route: args.config.subly402SellerUrl,
+    network: args.config.network,
+    facilitatorUrl: args.config.facilitatorUrl,
+    buyer: args.buyer.address.toString(),
+    buyerTokenAccount,
+    sellerTokenAccount,
+    vaultTokenAccount: args.config.vaultTokenAccount,
+    providerId,
+    amountAtomic: amountAtomic.toString(),
+    amount: formatUsdcAtomic(amountAtomic),
+    depositAmountAtomic: depositAmount.toString(),
+    depositAmount: formatUsdcAtomic(depositAmount),
+    faucetTx,
+    depositTx,
+    attestation: {
+      vaultConfig: attestation.vaultConfig,
+      vaultSigner: attestation.vaultSigner,
+      attestationPolicyHash: attestation.attestationPolicyHash,
+      snapshotSeqno: attestation.snapshotSeqno,
+      issuedAt: attestation.issuedAt,
+      expiresAt: attestation.expiresAt,
+    },
+    balance,
+    response: body,
+    paymentRequired,
+    paymentResponse,
+    settlementStatus,
+    balances: {
+      sellerBefore: sellerBefore?.toString() || null,
+      sellerAfter: sellerAfter?.toString() || null,
+    },
+    chainView: {
+      visibleNow: [
+        {
+          label: "vault deposit",
+          from: buyerTokenAccount,
+          to: args.config.vaultTokenAccount,
+          amount: formatUsdcAtomic(depositAmount),
+          tx: depositTx,
+        },
+      ],
+      hidden: [
+        {
+          label: "direct Buyer -> Seller edge",
+          from: buyerTokenAccount,
+          to: sellerTokenAccount,
+          amount: formatUsdcAtomic(amountAtomic),
+        },
+      ],
+      delayed: [
+        {
+          label: "batched seller payout",
+          from: args.config.vaultTokenAccount,
+          to: sellerTokenAccount,
+          tx: settlementStatus?.txSignature || null,
+          status: settlementStatus?.status || "pending",
+        },
+      ],
+      summary:
+        "Public chain shows the Buyer depositing into Subly's vault; the Buyer token account does not directly transfer to the Seller token account.",
+    },
+  };
+}
+
 export async function runPaymentDemo() {
   const config = readConfig();
   requiredConfig(config);
@@ -800,141 +1609,53 @@ export async function runPaymentDemo() {
     config.feePayerSecretJson!,
     "SUBLY402_DEMO_FEE_PAYER_SECRET_JSON"
   );
-  const buyer = await generateKeyPairSigner(true);
-  const buyerAta = await createAssociatedTokenAccount(
+  const buyer = await demoBuyerFromConfig(config);
+  const metadata = await fetchSellerMetadata(config);
+  const x402 = await runOfficialX402SellerFlow({
+    config,
     rpc,
     feePayer,
-    buyer.address.toString(),
-    config.usdcMint
-  );
-  const faucetTx = await faucetToTokenAccount({
+    buyer,
+  });
+  const subly402 = await runSubly402SellerFlow({
+    config,
     rpc,
-    config,
     feePayer,
-    destinationTokenAccount: buyerAta.tokenAccount,
-    amountAtomic: config.depositAmountAtomic,
+    buyer,
   });
-
-  const depositTx = await sendInstructions(rpc, feePayer, [
-    buildDepositInstruction({
-      programId: config.programId,
-      client: buyer,
-      vaultConfig: config.vaultConfig,
-      clientTokenAccount: buyerAta.tokenAccount,
-      vaultTokenAccount: config.vaultTokenAccount,
-      amountAtomic: config.depositAmountAtomic,
-    }),
-  ]);
-
-  const attestation = await fetchAttestation(config);
-  if (attestation.vaultConfig !== config.vaultConfig) {
-    throw new DemoError(
-      "attestation_mismatch",
-      "Live attestation vaultConfig does not match this demo deployment.",
-      502
-    );
-  }
-
-  const balance = await waitForBalance({
-    config,
-    client: buyer,
-    minimumAtomic: config.paymentAmountAtomic,
-  });
-  const providerId = deriveOpenProviderId({
-    network: config.network,
-    assetMint: config.usdcMint,
-    payTo: config.sellerTokenAccount,
-  });
-  const payment = buildPayment({
-    attestation,
-    clientSigner: buyer,
-    config,
-    providerId,
-    nonce: Date.now(),
-  });
-  const clientSig = await signPaymentPayload(buyer, payment.unsignedPayload);
-  const paymentPayload = {
-    ...payment.unsignedPayload,
-    clientSig,
-  };
-
-  const providerHeaders = {
-    "x-subly402-provider-id": providerId,
-  };
-  const verifyBody = await postJson<{
-    ok: boolean;
-    verificationId: string;
-    reservationId: string;
-    providerId: string;
-    amount: string;
-  }>(
-    config.facilitatorUrl,
-    "/v1/verify",
-    {
-      paymentPayload,
-      paymentDetails: payment.paymentDetails,
-      requestContext: payment.requestContext,
-    },
-    providerHeaders
-  );
-
-  const providerResponse = buildDemoProviderResponse(providerId);
-  const settleBody = await postJson<{
-    ok: boolean;
-    settlementId: string;
-    participantReceipt: string;
-    providerCreditAmount: string;
-  }>(
-    config.facilitatorUrl,
-    "/v1/settle",
-    {
-      verificationId: verifyBody.verificationId,
-      resultHash: sha256hex(JSON.stringify(providerResponse)),
-      statusCode: 200,
-    },
-    providerHeaders
-  );
-
-  const settlementStatus = await getSettlementStatus(
-    settleBody.settlementId,
-    providerId
-  ).catch((error) => ({
-    ok: false,
-    settlementId: settleBody.settlementId,
-    status: error instanceof Error ? error.message : "status unavailable",
-  }));
 
   return {
     ok: true,
-    mode: "subly-private-x402",
-    route: `${DEMO_HTTP_METHOD} ${DEMO_ROUTE_PATH}`,
+    mode: "x402-vs-subly402-hosted-buyer",
     buyer: buyer.address.toString(),
-    buyerTokenAccount: buyerAta.tokenAccount,
-    sellerTokenAccount: config.sellerTokenAccount,
-    providerId,
-    amountAtomic: config.paymentAmountAtomic.toString(),
-    amount: formatUsdcAtomic(config.paymentAmountAtomic),
-    faucetTx,
-    depositTx,
-    attestation: {
-      vaultConfig: attestation.vaultConfig,
-      vaultSigner: attestation.vaultSigner,
-      attestationPolicyHash: attestation.attestationPolicyHash,
-      snapshotSeqno: attestation.snapshotSeqno,
+    seller: {
+      baseUrl: config.sellerBaseUrl,
+      metadataUrl: `${config.sellerBaseUrl}/.well-known/subly402.json`,
+      wallet: metadata?.sellerWallet || x402.sellerWallet,
+      tokenAccount:
+        metadata?.sellerTokenAccount ||
+        subly402.sellerTokenAccount ||
+        x402.sellerTokenAccount,
+      routes: {
+        x402: config.x402SellerUrl,
+        subly402: config.subly402SellerUrl,
+      },
     },
-    balance,
-    verification: verifyBody,
-    settlement: settleBody,
-    settlementStatus,
-    privacy: {
-      visible: [
-        "buyer token account -> Subly vault deposit",
-        "Subly vault -> seller batched payout after the settlement window",
+    asset: {
+      mint: config.usdcMint,
+      symbol: "USDC",
+      decimals: USDC_DECIMALS,
+    },
+    x402,
+    subly402,
+    comparison: {
+      x402: [
+        "Uses the official x402 exact/SVM Buyer flow.",
+        "The settlement transaction transfers USDC directly from the Buyer token account to the Seller token account.",
       ],
-      hidden: [
-        "direct buyer -> seller edge",
-        "paid route contents",
-        "per-request seller correlation in the buyer wallet history",
+      subly402: [
+        "Uses an x402-style 402 challenge and PAYMENT-SIGNATURE retry against the Subly402 Seller route.",
+        "The visible Buyer transaction is a vault deposit. Seller payout is later batched from the vault, so the Buyer -> Seller edge is not visible.",
       ],
     },
   };
