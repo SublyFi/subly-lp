@@ -35,6 +35,7 @@ const DEFAULT_NETWORK = "solana:devnet";
 const DEFAULT_X402_NETWORK = "solana:EtWTRABZaYq6iMfeYKouRu166VU2xqa1";
 const DEFAULT_X402_FACILITATOR_URL = "https://x402.org/facilitator";
 const DEFAULT_SELLER_BASE_URL = "http://seller.demo.sublyfi.com";
+const DEFAULT_REMOTE_DEMO_BASE_URL = "https://www.sublyfi.com";
 const DEFAULT_REQUEST_ORIGIN = "https://demo.sublyfi.com";
 const DEMO_ROUTE_PATH = "/weather";
 const X402_ROUTE_PATH = "/x402/weather";
@@ -209,6 +210,77 @@ function envBigIntAny(names: string[], fallback: bigint) {
 
 function normalizeBaseUrl(url: string) {
   return url.replace(/\/$/, "");
+}
+
+function remoteDemoBaseUrl() {
+  if (env("SUBLY402_DEMO_DISABLE_REMOTE_PROXY") === "1") {
+    return "";
+  }
+  if (process.env.VERCEL_ENV === "production") {
+    return "";
+  }
+  if (process.env.NODE_ENV === "production" && process.env.VERCEL === "1") {
+    return "";
+  }
+  return normalizeBaseUrl(
+    env("SUBLY402_DEMO_PROXY_URL") || DEFAULT_REMOTE_DEMO_BASE_URL
+  );
+}
+
+function missingConfig(config: EnvConfig) {
+  try {
+    requiredConfig(config);
+    return [];
+  } catch (error) {
+    if (error instanceof DemoError) {
+      return error.missing || [];
+    }
+    throw error;
+  }
+}
+
+async function proxyDemoJson<T>(
+  path: string,
+  init?: RequestInit
+): Promise<T> {
+  const baseUrl = remoteDemoBaseUrl();
+  if (!baseUrl) {
+    throw new DemoError(
+      "demo_not_configured",
+      "Live devnet demo is not configured on this local deployment.",
+      503
+    );
+  }
+  const response = await fetch(`${baseUrl}${path}`, {
+    ...init,
+    cache: "no-store",
+    headers: {
+      "content-type": "application/json",
+      ...(init?.headers || {}),
+    },
+  });
+  const text = await response.text();
+  let body: unknown = null;
+  try {
+    body = text ? JSON.parse(text) : null;
+  } catch {
+    body = text;
+  }
+  if (!response.ok) {
+    const parsed = body as {
+      error?: string;
+      message?: string;
+      missing?: string[];
+    };
+    throw new DemoError(
+      parsed?.error || "remote_demo_error",
+      parsed?.message ||
+        `Remote demo ${path} failed with ${response.status}: ${text}`,
+      response.status,
+      parsed?.missing
+    );
+  }
+  return body as T;
 }
 
 function readConfig(): EnvConfig {
@@ -1155,6 +1227,11 @@ function buildDemoProviderResponse(providerId: string) {
 
 export async function getLiveAttestation() {
   const config = readConfig();
+  if (missingConfig(config).length > 0 && remoteDemoBaseUrl()) {
+    return proxyDemoJson<ReturnType<typeof getDemoPublicConfig> & {
+      attestation?: Attestation;
+    }>("/api/demo/attestation");
+  }
   const attestation = await fetchAttestation(config);
   return {
     ...getDemoPublicConfig(),
@@ -1171,11 +1248,21 @@ export async function getLiveAttestation() {
 
 export async function requestFaucet(recipient: string, amountAtomic?: bigint) {
   const config = readConfig();
-  requiredConfig(config, {
-    requireSeller: false,
-    requireBuyer: false,
-    requireAttestationPolicy: false,
-  });
+  try {
+    requiredConfig(config, {
+      requireSeller: false,
+      requireBuyer: false,
+      requireAttestationPolicy: false,
+    });
+  } catch (error) {
+    if (error instanceof DemoError && remoteDemoBaseUrl()) {
+      return proxyDemoJson("/api/demo/faucet", {
+        method: "POST",
+        body: JSON.stringify({ recipient }),
+      });
+    }
+    throw error;
+  }
   address(recipient);
   const amount = amountAtomic || config.faucetAmountAtomic;
   if (amount > config.faucetAmountAtomic) {
@@ -1608,7 +1695,17 @@ async function runSubly402SellerFlow(args: {
 
 export async function runPaymentDemo() {
   const config = readConfig();
-  requiredConfig(config);
+  try {
+    requiredConfig(config);
+  } catch (error) {
+    if (error instanceof DemoError && remoteDemoBaseUrl()) {
+      return proxyDemoJson("/api/demo/run", {
+        method: "POST",
+        body: "{}",
+      });
+    }
+    throw error;
+  }
 
   const rpc = createRpc(config);
   const feePayer = await signerFromSecret(
@@ -1678,6 +1775,12 @@ export async function getSettlementStatus(
       "settlementId is required",
       400
     );
+  }
+  if (missingConfig(config).length > 0 && remoteDemoBaseUrl()) {
+    return proxyDemoJson<SettlementStatus>("/api/demo/settlement-status", {
+      method: "POST",
+      body: JSON.stringify({ settlementId, providerId }),
+    });
   }
   const headers = providerId
     ? { "x-subly402-provider-id": providerId }
