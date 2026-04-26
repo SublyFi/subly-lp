@@ -1114,18 +1114,34 @@ async function verifySublyAttestationForDetails(
 }
 
 function isRetryableSubly402(paymentRequired: PaymentRequiredResponse) {
+  return (
+    isInsufficientSubly402(paymentRequired) ||
+    isDepositSyncInProgress(paymentRequired)
+  );
+}
+
+function isInsufficientSubly402(paymentRequired: PaymentRequiredResponse) {
   const code = paymentRequired.facilitatorError || paymentRequired.error;
-  if (code === "deposit_sync_in_progress" || code === "insufficient_balance") {
+  if (code === "insufficient_balance") {
     return true;
   }
   const message =
     typeof paymentRequired.message === "string"
       ? paymentRequired.message.toLowerCase()
       : "";
-  return (
-    message.includes("deposit synchronization") ||
-    message.includes("insufficient")
-  );
+  return message.includes("insufficient");
+}
+
+function isDepositSyncInProgress(paymentRequired: PaymentRequiredResponse) {
+  const code = paymentRequired.facilitatorError || paymentRequired.error;
+  if (code === "deposit_sync_in_progress") {
+    return true;
+  }
+  const message =
+    typeof paymentRequired.message === "string"
+      ? paymentRequired.message.toLowerCase()
+      : "";
+  return message.includes("deposit synchronization");
 }
 
 async function postJson<T>(
@@ -1543,25 +1559,31 @@ async function runSubly402SellerFlow(args: {
     sellerTokenAccount
   );
 
-  const depositTx = await sendInstructions(args.rpc, args.feePayer, [
-    buildDepositInstruction({
-      programId: args.config.programId,
+  const depositTxs: string[] = [];
+  const depositForSublyBalance = async (minimumAtomic: bigint) => {
+    const signature = await sendInstructions(args.rpc, args.feePayer, [
+      buildDepositInstruction({
+        programId: args.config.programId,
+        client: args.buyer,
+        vaultConfig: args.config.vaultConfig,
+        clientTokenAccount: buyerTokenAccount,
+        vaultTokenAccount: args.config.vaultTokenAccount,
+        amountAtomic: depositAmount,
+      }),
+    ]);
+    depositTxs.push(signature);
+    return waitForBalance({
+      config: args.config,
       client: args.buyer,
-      vaultConfig: args.config.vaultConfig,
-      clientTokenAccount: buyerTokenAccount,
-      vaultTokenAccount: args.config.vaultTokenAccount,
-      amountAtomic: depositAmount,
-    }),
-  ]);
+      minimumAtomic,
+    });
+  };
 
-  const balance = await waitForBalance({
-    config: args.config,
-    client: args.buyer,
-    minimumAtomic: amountAtomic,
-  });
+  const balance = await depositForSublyBalance(amountAtomic);
 
   let paidResponse: Response | null = null;
   let last402: PaymentRequiredResponse | null = null;
+  let topUpCount = 0;
   for (let attempt = 0; attempt < SUBLY402_PAYMENT_RETRY_ATTEMPTS; attempt += 1) {
     const payment = await buildSublyPaymentPayload({
       url: args.config.subly402SellerUrl,
@@ -1585,6 +1607,10 @@ async function runSubly402SellerFlow(args: {
     if (!last402 || !isRetryableSubly402(last402)) {
       paidResponse = response;
       break;
+    }
+    if (isInsufficientSubly402(last402) && topUpCount < 2) {
+      topUpCount += 1;
+      await depositForSublyBalance(amountAtomic * BigInt(topUpCount + 1));
     }
     await sleep(SUBLY402_PAYMENT_RETRY_DELAY_MS);
   }
@@ -1642,7 +1668,8 @@ async function runSubly402SellerFlow(args: {
     depositAmountAtomic: depositAmount.toString(),
     depositAmount: formatUsdcAtomic(depositAmount),
     faucetTx,
-    depositTx,
+    depositTx: depositTxs[0],
+    depositTxs,
     attestation: {
       vaultConfig: attestation.vaultConfig,
       vaultSigner: attestation.vaultSigner,
@@ -1667,7 +1694,7 @@ async function runSubly402SellerFlow(args: {
           from: buyerTokenAccount,
           to: args.config.vaultTokenAccount,
           amount: formatUsdcAtomic(depositAmount),
-          tx: depositTx,
+          tx: depositTxs[0],
         },
       ],
       hidden: [
