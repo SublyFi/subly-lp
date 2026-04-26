@@ -670,24 +670,32 @@ async function resolveFundingSource(
   const mint = await fetchMint(rpc, address(config.usdcMint));
   const mintAuthority = optionAddressValue(mint.data.mintAuthority);
 
-  const mintAuthoritySigner = config.mintAuthoritySecretJson
+  const loadedMintAuthoritySigner = config.mintAuthoritySecretJson
     ? await signerFromSecret(
         config.mintAuthoritySecretJson,
         "SUBLY402_DEMO_MINT_AUTHORITY_SECRET_JSON"
       )
     : feePayer;
+  const mintAuthoritySigner =
+    loadedMintAuthoritySigner.address === feePayer.address
+      ? feePayer
+      : loadedMintAuthoritySigner;
 
   if (mintAuthority && mintAuthoritySigner.address === mintAuthority) {
     return { mode: "mint" as const, signer: mintAuthoritySigner };
   }
 
   if (config.sourceTokenAccount) {
-    const sourceOwner = config.sourceOwnerSecretJson
+    const loadedSourceOwner = config.sourceOwnerSecretJson
       ? await signerFromSecret(
           config.sourceOwnerSecretJson,
           "SUBLY402_DEMO_SOURCE_OWNER_SECRET_JSON"
         )
       : feePayer;
+    const sourceOwner =
+      loadedSourceOwner.address === feePayer.address
+        ? feePayer
+        : loadedSourceOwner;
     return {
       mode: "transfer" as const,
       signer: sourceOwner,
