@@ -493,6 +493,10 @@ export function DemoSection() {
                       : undefined
                   }
                 />
+                <DataRow
+                  label="Faucet"
+                  value={attestation?.faucetAmount || "100.000000 USDC"}
+                />
                 <DataRow label="Buyer" value={attestation?.buyerMode} />
                 <DataRow
                   label="Seqno"
@@ -612,7 +616,8 @@ export function DemoSection() {
               </div>
               <p className="text-[13px] leading-[1.7] text-paper/70">
                 Paste a Solana devnet wallet address. The server creates the
-                USDC ATA if needed and sends a small test amount.
+                USDC ATA if needed and sends{" "}
+                {attestation?.faucetAmount || "100.000000 USDC"}.
               </p>
               <div className="mt-5 flex flex-col gap-3 sm:flex-row">
                 <input

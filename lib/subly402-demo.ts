@@ -335,7 +335,7 @@ function readConfig(): EnvConfig {
     ),
     faucetAmountAtomic: envBigIntAny(
       ["SUBLY402_DEMO_FAUCET_AMOUNT_ATOMIC", "SUBLY402_DEMO_FAUCET_AMOUNT"],
-      BigInt(1_500_000)
+      BigInt(100_000_000)
     ),
     feePayerSecretJson:
       env("SUBLY402_DEMO_FEE_PAYER_SECRET_JSON") ||
