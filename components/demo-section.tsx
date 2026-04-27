@@ -15,6 +15,7 @@ import {
   Layers,
   Loader2,
   LockKeyhole,
+  Pause,
   Play,
   RefreshCw,
   Server,
@@ -210,6 +211,7 @@ const privacyDemoSteps = [
   {
     n: "01",
     label: "Request",
+    phase: "Challenge",
     title: "Buyer asks for the same paid API.",
     body: "Both paths start with a normal HTTP request and a 402 challenge. The privacy difference starts with where the payment is allowed to settle.",
     x402: "The seller's 402 challenge points the buyer at a seller payTo account.",
@@ -221,6 +223,7 @@ const privacyDemoSteps = [
   {
     n: "02",
     label: "Payment",
+    phase: "Commit",
     title: "The buyer signs payment.",
     body: "x402 pays the seller directly. Subly402 keeps the x402-style retry flow, but the buyer deposits into the vault after checking attestation.",
     x402: "Buyer signs a direct USDC transfer to the seller.",
@@ -232,6 +235,7 @@ const privacyDemoSteps = [
   {
     n: "03",
     label: "Public trail",
+    phase: "Reveal",
     title: "The chain tells a different story.",
     body: "This is the core point: x402 exposes who paid which seller. Subly402 exposes that the buyer funded a vault, not the seller they called.",
     x402: "Public chain shows Buyer token account -> Seller token account.",
@@ -243,6 +247,7 @@ const privacyDemoSteps = [
   {
     n: "04",
     label: "Payout",
+    phase: "Resolve",
     title: "Seller still gets paid.",
     body: "Subly402 is not hiding payment from the seller. It changes the public settlement shape so the seller receives a later vault payout instead of a direct buyer transfer.",
     x402: "The request is already publicly linkable to this seller.",
@@ -252,6 +257,68 @@ const privacyDemoSteps = [
       "The seller payout is public, but it is no longer the same onchain edge as the buyer's API call.",
   },
 ] as const;
+
+const x402PhaseTrace = [
+  {
+    n: "01",
+    label: "402 challenge",
+    edge: "seller payTo exposed",
+    tone: "neutral",
+  },
+  {
+    n: "02",
+    label: "direct transfer",
+    edge: "Buyer -> Seller",
+    tone: "risk",
+  },
+  {
+    n: "03",
+    label: "public graph",
+    edge: "same edge remains readable",
+    tone: "risk",
+  },
+  {
+    n: "04",
+    label: "seller state",
+    edge: "already paid directly",
+    tone: "risk",
+  },
+] as const;
+
+const sublyPhaseTrace = [
+  {
+    n: "01",
+    label: "attested policy",
+    edge: "vault, not seller",
+    tone: "private",
+  },
+  {
+    n: "02",
+    label: "vault deposit",
+    edge: "Buyer -> Vault",
+    tone: "private",
+  },
+  {
+    n: "03",
+    label: "public graph",
+    edge: "Buyer -> Seller absent",
+    tone: "hidden",
+  },
+  {
+    n: "04",
+    label: "demo batch",
+    edge: "Vault -> Seller after ~1m",
+    tone: "resolve",
+  },
+] as const;
+
+type PhaseTone = "neutral" | "risk" | "private" | "hidden" | "resolve";
+type PhaseTraceItem = {
+  n: string;
+  label: string;
+  edge: string;
+  tone: PhaseTone;
+};
 
 function short(value?: string | number | null) {
   const text = String(value || "");
@@ -267,6 +334,34 @@ function txUrl(signature: string) {
 
 function addressUrl(value: string) {
   return `https://explorer.solana.com/address/${value}?cluster=devnet`;
+}
+
+function phaseButtonClass(index: number, selected: boolean, completed: boolean) {
+  if (selected) {
+    if (index === 1) {
+      return "border-subly bg-subly text-paper";
+    }
+    if (index === 2) {
+      return "border-alert bg-alert text-paper";
+    }
+    if (index === 3) {
+      return "border-ok bg-ink text-paper";
+    }
+    return "border-ink bg-ink text-paper";
+  }
+  if (completed) {
+    if (index === 1) {
+      return "bg-subly/10 text-ink";
+    }
+    if (index === 2) {
+      return "bg-alert/10 text-ink";
+    }
+    if (index === 3) {
+      return "bg-ok/10 text-ink";
+    }
+    return "bg-paper-deep text-ink";
+  }
+  return "bg-paper text-ink hover:bg-paper-deep";
 }
 
 async function postJson<T extends object>(url: string, body?: unknown) {
@@ -516,6 +611,19 @@ export function DemoSection() {
                 active={runBusy}
                 done={Boolean(sublySettlementId)}
               />
+            </div>
+
+            <div className="border-b border-paper/15 bg-glow/10 p-5">
+              <div className="font-mono text-[10px] uppercase tracking-[0.2em] text-glow">
+                Demo batch window
+              </div>
+              <p className="mt-2 max-w-3xl text-[12px] leading-[1.6] text-paper/70">
+                This hosted proof targets an approximately 1 minute Subly402
+                batch so the Vault -&gt; Seller movement is visible during the
+                demo. Public deployments should use longer anonymity windows;
+                low-volume 1 minute batches can make participant correlation
+                easier.
+              </p>
             </div>
 
             <div className="grid gap-0 lg:grid-cols-2">
@@ -846,13 +954,11 @@ function PrivacyStoryboard({
                 key={item.label}
                 type="button"
                 onClick={() => onStepChange(index)}
-                className={`min-h-[94px] border-b border-ink/10 p-4 text-left transition-colors last:border-b-0 sm:border-b-0 sm:border-r sm:last:border-r-0 ${
-                  selected
-                    ? "bg-ink text-paper"
-                    : completed
-                      ? "bg-paper-deep text-ink"
-                      : "bg-paper text-ink hover:bg-paper-deep"
-                }`}
+                className={`min-h-[104px] border-b border-ink/10 p-4 text-left transition-colors last:border-b-0 sm:border-b-0 sm:border-r sm:last:border-r-0 ${phaseButtonClass(
+                  index,
+                  selected,
+                  completed
+                )}`}
               >
                 <div
                   className={`font-mono text-[10px] uppercase tracking-[0.2em] ${
@@ -863,6 +969,13 @@ function PrivacyStoryboard({
                 </div>
                 <div className="mt-3 font-display text-[24px] font-semibold leading-none">
                   {item.label}
+                </div>
+                <div
+                  className={`mt-2 font-mono text-[9px] uppercase tracking-[0.12em] ${
+                    selected ? "text-paper/75" : "text-ink-muted"
+                  }`}
+                >
+                  {item.phase}
                 </div>
                 <div
                   className={`mt-2 font-mono text-[9px] uppercase tracking-[0.12em] ${
@@ -938,6 +1051,7 @@ function FlowLane({
   const paymentActive = activeStep >= 1;
   const publicTrailActive = activeStep >= 2;
   const payoutActive = activeStep >= 3;
+  const phaseTrace = isSubly ? sublyPhaseTrace : x402PhaseTrace;
 
   const visibleValue = isSubly
     ? runResult?.subly402.depositTx
@@ -1012,6 +1126,12 @@ function FlowLane({
         </div>
       )}
 
+      <PathPhaseTrace
+        variant={variant}
+        activeStep={activeStep}
+        items={phaseTrace}
+      />
+
       <div className="mt-5 grid gap-3 md:grid-cols-2">
         <EvidenceTile
           icon={isSubly ? ShieldCheck : CircleDollarSign}
@@ -1071,6 +1191,118 @@ function FlowLane({
       </div>
     </div>
   );
+}
+
+function PathPhaseTrace({
+  variant,
+  activeStep,
+  items,
+}: {
+  variant: "x402" | "subly402";
+  activeStep: number;
+  items: readonly PhaseTraceItem[];
+}) {
+  const isSubly = variant === "subly402";
+  return (
+    <div className="mt-5 border border-ink/10 bg-white">
+      <div className="flex flex-col gap-2 border-b border-ink/10 p-3 sm:flex-row sm:items-center sm:justify-between">
+        <div className="font-mono text-[10px] uppercase tracking-[0.18em] text-ink-muted">
+          {isSubly ? "Subly402 movement" : "x402 movement"}
+        </div>
+        <div
+          className={`font-mono text-[10px] uppercase tracking-[0.16em] ${
+            isSubly ? "text-ok" : "text-alert"
+          }`}
+        >
+          {isSubly ? "split now, settle later" : "single visible edge"}
+        </div>
+      </div>
+      <div className="grid sm:grid-cols-4">
+        {items.map((item, index) => {
+          const active = index === activeStep;
+          const complete = index < activeStep;
+          return (
+            <div
+              key={`${variant}-${item.n}`}
+              className={`min-h-[116px] border-b border-ink/10 p-3 last:border-b-0 sm:border-b-0 sm:border-r sm:last:border-r-0 ${phaseTraceClass(
+                item.tone,
+                active,
+                complete
+              )}`}
+            >
+              <div className="flex items-start justify-between gap-2">
+                <span className="font-mono text-[10px] uppercase tracking-[0.18em]">
+                  {item.n}
+                </span>
+                <PhaseTraceIcon tone={item.tone} active={active} complete={complete} />
+              </div>
+              <div className="mt-3 font-display text-[21px] font-semibold leading-none">
+                {item.label}
+              </div>
+              <div className="mt-3 min-h-[34px] text-[12px] leading-[1.4]">
+                {item.edge}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+function phaseTraceClass(tone: PhaseTone, active: boolean, complete: boolean) {
+  if (!active && !complete) {
+    return "bg-paper text-ink-muted";
+  }
+  if (tone === "risk") {
+    return active
+      ? "bg-alert text-paper"
+      : "bg-alert/10 text-ink";
+  }
+  if (tone === "private") {
+    return active
+      ? "bg-ok text-paper"
+      : "bg-ok/10 text-ink";
+  }
+  if (tone === "hidden") {
+    return active
+      ? "bg-ink text-paper"
+      : "bg-ink/10 text-ink";
+  }
+  if (tone === "resolve") {
+    return active
+      ? "bg-glow text-ink"
+      : "bg-glow/20 text-ink";
+  }
+  return active ? "bg-ink text-paper" : "bg-paper-deep text-ink";
+}
+
+function PhaseTraceIcon({
+  tone,
+  active,
+  complete,
+}: {
+  tone: PhaseTone;
+  active: boolean;
+  complete: boolean;
+}) {
+  const className = `h-4 w-4 ${active ? "motion-safe:animate-pulse" : ""}`;
+  if (tone === "hidden") {
+    return <Pause className={className} />;
+  }
+  if (tone === "private") {
+    return <LockKeyhole className={className} />;
+  }
+  if (tone === "resolve") {
+    return <Layers className={className} />;
+  }
+  if (tone === "risk") {
+    return <Eye className={className} />;
+  }
+  if (complete) {
+    return <CheckCircle2 className={className} />;
+  }
+  return <ArrowRight className={className} />;
 }
 
 function ActorNode({
