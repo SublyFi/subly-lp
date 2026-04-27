@@ -336,6 +336,28 @@ function addressUrl(value: string) {
   return `https://explorer.solana.com/address/${value}?cluster=devnet`;
 }
 
+function flowStepForPath(
+  variant: "x402" | "subly402",
+  activeStep: number,
+  runResult: RunResult | null
+) {
+  if (!runResult || activeStep < 2) {
+    return activeStep;
+  }
+  if (variant === "x402" && runResult.x402.settlementTx) {
+    return 3;
+  }
+  if (variant === "subly402") {
+    if (runResult.subly402.settlementStatus?.txSignature) {
+      return 3;
+    }
+    if (runResult.subly402.depositTx) {
+      return 2;
+    }
+  }
+  return activeStep;
+}
+
 function phaseButtonClass(index: number, selected: boolean, completed: boolean) {
   if (selected) {
     if (index === 1) {
@@ -464,8 +486,9 @@ export function DemoSection() {
     setActiveStep(1);
     setRunBusy(true);
     try {
-      setRunResult(await postJson<RunResult>("/api/demo/run"));
-      setActiveStep(privacyDemoSteps.length - 1);
+      const result = await postJson<RunResult>("/api/demo/run");
+      setRunResult(result);
+      setActiveStep(result.subly402.settlementStatus?.txSignature ? 3 : 2);
     } catch (err) {
       setError(err as ApiError);
     } finally {
@@ -511,6 +534,9 @@ export function DemoSection() {
           },
         },
       });
+      if (status.txSignature) {
+        setActiveStep(3);
+      }
     } catch (err) {
       setError(err as ApiError);
     } finally {
@@ -1056,10 +1082,11 @@ function FlowLane({
   runResult: RunResult | null;
 }) {
   const isSubly = variant === "subly402";
-  const step = privacyDemoSteps[activeStep] || privacyDemoSteps[0];
-  const paymentActive = activeStep >= 1;
-  const publicTrailActive = activeStep >= 2;
-  const payoutActive = activeStep >= 3;
+  const pathStep = flowStepForPath(variant, activeStep, runResult);
+  const step = privacyDemoSteps[pathStep] || privacyDemoSteps[0];
+  const paymentActive = pathStep >= 1;
+  const publicTrailActive = pathStep >= 2;
+  const payoutActive = pathStep >= 3;
   const phaseTrace = isSubly ? sublyPhaseTrace : x402PhaseTrace;
 
   const visibleValue = isSubly
@@ -1076,6 +1103,8 @@ function FlowLane({
 
   const payoutValue = runResult?.subly402.settlementStatus?.txSignature
     ? `Payout tx ${short(runResult.subly402.settlementStatus.txSignature)}`
+    : runResult?.subly402.settlementStatus?.status === "SettledOffchain"
+      ? "Batch pending"
     : payoutActive
       ? "Vault -> Seller batch"
       : "Not paid out yet";
@@ -1137,7 +1166,7 @@ function FlowLane({
 
       <PathPhaseTrace
         variant={variant}
-        activeStep={activeStep}
+        activeStep={pathStep}
         items={phaseTrace}
       />
 
