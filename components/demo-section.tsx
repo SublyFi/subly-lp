@@ -1118,10 +1118,10 @@ function FlowLane({
               isSubly ? "text-ok" : "text-alert"
             }`}
           >
-            {isSubly ? "Subly402 privacy-preserving path" : "Official x402 path"}
+            {isSubly ? "Privacy-preserving x402 path" : "Official x402 path"}
           </div>
           <h4 className="mt-2 font-display text-[32px] font-semibold leading-none text-ink">
-            {isSubly ? "Vault-mediated" : "Direct settlement"}
+            {isSubly ? "Subly x402" : "Official x402"}
           </h4>
         </div>
         <div
