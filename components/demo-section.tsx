@@ -15,7 +15,6 @@ import {
   Layers,
   Loader2,
   LockKeyhole,
-  Pause,
   Play,
   RefreshCw,
   Server,
@@ -261,26 +260,26 @@ const privacyDemoSteps = [
 const x402PhaseTrace = [
   {
     n: "01",
-    label: "402 challenge",
-    edge: "seller payTo exposed",
+    label: "Seller shown",
+    edge: "challenge names seller wallet",
     tone: "neutral",
   },
   {
     n: "02",
-    label: "direct transfer",
-    edge: "Buyer -> Seller",
+    label: "Buyer pays Seller",
+    edge: "Buyer -> Seller tx",
     tone: "risk",
   },
   {
     n: "03",
-    label: "public graph",
-    edge: "same edge remains readable",
+    label: "Link visible",
+    edge: "buyer, seller, amount, time",
     tone: "risk",
   },
   {
     n: "04",
-    label: "seller state",
-    edge: "already paid directly",
+    label: "Seller paid now",
+    edge: "done in the direct tx",
     tone: "risk",
   },
 ] as const;
@@ -288,26 +287,26 @@ const x402PhaseTrace = [
 const sublyPhaseTrace = [
   {
     n: "01",
-    label: "attested policy",
-    edge: "vault, not seller",
+    label: "Vault shown",
+    edge: "challenge names vault",
     tone: "private",
   },
   {
     n: "02",
-    label: "vault deposit",
-    edge: "Buyer -> Vault",
+    label: "Buyer funds Vault",
+    edge: "Buyer -> Vault tx",
     tone: "private",
   },
   {
     n: "03",
-    label: "public graph",
-    edge: "Buyer -> Seller absent",
+    label: "Seller hidden",
+    edge: "no Buyer -> Seller tx",
     tone: "hidden",
   },
   {
     n: "04",
-    label: "demo batch",
-    edge: "Vault -> Seller after ~1m",
+    label: "Seller paid later",
+    edge: "Vault -> Seller batch",
     tone: "resolve",
   },
 ] as const;
@@ -875,7 +874,7 @@ export function DemoSection() {
 
             <div className="border border-paper/20 bg-paper/5 p-5">
               <div className="mb-4 font-mono text-[11px] uppercase tracking-[0.2em] text-glow">
-                Public chain view
+                On-chain comparison
               </div>
               <div className="space-y-3">
                 {privacyRows.map((row) => (
@@ -1042,7 +1041,7 @@ function PrivacyStoryboard({
         <div className="p-5">
           <div className="flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.2em] text-ink-muted">
             <Eye className="h-4 w-4" />
-            Public observer learns
+            What observer learns
           </div>
           <p className="mt-3 max-w-4xl font-serif-it text-[23px] leading-[1.25] text-ink md:text-[28px]">
             {step.observer}
@@ -1179,7 +1178,7 @@ function FlowLane({
         />
         <EvidenceTile
           icon={isSubly ? Layers : Server}
-          label="Public chain view"
+          label="Visible on-chain tx"
           value={visibleValue}
           tone={isSubly ? "private" : "risk"}
         />
@@ -1245,14 +1244,14 @@ function PathPhaseTrace({
     <div className="mt-5 border border-ink/10 bg-white">
       <div className="flex flex-col gap-2 border-b border-ink/10 p-3 sm:flex-row sm:items-center sm:justify-between">
         <div className="font-mono text-[10px] uppercase tracking-[0.18em] text-ink-muted">
-          {isSubly ? "Subly402 movement" : "x402 movement"}
+          {isSubly ? "Subly x402 tx path" : "Official x402 tx path"}
         </div>
         <div
           className={`font-mono text-[10px] uppercase tracking-[0.16em] ${
             isSubly ? "text-ok" : "text-alert"
           }`}
         >
-          {isSubly ? "split now, settle later" : "single visible edge"}
+          {isSubly ? "buyer pays vault first" : "buyer pays seller now"}
         </div>
       </div>
       <div className="grid sm:grid-cols-4">
@@ -1272,7 +1271,11 @@ function PathPhaseTrace({
                 <span className="font-mono text-[10px] uppercase tracking-[0.18em]">
                   {item.n}
                 </span>
-                <PhaseTraceIcon tone={item.tone} active={active} complete={complete} />
+                <PhaseTraceBadge
+                  tone={item.tone}
+                  active={active}
+                  complete={complete}
+                />
               </div>
               <div className="mt-3 font-display text-[21px] font-semibold leading-none">
                 {item.label}
@@ -1315,7 +1318,7 @@ function phaseTraceClass(tone: PhaseTone, active: boolean, complete: boolean) {
   return active ? "bg-ink text-paper" : "bg-paper-deep text-ink";
 }
 
-function PhaseTraceIcon({
+function PhaseTraceBadge({
   tone,
   active,
   complete,
@@ -1324,23 +1327,29 @@ function PhaseTraceIcon({
   active: boolean;
   complete: boolean;
 }) {
-  const className = `h-4 w-4 ${active ? "motion-safe:animate-pulse" : ""}`;
-  if (tone === "hidden") {
-    return <Pause className={className} />;
-  }
-  if (tone === "private") {
-    return <LockKeyhole className={className} />;
-  }
-  if (tone === "resolve") {
-    return <Layers className={className} />;
-  }
-  if (tone === "risk") {
-    return <Eye className={className} />;
-  }
-  if (complete) {
-    return <CheckCircle2 className={className} />;
-  }
-  return <ArrowRight className={className} />;
+  const label =
+    tone === "risk"
+      ? "visible"
+      : tone === "private"
+        ? "vault"
+        : tone === "hidden"
+          ? "hidden"
+          : tone === "resolve"
+            ? "later"
+            : complete
+              ? "done"
+              : "step";
+  return (
+    <span
+      className={`border px-1.5 py-0.5 font-mono text-[8px] uppercase tracking-[0.12em] ${
+        active || complete
+          ? "border-current text-current"
+          : "border-ink/20 text-ink-muted"
+      }`}
+    >
+      {label}
+    </span>
+  );
 }
 
 function ActorNode({
