@@ -1,16 +1,27 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import type { LucideIcon } from "lucide-react";
 import {
+  ArrowRight,
   CheckCircle2,
+  CircleDollarSign,
   Clipboard,
   Droplets,
+  Eye,
+  EyeOff,
   ExternalLink,
+  Landmark,
+  Layers,
   Loader2,
+  LockKeyhole,
   Play,
   RefreshCw,
+  Server,
   ShieldCheck,
+  Store,
   Terminal,
+  Wallet,
 } from "lucide-react";
 
 type AttestationState = {
@@ -195,6 +206,53 @@ const client = new Subly402Client({
 const sublyFetch = wrapSublyFetchWithPayment(fetch, client);
 await sublyFetch("http://seller.demo.sublyfi.com/subly/weather");`;
 
+const privacyDemoSteps = [
+  {
+    n: "01",
+    label: "Request",
+    title: "Buyer asks for the same paid API.",
+    body: "Both paths start with a normal HTTP request and a 402 challenge. The privacy difference starts with where the payment is allowed to settle.",
+    x402: "The seller's 402 challenge points the buyer at a seller payTo account.",
+    subly402:
+      "The seller's 402 challenge points the buyer at an attested Subly vault policy.",
+    observer:
+      "No transfer has settled yet. The observer is waiting for the public payment trail.",
+  },
+  {
+    n: "02",
+    label: "Payment",
+    title: "The buyer signs payment.",
+    body: "x402 pays the seller directly. Subly402 keeps the x402-style retry flow, but the buyer deposits into the vault after checking attestation.",
+    x402: "Buyer signs a direct USDC transfer to the seller.",
+    subly402:
+      "Buyer signs a vault deposit and a paid request bound to the attested policy.",
+    observer:
+      "x402 creates a buyer-to-seller edge. Subly402 creates a buyer-to-vault edge.",
+  },
+  {
+    n: "03",
+    label: "Public trail",
+    title: "The chain tells a different story.",
+    body: "This is the core point: x402 exposes who paid which seller. Subly402 exposes that the buyer funded a vault, not the seller they called.",
+    x402: "Public chain shows Buyer token account -> Seller token account.",
+    subly402:
+      "Public chain shows Buyer token account -> Subly vault. The direct seller edge is absent.",
+    observer:
+      "A block explorer can link buyer and seller in x402. With Subly402, that direct link is not visible.",
+  },
+  {
+    n: "04",
+    label: "Payout",
+    title: "Seller still gets paid.",
+    body: "Subly402 is not hiding payment from the seller. It changes the public settlement shape so the seller receives a later vault payout instead of a direct buyer transfer.",
+    x402: "The request is already publicly linkable to this seller.",
+    subly402:
+      "Seller receives a batched Vault -> Seller payout, separate from the buyer deposit.",
+    observer:
+      "The seller payout is public, but it is no longer the same onchain edge as the buyer's API call.",
+  },
+] as const;
+
 function short(value?: string | number | null) {
   const text = String(value || "");
   if (text.length <= 16) {
@@ -227,6 +285,7 @@ async function postJson<T extends object>(url: string, body?: unknown) {
 export function DemoSection() {
   const [attestation, setAttestation] = useState<AttestationState | null>(null);
   const [attestationLoading, setAttestationLoading] = useState(true);
+  const [activeStep, setActiveStep] = useState(0);
   const [recipient, setRecipient] = useState("");
   const [faucetBusy, setFaucetBusy] = useState(false);
   const [runBusy, setRunBusy] = useState(false);
@@ -249,17 +308,20 @@ export function DemoSection() {
     () => [
       {
         label: "x402",
-        value: "buyer token account -> seller token account is visible on the settlement tx",
+        value:
+          "Each paid request can settle as a visible Buyer token account -> Seller token account transfer.",
         tone: "text-alert",
       },
       {
         label: "Subly402",
-        value: "buyer token account -> Subly vault deposit is visible; buyer -> seller is not",
+        value:
+          "The buyer's visible transaction is a vault deposit. Seller payout is delayed and batched from the vault.",
         tone: "text-glow",
       },
       {
-        label: "Payout",
-        value: "vault -> seller payout appears after batch settlement",
+        label: "Why it matters",
+        value:
+          "The seller is paid, but public observers do not get the direct Buyer -> Seller edge for the API call.",
         tone: "text-paper/80",
       },
     ],
@@ -304,14 +366,20 @@ export function DemoSection() {
 
   async function runLivePayment() {
     setError(null);
+    setActiveStep(1);
     setRunBusy(true);
     try {
       setRunResult(await postJson<RunResult>("/api/demo/run"));
+      setActiveStep(privacyDemoSteps.length - 1);
     } catch (err) {
       setError(err as ApiError);
     } finally {
       setRunBusy(false);
     }
+  }
+
+  function advancePrivacyStep() {
+    setActiveStep((step) => (step + 1) % privacyDemoSteps.length);
   }
 
   async function refreshSettlementStatus() {
@@ -349,29 +417,38 @@ export function DemoSection() {
         <div className="mb-12 grid gap-8 md:grid-cols-12">
           <div className="md:col-span-5">
             <div className="mb-4 font-mono text-[10px] uppercase tracking-[0.24em] text-glow">
-              § 01 · x402 vs Subly402 live demo
+              § 01 · Privacy flow demo
             </div>
             <h2 className="font-display text-[54px] font-semibold leading-[0.94] text-paper md:text-[78px]">
-              Click once.
+              Same API call.
               <br />
-              Compare two
+              Different public
               <br />
-              paid requests.
+              trail.
             </h2>
           </div>
           <div className="md:col-span-6 md:col-start-7">
             <p className="font-serif-it text-[26px] leading-[1.3] text-paper md:text-[32px]">
-              The hosted Buyer calls the same Seller host twice: once through
-              official x402, once through Subly402.
+              Press through the flow. Official x402 makes the Buyer to Seller
+              payment edge public. Subly402 keeps the x402-style HTTP flow, but
+              changes what the chain reveals.
             </p>
             <p className="mt-6 max-w-xl text-[14px] leading-[1.7] text-paper/70">
-              The result shows the public Solana devnet evidence. x402 settles
-              as a direct Buyer token account to Seller token account transfer.
-              Subly402 shows a Buyer deposit into the vault, with the Seller
-              payout delayed into a batch.
+              The live proof below calls the same Seller twice: once through
+              official x402, once through Subly402. The important difference is
+              not the API response. It is the public settlement graph.
             </p>
           </div>
         </div>
+
+        <PrivacyStoryboard
+          activeStep={activeStep}
+          onStepChange={setActiveStep}
+          onNextStep={advancePrivacyStep}
+          onRunLive={runLivePayment}
+          runBusy={runBusy}
+          runResult={runResult}
+        />
 
         <div className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
           <div className="border border-paper/20 bg-paper/5 shadow-[6px_6px_0_0_var(--glow)]">
@@ -379,10 +456,10 @@ export function DemoSection() {
               <div>
                 <div className="flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.2em] text-glow">
                   <Terminal className="h-4 w-4" />
-                  Devnet payment console
+                  Live devnet proof
                 </div>
                 <div className="mt-2 text-[13px] text-paper/60">
-                  Seller {short(attestation?.sellerBaseUrl)} · hosted buyer ·{" "}
+                  Same seller · hosted buyer ·{" "}
                   {attestation?.network || "solana:devnet"}
                 </div>
               </div>
@@ -397,14 +474,14 @@ export function DemoSection() {
                 ) : (
                   <Play className="h-4 w-4" />
                 )}
-                Run comparison
+                Run proof
               </button>
             </div>
 
             <div className="grid border-b border-paper/15 md:grid-cols-3">
               <StepCell
                 n="01"
-                label="x402 direct"
+                label="x402 public edge"
                 value={
                   runResult?.x402.settlementTx
                     ? short(runResult.x402.settlementTx)
@@ -417,7 +494,7 @@ export function DemoSection() {
               />
               <StepCell
                 n="02"
-                label="Subly deposit"
+                label="Subly vault edge"
                 value={
                   runResult?.subly402.depositTx
                     ? short(runResult.subly402.depositTx)
@@ -430,7 +507,7 @@ export function DemoSection() {
               />
               <StepCell
                 n="03"
-                label="Batch payout"
+                label="Seller payout"
                 value={
                   runResult?.subly402.settlementStatus?.status ||
                   sublySettlementId ||
@@ -678,7 +755,7 @@ export function DemoSection() {
           </div>
         </div>
 
-        <div className="mt-10 grid gap-6 lg:grid-cols-2">
+        <div className="mt-10 grid min-w-0 gap-6 lg:grid-cols-2">
           <CodePanel
             title="Seller"
             subtitle="one middleware route, receiving wallet only"
@@ -696,6 +773,420 @@ export function DemoSection() {
         </div>
       </div>
     </section>
+  );
+}
+
+function PrivacyStoryboard({
+  activeStep,
+  onStepChange,
+  onNextStep,
+  onRunLive,
+  runBusy,
+  runResult,
+}: {
+  activeStep: number;
+  onStepChange: (step: number) => void;
+  onNextStep: () => void;
+  onRunLive: () => void;
+  runBusy: boolean;
+  runResult: RunResult | null;
+}) {
+  const step = privacyDemoSteps[activeStep] || privacyDemoSteps[0];
+  const isLastStep = activeStep === privacyDemoSteps.length - 1;
+
+  return (
+    <div className="mb-10 border border-paper/20 bg-paper text-ink shadow-[6px_6px_0_0_var(--glow)]">
+      <div className="grid border-b border-ink/10 lg:grid-cols-[0.8fr_1.2fr]">
+        <div className="border-b border-ink/10 p-5 lg:border-b-0 lg:border-r">
+          <div className="flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.22em] text-ink-muted">
+            <ShieldCheck className="h-4 w-4 text-ok" />
+            Press to reveal the settlement graph
+          </div>
+          <h3 className="mt-4 font-display text-[34px] font-semibold leading-[0.98] text-ink md:text-[46px]">
+            {step.title}
+          </h3>
+          <p className="mt-4 max-w-xl text-[14px] leading-[1.7] text-ink-muted">
+            {step.body}
+          </p>
+          <div className="mt-5 flex flex-col gap-3 sm:flex-row">
+            <button
+              type="button"
+              onClick={onNextStep}
+              className="inline-flex h-11 items-center justify-center gap-2 border border-ink bg-ink px-4 font-mono text-[11px] uppercase tracking-[0.16em] text-paper transition-colors hover:border-subly hover:bg-subly"
+            >
+              {isLastStep ? (
+                <RefreshCw className="h-4 w-4" />
+              ) : (
+                <ArrowRight className="h-4 w-4" />
+              )}
+              {isLastStep ? "Replay flow" : "Next step"}
+            </button>
+            <button
+              type="button"
+              onClick={onRunLive}
+              disabled={runBusy}
+              className="inline-flex h-11 items-center justify-center gap-2 border border-ink/25 px-4 font-mono text-[11px] uppercase tracking-[0.16em] text-ink transition-colors hover:border-subly hover:text-subly disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              {runBusy ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <Play className="h-4 w-4" />
+              )}
+              Run live proof
+            </button>
+          </div>
+        </div>
+
+        <div className="grid sm:grid-cols-4">
+          {privacyDemoSteps.map((item, index) => {
+            const selected = index === activeStep;
+            const completed = index < activeStep;
+            return (
+              <button
+                key={item.label}
+                type="button"
+                onClick={() => onStepChange(index)}
+                className={`min-h-[94px] border-b border-ink/10 p-4 text-left transition-colors last:border-b-0 sm:border-b-0 sm:border-r sm:last:border-r-0 ${
+                  selected
+                    ? "bg-ink text-paper"
+                    : completed
+                      ? "bg-paper-deep text-ink"
+                      : "bg-paper text-ink hover:bg-paper-deep"
+                }`}
+              >
+                <div
+                  className={`font-mono text-[10px] uppercase tracking-[0.2em] ${
+                    selected ? "text-glow" : "text-ink-muted"
+                  }`}
+                >
+                  {item.n}
+                </div>
+                <div className="mt-3 font-display text-[24px] font-semibold leading-none">
+                  {item.label}
+                </div>
+                <div
+                  className={`mt-2 font-mono text-[9px] uppercase tracking-[0.12em] ${
+                    selected ? "text-paper/60" : "text-ink-muted"
+                  }`}
+                >
+                  {completed ? "revealed" : selected ? "active" : "tap"}
+                </div>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      <div className="grid gap-px bg-ink/10 lg:grid-cols-2">
+        <FlowLane
+          variant="x402"
+          activeStep={activeStep}
+          runResult={runResult}
+        />
+        <FlowLane
+          variant="subly402"
+          activeStep={activeStep}
+          runResult={runResult}
+        />
+      </div>
+
+      <div className="grid border-t border-ink/10 lg:grid-cols-[1fr_320px]">
+        <div className="p-5">
+          <div className="flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.2em] text-ink-muted">
+            <Eye className="h-4 w-4" />
+            Public observer learns
+          </div>
+          <p className="mt-3 max-w-4xl font-serif-it text-[23px] leading-[1.25] text-ink md:text-[28px]">
+            {step.observer}
+          </p>
+        </div>
+        <div className="border-t border-ink/10 p-5 lg:border-l lg:border-t-0">
+          <div className="font-mono text-[10px] uppercase tracking-[0.2em] text-ink-muted">
+            Verdict
+          </div>
+          <div className="mt-3 grid gap-2">
+            <VerdictRow
+              icon={Eye}
+              label="x402"
+              value="Buyer -> Seller is visible"
+              tone="risk"
+            />
+            <VerdictRow
+              icon={EyeOff}
+              label="Subly402"
+              value="Direct buyer-seller edge is not visible"
+              tone="private"
+            />
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function FlowLane({
+  variant,
+  activeStep,
+  runResult,
+}: {
+  variant: "x402" | "subly402";
+  activeStep: number;
+  runResult: RunResult | null;
+}) {
+  const isSubly = variant === "subly402";
+  const step = privacyDemoSteps[activeStep] || privacyDemoSteps[0];
+  const paymentActive = activeStep >= 1;
+  const publicTrailActive = activeStep >= 2;
+  const payoutActive = activeStep >= 3;
+
+  const visibleValue = isSubly
+    ? runResult?.subly402.depositTx
+      ? `Deposit tx ${short(runResult.subly402.depositTx)}`
+      : publicTrailActive
+        ? "Buyer ATA -> Subly vault"
+        : "Waiting for vault deposit"
+    : runResult?.x402.settlementTx
+      ? `Settle tx ${short(runResult.x402.settlementTx)}`
+      : publicTrailActive
+        ? "Buyer ATA -> Seller ATA"
+        : "Waiting for direct payment";
+
+  const payoutValue = runResult?.subly402.settlementStatus?.txSignature
+    ? `Payout tx ${short(runResult.subly402.settlementStatus.txSignature)}`
+    : payoutActive
+      ? "Vault -> Seller batch"
+      : "Not paid out yet";
+
+  return (
+    <div className="bg-paper p-5">
+      <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
+        <div>
+          <div
+            className={`font-mono text-[10px] uppercase tracking-[0.22em] ${
+              isSubly ? "text-ok" : "text-alert"
+            }`}
+          >
+            {isSubly ? "Subly402 privacy-preserving path" : "Official x402 path"}
+          </div>
+          <h4 className="mt-2 font-display text-[32px] font-semibold leading-none text-ink">
+            {isSubly ? "Vault-mediated" : "Direct settlement"}
+          </h4>
+        </div>
+        <div
+          className={`inline-flex w-fit items-center gap-2 border px-3 py-2 font-mono text-[10px] uppercase tracking-[0.14em] ${
+            isSubly
+              ? "border-ok bg-ok/10 text-ink"
+              : "border-alert bg-alert/10 text-alert"
+          }`}
+        >
+          {isSubly ? (
+            <LockKeyhole className="h-4 w-4" />
+          ) : (
+            <Eye className="h-4 w-4" />
+          )}
+          {isSubly ? "Link reduced" : "Link exposed"}
+        </div>
+      </div>
+
+      {isSubly ? (
+        <div className="mt-5 grid gap-3 md:grid-cols-[minmax(0,1fr)_58px_minmax(0,1fr)_58px_minmax(0,1fr)] md:items-stretch">
+          <ActorNode icon={Wallet} label="Buyer wallet" detail="Buyer" />
+          <FlowConnector
+            active={paymentActive}
+            label="deposit"
+            tone="private"
+          />
+          <ActorNode icon={Landmark} label="Attested vault" detail="Vault" />
+          <FlowConnector
+            active={payoutActive}
+            label="batch"
+            tone="private"
+          />
+          <ActorNode icon={Store} label="Seller wallet" detail="Seller" />
+        </div>
+      ) : (
+        <div className="mt-5 grid gap-3 md:grid-cols-[minmax(0,1fr)_72px_minmax(0,1fr)] md:items-stretch">
+          <ActorNode icon={Wallet} label="Buyer wallet" detail="Buyer" />
+          <FlowConnector active={paymentActive} label="direct" tone="risk" />
+          <ActorNode icon={Store} label="Seller wallet" detail="Seller" />
+        </div>
+      )}
+
+      <div className="mt-5 grid gap-3 md:grid-cols-2">
+        <EvidenceTile
+          icon={isSubly ? ShieldCheck : CircleDollarSign}
+          label="What happens"
+          value={isSubly ? step.subly402 : step.x402}
+          tone={isSubly ? "private" : "risk"}
+        />
+        <EvidenceTile
+          icon={isSubly ? Layers : Server}
+          label="Public chain view"
+          value={visibleValue}
+          tone={isSubly ? "private" : "risk"}
+        />
+        {isSubly ? (
+          <>
+            <EvidenceTile
+              icon={EyeOff}
+              label="Not directly visible"
+              value={
+                publicTrailActive
+                  ? "Buyer ATA -> Seller ATA"
+                  : "Direct seller link has not appeared"
+              }
+              tone="private"
+            />
+            <EvidenceTile
+              icon={Layers}
+              label="Seller payout"
+              value={payoutValue}
+              tone="neutral"
+            />
+          </>
+        ) : (
+          <>
+            <EvidenceTile
+              icon={Eye}
+              label="Observer can infer"
+              value={
+                publicTrailActive
+                  ? "Buyer, seller, amount, and timing"
+                  : "Nothing until settlement"
+              }
+              tone="risk"
+            />
+            <EvidenceTile
+              icon={Server}
+              label="API privacy"
+              value={
+                publicTrailActive
+                  ? "The paid provider is linkable"
+                  : "Payment not broadcast yet"
+              }
+              tone="neutral"
+            />
+          </>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function ActorNode({
+  icon: Icon,
+  label,
+  detail,
+}: {
+  icon: LucideIcon;
+  label: string;
+  detail: string;
+}) {
+  return (
+    <div className="min-h-[108px] min-w-0 border border-ink/15 bg-white p-4">
+      <div className="flex items-center gap-3">
+        <span className="flex h-10 w-10 shrink-0 items-center justify-center border border-ink/20 bg-paper-deep text-ink">
+          <Icon className="h-5 w-5" />
+        </span>
+        <div className="min-w-0">
+          <div className="font-mono text-[10px] uppercase tracking-[0.18em] text-ink-muted">
+            {label}
+          </div>
+          <div className="mt-2 truncate font-display text-[22px] font-semibold leading-none text-ink">
+            {detail}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function FlowConnector({
+  active,
+  label,
+  tone,
+}: {
+  active: boolean;
+  label: string;
+  tone: "risk" | "private";
+}) {
+  const activeClass =
+    tone === "risk"
+      ? "border-alert bg-alert/10 text-alert"
+      : "border-ok bg-ok/10 text-ink";
+
+  return (
+    <div
+      className={`flex min-h-[54px] items-center justify-center gap-2 border px-2 text-center transition-colors md:min-h-[108px] md:flex-col ${
+        active ? activeClass : "border-ink/15 bg-paper-deep text-ink-muted"
+      }`}
+    >
+      <ArrowRight
+        className={`h-4 w-4 rotate-90 md:rotate-0 ${
+          active ? "" : "opacity-45"
+        }`}
+      />
+      <span className="font-mono text-[9px] uppercase tracking-[0.14em]">
+        {label}
+      </span>
+    </div>
+  );
+}
+
+function EvidenceTile({
+  icon: Icon,
+  label,
+  value,
+  tone,
+}: {
+  icon: LucideIcon;
+  label: string;
+  value: string;
+  tone: "risk" | "private" | "neutral";
+}) {
+  const toneClass =
+    tone === "risk"
+      ? "text-alert"
+      : tone === "private"
+        ? "text-ok"
+        : "text-ink-muted";
+
+  return (
+    <div className="min-h-[116px] border border-ink/10 bg-white p-4">
+      <div
+        className={`flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.18em] ${toneClass}`}
+      >
+        <Icon className="h-4 w-4" />
+        {label}
+      </div>
+      <p className="mt-3 text-[13px] leading-[1.55] text-ink-soft">{value}</p>
+    </div>
+  );
+}
+
+function VerdictRow({
+  icon: Icon,
+  label,
+  value,
+  tone,
+}: {
+  icon: LucideIcon;
+  label: string;
+  value: string;
+  tone: "risk" | "private";
+}) {
+  return (
+    <div className="grid grid-cols-[78px_1fr] items-center gap-3 border border-ink/10 bg-white p-3">
+      <span
+        className={`flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.16em] ${
+          tone === "risk" ? "text-alert" : "text-ok"
+        }`}
+      >
+        <Icon className="h-4 w-4" />
+        {label}
+      </span>
+      <span className="text-[12px] leading-[1.4] text-ink-soft">{value}</span>
+    </div>
   );
 }
 
@@ -909,13 +1400,13 @@ function CodePanel({
   onCopy: () => void;
 }) {
   return (
-    <div className="border border-paper/20 bg-paper/5">
+    <div className="min-w-0 border border-paper/20 bg-paper/5">
       <div className="flex items-center justify-between gap-4 border-b border-paper/15 p-4">
-        <div>
+        <div className="min-w-0">
           <div className="font-display text-[24px] font-semibold text-paper">
             {title}
           </div>
-          <div className="mt-1 font-mono text-[10px] uppercase tracking-[0.18em] text-paper/50">
+          <div className="mt-1 truncate font-mono text-[10px] uppercase tracking-[0.18em] text-paper/50">
             {subtitle}
           </div>
         </div>
@@ -932,7 +1423,7 @@ function CodePanel({
           {copied ? "Copied" : "Copy"}
         </button>
       </div>
-      <pre className="max-h-[430px] overflow-auto p-4 text-[12px] leading-[1.65] text-paper/75">
+      <pre className="max-h-[430px] max-w-full overflow-auto p-4 text-[12px] leading-[1.65] text-paper/75">
         <code>{code}</code>
       </pre>
       <div className="flex items-center justify-between border-t border-paper/15 p-4 font-mono text-[10px] uppercase tracking-[0.18em] text-paper/45">
