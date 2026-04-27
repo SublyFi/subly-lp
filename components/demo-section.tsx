@@ -1029,9 +1029,11 @@ function FlowLane({
   const payoutActive = pathStep >= 3;
   const x402Paid = Boolean(runResult?.x402.settlementTx);
   const sublyDeposited = Boolean(runResult?.subly402.depositTx);
-  const sublyPayoutConfirmed = Boolean(
-    runResult?.subly402.settlementStatus?.txSignature
-  );
+  const sublyPayoutTx =
+    runResult?.subly402.settlementStatus?.txSignature ||
+    runResult?.subly402.chainView.delayed?.[0]?.tx ||
+    null;
+  const sublyPayoutConfirmed = Boolean(sublyPayoutTx);
   const sublyBatchPending =
     sublyDeposited &&
     !sublyPayoutConfirmed &&
@@ -1109,7 +1111,7 @@ function FlowLane({
       </div>
 
       {isSubly ? (
-        <div className="mt-5 grid gap-3 md:grid-cols-[minmax(0,1fr)_58px_minmax(0,1fr)_58px_minmax(0,1fr)] md:items-stretch">
+        <div className="mt-5 grid gap-3 md:grid-cols-[minmax(0,1fr)_96px_minmax(0,1fr)_96px_minmax(0,1fr)] md:items-stretch">
           <ActorNode
             icon={Wallet}
             label="Buyer wallet"
@@ -1122,6 +1124,7 @@ function FlowLane({
             label="Buyer -> Vault"
             tone="private"
             status={sublyDeposited ? "deposit complete" : "vault deposit"}
+            txSignature={runResult?.subly402.depositTx}
           />
           <ActorNode
             icon={Landmark}
@@ -1141,6 +1144,7 @@ function FlowLane({
                   ? "batch pending"
                   : "seller payout"
             }
+            txSignature={sublyPayoutTx}
           />
           <ActorNode
             icon={Store}
@@ -1152,7 +1156,7 @@ function FlowLane({
           />
         </div>
       ) : (
-        <div className="mt-5 grid gap-3 md:grid-cols-[minmax(0,1fr)_72px_minmax(0,1fr)] md:items-stretch">
+        <div className="mt-5 grid gap-3 md:grid-cols-[minmax(0,1fr)_128px_minmax(0,1fr)] md:items-stretch">
           <ActorNode
             icon={Wallet}
             label="Buyer wallet"
@@ -1165,6 +1169,7 @@ function FlowLane({
             label="Buyer -> Seller"
             tone="risk"
             status={x402Paid ? "paid now" : "direct tx"}
+            txSignature={runResult?.x402.settlementTx}
           />
           <ActorNode
             icon={Store}
@@ -1405,11 +1410,13 @@ function FlowConnector({
   label,
   tone,
   status,
+  txSignature,
 }: {
   state: FlowState;
   label: string;
   tone: FlowTone;
   status: string;
+  txSignature?: string | null;
 }) {
   const active = state !== "idle";
   const activeClass =
@@ -1430,13 +1437,25 @@ function FlowConnector({
           active ? "" : "opacity-45"
         }`}
       />
-      <div className="grid gap-1">
+      <div className="grid min-w-0 gap-1">
         <span className="font-mono text-[9px] uppercase tracking-[0.14em]">
           {label}
         </span>
         <span className="font-mono text-[8px] uppercase tracking-[0.1em] opacity-70">
           {state === "complete" ? "complete" : status}
         </span>
+        {txSignature && (
+          <a
+            href={txUrl(txSignature)}
+            target="_blank"
+            rel="noreferrer"
+            aria-label={`Open ${label} transaction in Solana Explorer`}
+            className="mt-1 inline-flex min-w-0 items-center justify-center gap-1 font-mono text-[9px] leading-none underline-offset-2 transition-colors hover:underline"
+          >
+            <span className="min-w-0 truncate">{short(txSignature)}</span>
+            <ExternalLink className="h-3 w-3 shrink-0 opacity-70" />
+          </a>
+        )}
       </div>
     </div>
   );
