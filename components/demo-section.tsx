@@ -621,7 +621,7 @@ export function DemoSection() {
                 label="x402 public edge"
                 value={
                   runResult?.x402.settlementTx
-                    ? short(runResult.x402.settlementTx)
+                    ? "direct tx settled"
                     : attestation?.routes?.x402
                       ? "seller route ready"
                       : "pending"
@@ -634,7 +634,7 @@ export function DemoSection() {
                 label="Subly vault edge"
                 value={
                   runResult?.subly402.depositTx
-                    ? short(runResult.subly402.depositTx)
+                    ? "vault deposit tx"
                     : attestation?.routes?.subly402
                       ? "seller route ready"
                       : "pending"
@@ -1091,18 +1091,18 @@ function FlowLane({
 
   const visibleValue = isSubly
     ? runResult?.subly402.depositTx
-      ? `Deposit tx ${short(runResult.subly402.depositTx)}`
+      ? "Vault deposit tx recorded"
       : publicTrailActive
         ? "Buyer ATA -> Subly vault"
         : "Waiting for vault deposit"
     : runResult?.x402.settlementTx
-      ? `Settle tx ${short(runResult.x402.settlementTx)}`
+      ? "Direct tx settled"
       : publicTrailActive
         ? "Buyer ATA -> Seller ATA"
         : "Waiting for direct payment";
 
   const payoutValue = runResult?.subly402.settlementStatus?.txSignature
-    ? `Payout tx ${short(runResult.subly402.settlementStatus.txSignature)}`
+    ? "Payout tx confirmed"
     : runResult?.subly402.settlementStatus?.status === "SettledOffchain"
       ? "Batch pending"
     : payoutActive
@@ -1557,7 +1557,23 @@ function TxRow({
   if (!signature) {
     return <DataRow label={label} value="pending" />;
   }
-  return <DataRow label={label} value={signature} href={txUrl(signature)} />;
+  return (
+    <div className="grid grid-cols-[92px_1fr] items-start gap-3 border-b border-paper/10 py-2.5 font-mono text-[11px] last:border-b-0">
+      <span className="uppercase tracking-[0.16em] text-paper/45">{label}</span>
+      <a
+        href={txUrl(signature)}
+        target="_blank"
+        rel="noreferrer"
+        aria-label={`Open ${label} in Solana Explorer`}
+        className="group flex min-w-0 items-start justify-end gap-2 text-right text-paper transition-colors hover:text-glow"
+      >
+        <span className="min-w-0 break-all text-[10px] leading-[1.45]">
+          {signature}
+        </span>
+        <ExternalLink className="mt-0.5 h-3.5 w-3.5 shrink-0 text-paper/35 transition-colors group-hover:text-glow" />
+      </a>
+    </div>
+  );
 }
 
 function FlowPanel({
