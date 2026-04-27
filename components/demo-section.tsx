@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { LucideIcon } from "lucide-react";
 import {
   ArrowRight,
@@ -351,15 +351,18 @@ export function DemoSection() {
   const [runResult, setRunResult] = useState<RunResult | null>(null);
   const [error, setError] = useState<ApiError | null>(null);
   const [copied, setCopied] = useState<string | null>(null);
+  const settlementPollInFlightRef = useRef(false);
+  const latestSettlementIdRef = useRef("");
 
   const sublySettlementId = useMemo(() => {
     const value = runResult?.subly402.paymentResponse?.settlementId;
     return typeof value === "string" ? value : "";
   }, [runResult]);
 
-  const settlementReady =
+  const settlementReady = Boolean(
     runResult?.subly402.settlementStatus?.status === "BatchedOnchain" &&
-    runResult?.subly402.settlementStatus?.txSignature;
+      runResult?.subly402.settlementStatus?.txSignature
+  );
 
   const privacyRows = useMemo(
     () => [
@@ -388,6 +391,115 @@ export function DemoSection() {
   useEffect(() => {
     void refreshAttestation();
   }, []);
+
+  useEffect(() => {
+    latestSettlementIdRef.current = sublySettlementId;
+  }, [sublySettlementId]);
+
+  const refreshSettlementStatus = useCallback(
+    async ({ manual = true }: { manual?: boolean } = {}) => {
+      const providerId = runResult?.subly402.providerId;
+      if (
+        !sublySettlementId ||
+        !providerId ||
+        settlementPollInFlightRef.current
+      ) {
+        return;
+      }
+
+      if (manual) {
+        setError(null);
+        setStatusBusy(true);
+      }
+      settlementPollInFlightRef.current = true;
+
+      try {
+        const status = await postJson<SettlementStatus>(
+          "/api/demo/settlement-status",
+          {
+            settlementId: sublySettlementId,
+            providerId,
+          }
+        );
+
+        if (latestSettlementIdRef.current !== sublySettlementId) {
+          return;
+        }
+
+        setRunResult((current) => {
+          const currentSettlementId =
+            typeof current?.subly402.paymentResponse?.settlementId === "string"
+              ? current.subly402.paymentResponse.settlementId
+              : "";
+          if (!current || currentSettlementId !== sublySettlementId) {
+            return current;
+          }
+
+          return {
+            ...current,
+            subly402: {
+              ...current.subly402,
+              settlementStatus: status,
+              chainView: {
+                ...current.subly402.chainView,
+                delayed: current.subly402.chainView.delayed?.map(
+                  (edge, index) =>
+                    index === 0
+                      ? {
+                          ...edge,
+                          status: status.status || edge.status,
+                          tx: status.txSignature || edge.tx,
+                        }
+                      : edge
+                ),
+              },
+            },
+          };
+        });
+
+        if (status.txSignature) {
+          setActiveStep(3);
+        }
+      } catch (err) {
+        if (manual) {
+          setError(err as ApiError);
+        }
+      } finally {
+        settlementPollInFlightRef.current = false;
+        if (manual) {
+          setStatusBusy(false);
+        }
+      }
+    },
+    [runResult?.subly402.providerId, sublySettlementId]
+  );
+
+  useEffect(() => {
+    if (
+      !sublySettlementId ||
+      !runResult?.subly402.providerId ||
+      settlementReady
+    ) {
+      return;
+    }
+
+    const initialPollId = window.setTimeout(() => {
+      void refreshSettlementStatus({ manual: false });
+    }, 5000);
+    const pollId = window.setInterval(() => {
+      void refreshSettlementStatus({ manual: false });
+    }, 10000);
+
+    return () => {
+      window.clearTimeout(initialPollId);
+      window.clearInterval(pollId);
+    };
+  }, [
+    refreshSettlementStatus,
+    runResult?.subly402.providerId,
+    settlementReady,
+    sublySettlementId,
+  ]);
 
   async function refreshAttestation() {
     setAttestationLoading(true);
@@ -438,50 +550,6 @@ export function DemoSection() {
 
   function advancePrivacyStep() {
     setActiveStep((step) => (step + 1) % privacyDemoSteps.length);
-  }
-
-  async function refreshSettlementStatus() {
-    if (!sublySettlementId || !runResult?.subly402.providerId) {
-      return;
-    }
-    setError(null);
-    setStatusBusy(true);
-    try {
-      const status = await postJson<SettlementStatus>(
-        "/api/demo/settlement-status",
-        {
-          settlementId: sublySettlementId,
-          providerId: runResult.subly402.providerId,
-        }
-      );
-      setRunResult({
-        ...runResult,
-        subly402: {
-          ...runResult.subly402,
-          settlementStatus: status,
-          chainView: {
-            ...runResult.subly402.chainView,
-            delayed: runResult.subly402.chainView.delayed?.map(
-              (edge, index) =>
-                index === 0
-                  ? {
-                      ...edge,
-                      status: status.status || edge.status,
-                      tx: status.txSignature || edge.tx,
-                    }
-                  : edge
-            ),
-          },
-        },
-      });
-      if (status.txSignature) {
-        setActiveStep(3);
-      }
-    } catch (err) {
-      setError(err as ApiError);
-    } finally {
-      setStatusBusy(false);
-    }
   }
 
   return (
@@ -715,20 +783,28 @@ export function DemoSection() {
                       flow={runResult.subly402}
                       onCopy={copy}
                     />
-                    {!settlementReady && (
-                      <button
-                        type="button"
-                        onClick={refreshSettlementStatus}
-                        disabled={statusBusy}
-                        className="mt-2 inline-flex h-10 items-center gap-2 border border-paper/25 px-3 font-mono text-[10px] uppercase tracking-[0.18em] text-paper transition-colors hover:border-glow hover:text-glow disabled:opacity-60"
-                      >
-                        {statusBusy ? (
-                          <Loader2 className="h-4 w-4 animate-spin" />
-                        ) : (
-                          <RefreshCw className="h-4 w-4" />
-                        )}
-                        Check seller payout
-                      </button>
+                    {!settlementReady && sublySettlementId && (
+                      <div className="mt-2 flex flex-col gap-2 sm:flex-row sm:items-center">
+                        <button
+                          type="button"
+                          onClick={() =>
+                            void refreshSettlementStatus({ manual: true })
+                          }
+                          disabled={statusBusy}
+                          className="inline-flex h-10 items-center gap-2 border border-paper/25 px-3 font-mono text-[10px] uppercase tracking-[0.18em] text-paper transition-colors hover:border-glow hover:text-glow disabled:opacity-60"
+                        >
+                          {statusBusy ? (
+                            <Loader2 className="h-4 w-4 animate-spin" />
+                          ) : (
+                            <RefreshCw className="h-4 w-4" />
+                          )}
+                          Check seller payout
+                        </button>
+                        <div className="inline-flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.16em] text-paper/45">
+                          <RefreshCw className="h-3.5 w-3.5 animate-spin text-glow" />
+                          Auto-checking every 10s
+                        </div>
+                      </div>
                     )}
                   </div>
                 ) : (
