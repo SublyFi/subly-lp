@@ -493,7 +493,23 @@ export function DemoSection() {
       );
       setRunResult({
         ...runResult,
-        subly402: { ...runResult.subly402, settlementStatus: status },
+        subly402: {
+          ...runResult.subly402,
+          settlementStatus: status,
+          chainView: {
+            ...runResult.subly402.chainView,
+            delayed: runResult.subly402.chainView.delayed?.map(
+              (edge, index) =>
+                index === 0
+                  ? {
+                      ...edge,
+                      status: status.status || edge.status,
+                      tx: status.txSignature || edge.tx,
+                    }
+                  : edge
+            ),
+          },
+        },
       });
     } catch (err) {
       setError(err as ApiError);
@@ -733,14 +749,7 @@ export function DemoSection() {
                       flow={runResult.subly402}
                       onCopy={copy}
                     />
-                    {settlementReady ? (
-                      <TxRow
-                        label="Batch payout"
-                        signature={
-                          runResult.subly402.settlementStatus!.txSignature!
-                        }
-                      />
-                    ) : (
+                    {!settlementReady && (
                       <button
                         type="button"
                         onClick={refreshSettlementStatus}
@@ -1534,6 +1543,7 @@ function FlowPanel({
   onCopy: (value: string, key: string) => void;
 }) {
   const delayed = flow.chainView.delayed?.[0];
+  const payoutTx = flow.settlementStatus?.txSignature || delayed?.tx || null;
   return (
     <div className="border border-paper/15 bg-ink/35">
       <div className="flex items-start justify-between gap-3 border-b border-paper/10 p-3">
@@ -1579,9 +1589,7 @@ function FlowPanel({
         ) : (
           <TxRow label="Deposit tx" signature={flow.depositTx} />
         )}
-        {delayed && (
-          <TxRow label="Payout tx" signature={delayed.tx || null} />
-        )}
+        {delayed && <TxRow label="Payout tx" signature={payoutTx} />}
         <div className="mt-3 border-t border-paper/10 pt-3">
           <div className="font-mono text-[9px] uppercase tracking-[0.18em] text-paper/45">
             Chain excerpt
