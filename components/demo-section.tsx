@@ -217,7 +217,7 @@ const privacyDemoSteps = [
     subly402:
       "The seller's 402 challenge points the buyer at an attested Subly vault policy.",
     observer:
-      "No transfer has settled yet. The observer is waiting for the public payment trail.",
+      "No transfer has settled yet. The observer is waiting to see which onchain edge appears.",
   },
   {
     n: "02",
@@ -233,13 +233,13 @@ const privacyDemoSteps = [
   },
   {
     n: "03",
-    label: "Public trail",
+    label: "Visible edge",
     phase: "Reveal",
-    title: "The chain tells a different story.",
+    title: "The visible payment edge is different.",
     body: "This is the core point: x402 exposes who paid which seller. Subly402 exposes that the buyer funded a vault, not the seller they called.",
-    x402: "Public chain shows Buyer token account -> Seller token account.",
+    x402: "Explorer shows Buyer token account -> Seller token account.",
     subly402:
-      "Public chain shows Buyer token account -> Subly vault. The direct seller edge is absent.",
+      "Explorer shows Buyer token account -> Subly vault. No Buyer -> Seller transfer appears in the buyer request.",
     observer:
       "A block explorer can link buyer and seller in x402. With Subly402, that direct link is not visible.",
   },
@@ -248,76 +248,17 @@ const privacyDemoSteps = [
     label: "Payout",
     phase: "Resolve",
     title: "Seller still gets paid.",
-    body: "Subly402 is not hiding payment from the seller. It changes the public settlement shape so the seller receives a later vault payout instead of a direct buyer transfer.",
-    x402: "The request is already publicly linkable to this seller.",
+    body: "Subly402 is not hiding payment from the seller. It changes the onchain settlement shape so the seller receives a later vault payout instead of a direct buyer transfer.",
+    x402: "The request is already linkable to this seller.",
     subly402:
       "Seller receives a batched Vault -> Seller payout, separate from the buyer deposit.",
     observer:
-      "The seller payout is public, but it is no longer the same onchain edge as the buyer's API call.",
+      "The seller payout is visible, but it is no longer the same onchain edge as the buyer's API call.",
   },
 ] as const;
 
-const x402PhaseTrace = [
-  {
-    n: "01",
-    label: "Seller shown",
-    edge: "challenge names seller wallet",
-    tone: "neutral",
-  },
-  {
-    n: "02",
-    label: "Buyer pays Seller",
-    edge: "Buyer -> Seller tx",
-    tone: "risk",
-  },
-  {
-    n: "03",
-    label: "Link visible",
-    edge: "buyer, seller, amount, time",
-    tone: "risk",
-  },
-  {
-    n: "04",
-    label: "Seller paid now",
-    edge: "done in the direct tx",
-    tone: "risk",
-  },
-] as const;
-
-const sublyPhaseTrace = [
-  {
-    n: "01",
-    label: "Vault shown",
-    edge: "challenge names vault",
-    tone: "private",
-  },
-  {
-    n: "02",
-    label: "Buyer funds Vault",
-    edge: "Buyer -> Vault tx",
-    tone: "private",
-  },
-  {
-    n: "03",
-    label: "Seller hidden",
-    edge: "no Buyer -> Seller tx",
-    tone: "hidden",
-  },
-  {
-    n: "04",
-    label: "Seller paid later",
-    edge: "Vault -> Seller batch",
-    tone: "resolve",
-  },
-] as const;
-
-type PhaseTone = "neutral" | "risk" | "private" | "hidden" | "resolve";
-type PhaseTraceItem = {
-  n: string;
-  label: string;
-  edge: string;
-  tone: PhaseTone;
-};
+type FlowTone = "neutral" | "risk" | "private" | "resolve";
+type FlowState = "idle" | "active" | "pending" | "complete";
 
 function short(value?: string | number | null) {
   const text = String(value || "");
@@ -437,7 +378,7 @@ export function DemoSection() {
       {
         label: "Why it matters",
         value:
-          "The seller is paid, but public observers do not get the direct Buyer -> Seller edge for the API call.",
+          "The seller is paid, but outside observers do not get the direct Buyer -> Seller edge for the API call.",
         tone: "text-paper/80",
       },
     ],
@@ -558,21 +499,21 @@ export function DemoSection() {
             <h2 className="font-display text-[54px] font-semibold leading-[0.94] text-paper md:text-[78px]">
               Same API call.
               <br />
-              Different public
+              Different payment
               <br />
-              trail.
+              edge.
             </h2>
           </div>
           <div className="md:col-span-6 md:col-start-7">
             <p className="font-serif-it text-[26px] leading-[1.3] text-paper md:text-[32px]">
               Press through the flow. Official x402 makes the Buyer to Seller
-              payment edge public. Subly402 keeps the x402-style HTTP flow, but
+              payment edge visible. Subly402 keeps the x402-style HTTP flow, but
               changes what the chain reveals.
             </p>
             <p className="mt-6 max-w-xl text-[14px] leading-[1.7] text-paper/70">
               The live proof below calls the same Seller twice: once through
               official x402, once through Subly402. The important difference is
-              not the API response. It is the public settlement graph.
+              not the API response. It is the visible onchain edge.
             </p>
           </div>
         </div>
@@ -617,7 +558,7 @@ export function DemoSection() {
             <div className="grid border-b border-paper/15 md:grid-cols-3">
               <StepCell
                 n="01"
-                label="x402 public edge"
+                label="x402 direct edge"
                 value={
                   runResult?.x402.settlementTx
                     ? "direct tx settled"
@@ -942,7 +883,7 @@ function PrivacyStoryboard({
         <div className="border-b border-ink/10 p-5 lg:border-b-0 lg:border-r">
           <div className="flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.22em] text-ink-muted">
             <ShieldCheck className="h-4 w-4 text-ok" />
-            Press to reveal the settlement graph
+            Press to reveal the payment edge
           </div>
           <h3 className="mt-4 font-display text-[34px] font-semibold leading-[0.98] text-ink md:text-[46px]">
             {step.title}
@@ -1086,16 +1027,44 @@ function FlowLane({
   const paymentActive = pathStep >= 1;
   const publicTrailActive = pathStep >= 2;
   const payoutActive = pathStep >= 3;
-  const phaseTrace = isSubly ? sublyPhaseTrace : x402PhaseTrace;
+  const x402Paid = Boolean(runResult?.x402.settlementTx);
+  const sublyDeposited = Boolean(runResult?.subly402.depositTx);
+  const sublyPayoutConfirmed = Boolean(
+    runResult?.subly402.settlementStatus?.txSignature
+  );
+  const sublyBatchPending =
+    sublyDeposited &&
+    !sublyPayoutConfirmed &&
+    Boolean(runResult?.subly402.settlementStatus);
+
+  const directState: FlowState =
+    x402Paid || (!isSubly && payoutActive)
+      ? "complete"
+      : paymentActive
+        ? "active"
+        : "idle";
+  const depositState: FlowState =
+    sublyDeposited || (isSubly && publicTrailActive)
+      ? "complete"
+      : paymentActive
+        ? "active"
+        : "idle";
+  const batchState: FlowState = sublyPayoutConfirmed
+    ? "complete"
+    : sublyBatchPending
+      ? "pending"
+      : payoutActive
+        ? "active"
+        : "idle";
 
   const visibleValue = isSubly
     ? runResult?.subly402.depositTx
-      ? "Vault deposit tx recorded"
+      ? "Buyer ATA -> Vault ATA"
       : publicTrailActive
         ? "Buyer ATA -> Subly vault"
         : "Waiting for vault deposit"
     : runResult?.x402.settlementTx
-      ? "Direct tx settled"
+      ? "Buyer ATA -> Seller ATA"
       : publicTrailActive
         ? "Buyer ATA -> Seller ATA"
         : "Waiting for direct payment";
@@ -1141,32 +1110,77 @@ function FlowLane({
 
       {isSubly ? (
         <div className="mt-5 grid gap-3 md:grid-cols-[minmax(0,1fr)_58px_minmax(0,1fr)_58px_minmax(0,1fr)] md:items-stretch">
-          <ActorNode icon={Wallet} label="Buyer wallet" detail="Buyer" />
-          <FlowConnector
-            active={paymentActive}
-            label="deposit"
+          <ActorNode
+            icon={Wallet}
+            label="Buyer wallet"
+            detail="Buyer"
+            active={depositState !== "idle"}
             tone="private"
           />
-          <ActorNode icon={Landmark} label="Attested vault" detail="Vault" />
           <FlowConnector
-            active={payoutActive}
-            label="batch"
+            state={depositState}
+            label="Buyer -> Vault"
+            tone="private"
+            status={sublyDeposited ? "deposit complete" : "vault deposit"}
+          />
+          <ActorNode
+            icon={Landmark}
+            label="Attested vault"
+            detail="Vault"
+            active={depositState !== "idle" || batchState !== "idle"}
             tone="private"
           />
-          <ActorNode icon={Store} label="Seller wallet" detail="Seller" />
+          <FlowConnector
+            state={batchState}
+            label="Vault -> Seller"
+            tone="resolve"
+            status={
+              sublyPayoutConfirmed
+                ? "batch payout"
+                : sublyBatchPending
+                  ? "batch pending"
+                  : "seller payout"
+            }
+          />
+          <ActorNode
+            icon={Store}
+            label="Seller wallet"
+            detail="Seller"
+            active={batchState === "complete"}
+            pending={batchState === "pending"}
+            tone="resolve"
+          />
         </div>
       ) : (
         <div className="mt-5 grid gap-3 md:grid-cols-[minmax(0,1fr)_72px_minmax(0,1fr)] md:items-stretch">
-          <ActorNode icon={Wallet} label="Buyer wallet" detail="Buyer" />
-          <FlowConnector active={paymentActive} label="direct" tone="risk" />
-          <ActorNode icon={Store} label="Seller wallet" detail="Seller" />
+          <ActorNode
+            icon={Wallet}
+            label="Buyer wallet"
+            detail="Buyer"
+            active={directState !== "idle"}
+            tone="risk"
+          />
+          <FlowConnector
+            state={directState}
+            label="Buyer -> Seller"
+            tone="risk"
+            status={x402Paid ? "paid now" : "direct tx"}
+          />
+          <ActorNode
+            icon={Store}
+            label="Seller wallet"
+            detail="Seller"
+            active={directState === "complete" || directState === "active"}
+            tone="risk"
+          />
         </div>
       )}
 
-      <PathPhaseTrace
+      <PathFlowSummary
         variant={variant}
-        activeStep={pathStep}
-        items={phaseTrace}
+        directState={directState}
+        depositState={depositState}
+        batchState={batchState}
       />
 
       <div className="mt-5 grid gap-3 md:grid-cols-2">
@@ -1230,122 +1244,97 @@ function FlowLane({
   );
 }
 
-function PathPhaseTrace({
+function PathFlowSummary({
   variant,
-  activeStep,
-  items,
+  directState,
+  depositState,
+  batchState,
 }: {
   variant: "x402" | "subly402";
-  activeStep: number;
-  items: readonly PhaseTraceItem[];
+  directState: FlowState;
+  depositState: FlowState;
+  batchState: FlowState;
 }) {
   const isSubly = variant === "subly402";
+  const tone: FlowTone = isSubly
+    ? batchState === "complete" || batchState === "pending"
+      ? "resolve"
+      : "private"
+    : "risk";
+  const Icon = isSubly ? LockKeyhole : Eye;
+  const state = isSubly
+    ? batchState === "complete" || batchState === "pending"
+      ? batchState
+      : depositState
+    : directState;
+
+  const title = isSubly
+    ? batchState === "complete"
+      ? "Vault pays Seller after the batch"
+      : depositState === "complete" || batchState === "pending"
+        ? "Buyer funds Vault first"
+        : "Buyer funds Vault, then Vault pays Seller"
+    : "Buyer pays Seller directly";
+
+  const body = isSubly
+    ? batchState === "complete"
+      ? "The buyer-facing transfer is Buyer -> Vault. After the batch succeeds, the final highlighted edge is Vault -> Seller."
+      : depositState === "complete" || batchState === "pending"
+        ? "The visible buyer transaction stops at the Vault. The Seller edge stays pending until the batch payout succeeds."
+        : "The first highlighted edge is Buyer -> Vault. The second edge appears only after Subly402 batch payout succeeds."
+    : directState === "complete"
+      ? "The highlighted edge is the payment: Buyer -> Seller. The seller is paid in that same visible transaction."
+      : "When the proof runs, the payment edge is Buyer -> Seller. That direct edge is what becomes visible onchain.";
+
   return (
-    <div className="mt-5 border border-ink/10 bg-white">
-      <div className="flex flex-col gap-2 border-b border-ink/10 p-3 sm:flex-row sm:items-center sm:justify-between">
-        <div className="font-mono text-[10px] uppercase tracking-[0.18em] text-ink-muted">
-          {isSubly ? "Subly x402 tx path" : "Official x402 tx path"}
+    <div className="mt-5 border border-ink/10 bg-white p-4">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+        <div className="min-w-0">
+          <div
+            className={`flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.18em] ${
+              tone === "risk"
+                ? "text-alert"
+                : tone === "resolve"
+                  ? "text-ink"
+                  : "text-ok"
+            }`}
+          >
+            <Icon className="h-4 w-4 shrink-0" />
+            Payment flow
+          </div>
+          <h5 className="mt-3 font-display text-[24px] font-semibold leading-none text-ink">
+            {title}
+          </h5>
+          <p className="mt-3 max-w-2xl text-[13px] leading-[1.55] text-ink-soft">
+            {body}
+          </p>
         </div>
-        <div
-          className={`font-mono text-[10px] uppercase tracking-[0.16em] ${
-            isSubly ? "text-ok" : "text-alert"
-          }`}
-        >
-          {isSubly ? "buyer pays vault first" : "buyer pays seller now"}
-        </div>
-      </div>
-      <div className="grid sm:grid-cols-4">
-        {items.map((item, index) => {
-          const active = index === activeStep;
-          const complete = index < activeStep;
-          return (
-            <div
-              key={`${variant}-${item.n}`}
-              className={`min-h-[116px] border-b border-ink/10 p-3 last:border-b-0 sm:border-b-0 sm:border-r sm:last:border-r-0 ${phaseTraceClass(
-                item.tone,
-                active,
-                complete
-              )}`}
-            >
-              <div className="flex items-start justify-between gap-2">
-                <span className="font-mono text-[10px] uppercase tracking-[0.18em]">
-                  {item.n}
-                </span>
-                <PhaseTraceBadge
-                  tone={item.tone}
-                  active={active}
-                  complete={complete}
-                />
-              </div>
-              <div className="mt-3 font-display text-[21px] font-semibold leading-none">
-                {item.label}
-              </div>
-              <div className="mt-3 min-h-[34px] text-[12px] leading-[1.4]">
-                {item.edge}
-              </div>
-            </div>
-          );
-        })}
+        <FlowStateBadge state={state} tone={tone} />
       </div>
     </div>
   );
 }
 
-function phaseTraceClass(tone: PhaseTone, active: boolean, complete: boolean) {
-  if (!active && !complete) {
-    return "bg-paper text-ink-muted";
-  }
-  if (tone === "risk") {
-    return active
-      ? "bg-alert text-paper"
-      : "bg-alert/10 text-ink";
-  }
-  if (tone === "private") {
-    return active
-      ? "bg-ok text-paper"
-      : "bg-ok/10 text-ink";
-  }
-  if (tone === "hidden") {
-    return active
-      ? "bg-ink text-paper"
-      : "bg-ink/10 text-ink";
-  }
-  if (tone === "resolve") {
-    return active
-      ? "bg-glow text-ink"
-      : "bg-glow/20 text-ink";
-  }
-  return active ? "bg-ink text-paper" : "bg-paper-deep text-ink";
-}
-
-function PhaseTraceBadge({
+function FlowStateBadge({
+  state,
   tone,
-  active,
-  complete,
 }: {
-  tone: PhaseTone;
-  active: boolean;
-  complete: boolean;
+  state: FlowState;
+  tone: FlowTone;
 }) {
-  const label =
-    tone === "risk"
-      ? "visible"
-      : tone === "private"
-        ? "vault"
-        : tone === "hidden"
-          ? "hidden"
-          : tone === "resolve"
-            ? "later"
-            : complete
-              ? "done"
-              : "step";
+  const label = state === "complete" ? "complete" : state;
+  const toneClass =
+    state === "idle"
+      ? "border-ink/20 bg-paper-deep text-ink-muted"
+      : tone === "risk"
+        ? "border-alert bg-alert/10 text-alert"
+        : tone === "resolve"
+          ? "border-glow bg-glow/20 text-ink"
+          : "border-ok bg-ok/10 text-ink";
+
   return (
     <span
-      className={`border px-1.5 py-0.5 font-mono text-[8px] uppercase tracking-[0.12em] ${
-        active || complete
-          ? "border-current text-current"
-          : "border-ink/20 text-ink-muted"
-      }`}
+      className={`inline-flex w-fit items-center border px-3 py-2 font-mono text-[10px] uppercase tracking-[0.14em] ${toneClass}`}
     >
       {label}
     </span>
@@ -1356,22 +1345,53 @@ function ActorNode({
   icon: Icon,
   label,
   detail,
+  active = false,
+  pending = false,
+  tone = "neutral",
 }: {
   icon: LucideIcon;
   label: string;
   detail: string;
+  active?: boolean;
+  pending?: boolean;
+  tone?: FlowTone;
 }) {
+  const toneClass =
+    pending
+      ? "border-glow bg-glow/10 text-ink"
+      : active && tone === "risk"
+        ? "border-alert bg-alert/10 text-alert"
+        : active && tone === "private"
+          ? "border-ok bg-ok/10 text-ink"
+          : active && tone === "resolve"
+            ? "border-glow bg-glow/20 text-ink"
+            : "border-ink/15 bg-white text-ink";
+  const iconClass =
+    pending
+      ? "border-glow bg-glow/20 text-ink"
+      : active && tone === "risk"
+        ? "border-alert bg-alert text-paper"
+        : active && tone === "private"
+          ? "border-ok bg-ok text-paper"
+          : active && tone === "resolve"
+            ? "border-glow bg-glow text-ink"
+            : "border-ink/20 bg-paper-deep text-ink";
+
   return (
-    <div className="min-h-[108px] min-w-0 border border-ink/15 bg-white p-4">
-      <div className="flex items-center gap-3">
-        <span className="flex h-10 w-10 shrink-0 items-center justify-center border border-ink/20 bg-paper-deep text-ink">
+    <div
+      className={`min-h-[108px] min-w-0 border p-4 transition-colors ${toneClass}`}
+    >
+      <div className="flex h-full flex-col justify-between gap-3">
+        <span
+          className={`flex h-10 w-10 shrink-0 items-center justify-center border transition-colors ${iconClass}`}
+        >
           <Icon className="h-5 w-5" />
         </span>
         <div className="min-w-0">
-          <div className="font-mono text-[10px] uppercase tracking-[0.18em] text-ink-muted">
+          <div className="font-mono text-[10px] uppercase leading-[1.35] tracking-[0.18em] text-ink-muted">
             {label}
           </div>
-          <div className="mt-2 truncate font-display text-[22px] font-semibold leading-none text-ink">
+          <div className="mt-2 break-words font-display text-[21px] font-semibold leading-none text-ink">
             {detail}
           </div>
         </div>
@@ -1381,22 +1401,27 @@ function ActorNode({
 }
 
 function FlowConnector({
-  active,
+  state,
   label,
   tone,
+  status,
 }: {
-  active: boolean;
+  state: FlowState;
   label: string;
-  tone: "risk" | "private";
+  tone: FlowTone;
+  status: string;
 }) {
+  const active = state !== "idle";
   const activeClass =
     tone === "risk"
       ? "border-alert bg-alert/10 text-alert"
-      : "border-ok bg-ok/10 text-ink";
+      : tone === "resolve"
+        ? "border-glow bg-glow/20 text-ink"
+        : "border-ok bg-ok/10 text-ink";
 
   return (
     <div
-      className={`flex min-h-[54px] items-center justify-center gap-2 border px-2 text-center transition-colors md:min-h-[108px] md:flex-col ${
+      className={`flex min-h-[70px] items-center justify-center gap-2 border px-2 text-center transition-colors md:min-h-[108px] md:flex-col ${
         active ? activeClass : "border-ink/15 bg-paper-deep text-ink-muted"
       }`}
     >
@@ -1405,9 +1430,14 @@ function FlowConnector({
           active ? "" : "opacity-45"
         }`}
       />
-      <span className="font-mono text-[9px] uppercase tracking-[0.14em]">
-        {label}
-      </span>
+      <div className="grid gap-1">
+        <span className="font-mono text-[9px] uppercase tracking-[0.14em]">
+          {label}
+        </span>
+        <span className="font-mono text-[8px] uppercase tracking-[0.1em] opacity-70">
+          {state === "complete" ? "complete" : status}
+        </span>
+      </div>
     </div>
   );
 }
