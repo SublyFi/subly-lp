@@ -100,14 +100,6 @@ export function Footer() {
                 </a>
               ))}
             </div>
-            <a
-              href="https://arxiv.org/abs/2603.01179"
-              target="_blank"
-              rel="noreferrer"
-              className="mt-6 inline-block font-mono text-[11px] uppercase tracking-[0.18em] text-paper/65 transition-colors hover:text-subly-glow"
-            >
-              Academic foundation · arXiv 2603.01179 ↗
-            </a>
           </div>
         </div>
 
