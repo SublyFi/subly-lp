@@ -17,7 +17,7 @@ const FLOW_STEPS = [
     n: "03",
     tag: "PAY",
     title: "Pay providers.",
-    body: "Buyers call providers via x402-style HTTP. Settlement is batched from the shared vault inside a TEE, so observers can't link Buyer to Seller.",
+    body: "Buyers call providers via x402-style HTTP. The TEE keeps the per-buyer ledger off-chain and instructs the on-chain shared vault to pay sellers in delayed batches, so observers can't link Buyer to Seller.",
     ornament: "→",
   },
 ];
@@ -59,9 +59,10 @@ export function SolutionSection() {
             <p className="font-sans text-[15px] leading-[1.75] text-ink-soft md:text-[16px]">
               An agent deposits USDC into Subly once. The vault earns DeFi
               yield, and that yield is what pays for x402 calls — the
-              principal never leaves. Settlement runs through a shared user
-              vault managed inside a TEE, so the on-chain Buyer → Seller link
-              that x402 normally exposes is broken.
+              principal never leaves. Settlement flows through an on-chain
+              shared vault, with the per-buyer ledger kept inside a TEE that
+              schedules the payouts, so the on-chain Buyer → Seller link that
+              x402 normally exposes is broken.
             </p>
           </div>
         </div>
@@ -86,7 +87,7 @@ export function SolutionSection() {
           <Pillar
             kicker="03 · Privacy"
             title="Buyer ↔ Seller link, broken."
-            body="Buyers and sellers still use x402-style HTTP. But payments flow into a shared user vault first; settlement is batched and delayed inside a TEE, so the direct on-chain link disappears."
+            body="Buyers and sellers still use x402-style HTTP. Payments flow into the on-chain shared vault first; the TEE keeps the per-buyer ledger off-chain and triggers vault payouts in delayed batches, so the direct on-chain link disappears."
             metric="0"
             metricLabel="Buyer↔Seller links"
             accent
