@@ -45,11 +45,11 @@ export function PrivacySection() {
               that x402 normally exposes is no longer present.
             </p>
             <p className="mt-4 font-sans text-[13px] leading-[1.75] text-paper/65">
-              Settlement bookkeeping runs inside a TEE, and the on-chain
-              privacy layer is handled by Arcium. The moment Solana&apos;s
-              Confidential SPL transfers ship to mainnet, Subly will integrate
-              them on day one so the transfer amounts themselves are also kept
-              private.
+              Subly&apos;s on-chain programs — including the Shared Vault — are
+              encrypted by Arcium, while the per-buyer ledger lives inside an
+              AWS Nitro Enclave. When Solana&apos;s Confidential SPL transfers
+              reach mainnet, Subly will adopt them on day one so the amounts
+              moved through the vault are also kept private.
             </p>
           </div>
         </div>
@@ -116,17 +116,17 @@ export function PrivacySection() {
             logo="/ArciumWhite.svg"
             logoAlt="Arcium"
             logoAsTitle
-            body="On-chain settlement runs through Arcium so the sensitive parts of the payment — who paid, how much, and which seller is being paid — are processed under MPC instead of in the clear. The chain still verifies, but it does not learn the link."
+            body="Subly's on-chain programs — including the Shared Vault that holds user funds — are encrypted by Arcium. Solana executes them and verifies the result, but never sees their internal state in the clear."
           />
           <Pillar
-            kicker="Off-chain bookkeeping"
+            kicker="Off-chain ledger"
             title="AWS Nitro Enclave"
-            body="The shared-vault ledger and the facilitator that authorizes payouts run inside an AWS Nitro Enclave. Balances and the per-Buyer accounting live in attested memory; the host instance only sees ciphertext."
+            body="When a buyer deposits into the Shared Vault, the per-buyer accounting that tracks who spent what is kept inside an AWS Nitro Enclave. Balances live in attested memory, and the host machine only ever sees ciphertext. The same ledger can be opened to a regulator or auditor on the buyer's terms."
           />
           <Pillar
-            kicker="Selective disclosure"
-            title="Audit on your terms"
-            body="Each buyer holds the keys to their own ledger view. You can hand a regulator, an auditor, or a counter-party a readable copy of just the records they need — without exposing anything else."
+            kicker="Coming next"
+            title="Confidential SPL · day one"
+            body="Solana's upcoming Confidential SPL transfers will keep transfer amounts hidden on-chain. The moment they ship to mainnet, Subly will integrate them so the amounts moving through the Shared Vault are also kept private."
           />
         </div>
       </div>

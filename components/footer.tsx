@@ -103,15 +103,8 @@ export function Footer() {
           </div>
         </div>
 
-        <div className="mt-16 flex flex-col gap-4 border-t border-paper/15 pt-8 font-mono text-[10px] uppercase tracking-[0.22em] text-paper/50 md:flex-row md:items-center md:justify-between">
+        <div className="mt-16 border-t border-paper/15 pt-8 font-mono text-[10px] uppercase tracking-[0.22em] text-paper/50">
           <div>© 2026 SublyFi · All rights reserved</div>
-          <div className="flex flex-wrap items-center gap-x-6 gap-y-2">
-            <span>
-              Colophon: Fraunces + Instrument Serif + JetBrains Mono + Geist
-            </span>
-            <span className="text-subly-glow">·</span>
-            <span>Built for Colosseum Frontier</span>
-          </div>
         </div>
       </div>
 
