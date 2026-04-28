@@ -66,7 +66,7 @@ export function HeroSection() {
             id="getWaitlistContainer"
             data-waitlist_id="31247"
             data-widget_type="WIDGET_2"
-            className="subly-waitlist md:flex-1"
+            className="subly-waitlist w-full md:max-w-[520px] md:flex-1"
           />
           <a
             href="#demo"
@@ -94,18 +94,21 @@ export function HeroSection() {
       </div>
 
       <style jsx global>{`
-        .subly-waitlist {
-          width: 100%;
-        }
         .subly-waitlist .waitlist-container,
-        .subly-waitlist .waitlist-form,
-        .subly-waitlist form {
+        .subly-waitlist .waitlist-form {
           width: 100% !important;
           max-width: 100% !important;
         }
-        .subly-waitlist .waitlist-container,
-        .subly-waitlist .waitlist-form,
-        .subly-waitlist form,
+        .subly-waitlist form {
+          display: flex !important;
+          flex-wrap: nowrap !important;
+          gap: 10px !important;
+          align-items: stretch !important;
+          justify-content: flex-start !important;
+          width: 100% !important;
+          max-width: 100% !important;
+          margin: 0 !important;
+        }
         .subly-waitlist input,
         .subly-waitlist button {
           border-radius: 2px !important;
@@ -113,6 +116,8 @@ export function HeroSection() {
           text-transform: uppercase;
           letter-spacing: 0.18em;
           font-size: 13px !important;
+          line-height: 1 !important;
+          box-sizing: border-box !important;
         }
         .subly-waitlist input[type="email"] {
           background: var(--paper) !important;
@@ -122,6 +127,8 @@ export function HeroSection() {
           height: auto !important;
           flex: 1 1 auto !important;
           min-width: 0 !important;
+          width: auto !important;
+          margin: 0 !important;
         }
         .subly-waitlist input[type="email"]::placeholder {
           color: var(--ink-muted) !important;
@@ -131,9 +138,12 @@ export function HeroSection() {
           background: var(--subly) !important;
           color: #ffffff !important;
           border: 1px solid var(--subly) !important;
-          padding: 16px 28px !important;
+          padding: 16px 24px !important;
           height: auto !important;
           font-weight: 600 !important;
+          flex: 0 0 auto !important;
+          white-space: nowrap !important;
+          margin: 0 !important;
         }
         .subly-waitlist button:hover {
           background: var(--subly-deep) !important;
