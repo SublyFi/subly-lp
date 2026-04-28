@@ -1,4 +1,28 @@
+"use client";
+
+import Image from "next/image";
 import { SublyLogo } from "./subly-logo";
+
+const SOCIALS = [
+  {
+    label: "X",
+    href: "https://x.com/subly_fi",
+    icon: "/x.svg",
+    size: 22,
+  },
+  {
+    label: "Telegram",
+    href: "https://t.me/+hR5mDS-l7bBhNjFl",
+    icon: "/telegram.svg",
+    size: 22,
+  },
+  {
+    label: "GitHub",
+    href: "https://github.com/SublyFi",
+    icon: "/github.svg",
+    size: 24,
+  },
+];
 
 export function Footer() {
   return (
@@ -62,28 +86,28 @@ export function Footer() {
             <div className="mb-4 font-mono text-[10px] uppercase tracking-[0.24em] text-subly-glow">
               ▌ Elsewhere
             </div>
-            <ul className="space-y-2 font-mono text-[12px] uppercase tracking-[0.16em]">
-              {[
-                ["https://x.com/subly_fi", "x.com/subly_fi ↗"],
-                ["https://t.me/+hR5mDS-l7bBhNjFl", "telegram group ↗"],
-                ["https://github.com/SublyFi", "github.com/SublyFi ↗"],
-                [
-                  "https://arxiv.org/abs/2603.01179",
-                  "academic foundation ↗",
-                ],
-              ].map(([href, label]) => (
-                <li key={href}>
-                  <a
-                    href={href}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="text-paper/80 transition-colors hover:text-subly-glow"
-                  >
-                    {label}
-                  </a>
-                </li>
+            <div className="flex items-center gap-5">
+              {SOCIALS.map((s) => (
+                <a
+                  key={s.label}
+                  href={s.href}
+                  target="_blank"
+                  rel="noreferrer"
+                  aria-label={`Subly on ${s.label}`}
+                  className="footer-icon inline-flex items-center justify-center transition-transform hover:-translate-y-0.5 hover:scale-110"
+                >
+                  <Image src={s.icon} alt="" width={s.size} height={s.size} />
+                </a>
               ))}
-            </ul>
+            </div>
+            <a
+              href="https://arxiv.org/abs/2603.01179"
+              target="_blank"
+              rel="noreferrer"
+              className="mt-6 inline-block font-mono text-[11px] uppercase tracking-[0.18em] text-paper/65 transition-colors hover:text-subly-glow"
+            >
+              Academic foundation · arXiv 2603.01179 ↗
+            </a>
           </div>
         </div>
 
@@ -98,6 +122,12 @@ export function Footer() {
           </div>
         </div>
       </div>
+
+      <style jsx global>{`
+        .footer-icon img {
+          filter: brightness(0) invert(1);
+        }
+      `}</style>
     </footer>
   );
 }
