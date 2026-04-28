@@ -360,30 +360,6 @@ export function DemoSection() {
       runResult?.subly402.settlementStatus?.txSignature
   );
 
-  const privacyRows = useMemo(
-    () => [
-      {
-        label: "x402",
-        value:
-          "Each paid request can settle as a visible Buyer token account -> Seller token account transfer.",
-        tone: "text-alert",
-      },
-      {
-        label: "Subly-x402",
-        value:
-          "The buyer's visible transaction is a vault deposit. Seller payout is delayed and batched from the vault.",
-        tone: "text-glow",
-      },
-      {
-        label: "Why it matters",
-        value:
-          "The seller is paid, but outside observers do not get the direct Buyer -> Seller edge for the API call.",
-        tone: "text-paper/80",
-      },
-    ],
-    []
-  );
-
   useEffect(() => {
     void refreshAttestation();
   }, []);
@@ -613,7 +589,7 @@ export function DemoSection() {
           runResult={runResult}
         />
 
-        <div className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
+        <div className="mt-6">
           <div className="border border-paper/20 bg-paper/5 shadow-[6px_6px_0_0_var(--glow)]">
             <div className="flex flex-col gap-4 border-b border-paper/15 p-5 md:flex-row md:items-start md:justify-between">
               <div className="md:flex-1">
@@ -868,203 +844,202 @@ export function DemoSection() {
               </div>
             )}
           </div>
-
-          <div className="grid gap-6">
-            <div className="border border-paper/20 bg-paper/5 p-5">
-              <div className="mb-4 flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.2em] text-glow">
-                <Droplets className="h-4 w-4" />
-                Test USDC faucet
-              </div>
-              <p className="text-[13px] leading-[1.7] text-paper/70">
-                Paste a Solana devnet wallet address. The server creates the
-                USDC ATA if needed and sends{" "}
-                {attestation?.faucetAmount || "100.000000 USDC"}.
-              </p>
-              <div className="mt-5 flex flex-col gap-3 sm:flex-row">
-                <input
-                  value={recipient}
-                  onChange={(event) => setRecipient(event.target.value)}
-                  placeholder="Devnet wallet address"
-                  className="h-11 min-w-0 flex-1 border border-paper/25 bg-ink px-3 font-mono text-[12px] text-paper outline-none transition-colors placeholder:text-paper/35 focus:border-glow"
-                />
-                <button
-                  type="button"
-                  onClick={requestTestUsdc}
-                  disabled={faucetBusy || recipient.length < 32}
-                  className="inline-flex h-11 items-center justify-center gap-2 border border-paper/25 px-4 font-mono text-[11px] uppercase tracking-[0.16em] text-paper transition-colors hover:border-glow hover:text-glow disabled:cursor-not-allowed disabled:opacity-50"
-                >
-                  {faucetBusy ? (
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                  ) : (
-                    <Droplets className="h-4 w-4" />
-                  )}
-                  Faucet
-                </button>
-              </div>
-              {faucetResult && (
-                <div className="mt-5 border-t border-paper/15 pt-4">
-                  <DataRow label="Amount" value={faucetResult.amount} />
-                  <DataRow
-                    label="ATA"
-                    value={faucetResult.tokenAccount}
-                    href={addressUrl(faucetResult.tokenAccount)}
-                  />
-                  <TxRow label="Faucet tx" signature={faucetResult.faucetTx} />
-                </div>
-              )}
-            </div>
-
-            <div className="border border-paper/20 bg-paper/5 p-5">
-              <div className="mb-4 font-mono text-[11px] uppercase tracking-[0.2em] text-glow">
-                On-chain comparison
-              </div>
-              <div className="space-y-3">
-                {privacyRows.map((row) => (
-                  <div
-                    key={row.label}
-                    className="grid grid-cols-[90px_1fr] gap-4 border-b border-paper/10 pb-3 last:border-b-0"
-                  >
-                    <span
-                      className={`font-mono text-[10px] uppercase ${row.tone}`}
-                    >
-                      {row.label}
-                    </span>
-                    <span className="text-[13px] leading-[1.5] text-paper/70">
-                      {row.value}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
         </div>
 
-        {/* Getting started — install the published packages */}
-        <div className="mt-12 border border-paper/20 bg-paper/5 p-5 md:p-7">
+        {/* Test USDC faucet — its own row below the Live proof */}
+        <div className="mt-6 border border-paper/20 bg-paper/5 p-5 md:p-7">
           <div className="grid gap-6 md:grid-cols-[1fr_auto] md:items-start">
             <div className="min-w-0">
               <div className="flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.22em] text-glow">
-                <Terminal className="h-4 w-4" />
-                Get started · install the packages
+                <Droplets className="h-4 w-4" />
+                Test USDC faucet
               </div>
-              <h3 className="mt-3 font-display text-[28px] font-semibold leading-[1.05] text-paper md:text-[34px]">
-                One{" "}
-                <code className="font-mono text-[20px] text-glow md:text-[26px]">
-                  npm install
-                </code>{" "}
-                and you're an x402 buyer or seller — without revealing the
-                edge.
-              </h3>
               <p className="mt-3 max-w-2xl text-[13px] leading-[1.7] text-paper/70">
-                Subly-x402 is shipped as two open-source npm packages: a
-                Buyer SDK and an Express middleware for Sellers. Drop them
-                into any TypeScript project — there is no Subly API key.
+                Paste a Solana devnet wallet address. The server creates the
+                associated USDC token account if needed and sends{" "}
+                {attestation?.faucetAmount || "100.000000 USDC"}.
               </p>
             </div>
-
-            <div className="flex flex-col gap-3 md:items-end">
-              <a
-                href="https://www.npmjs.com/package/subly402-sdk"
-                target="_blank"
-                rel="noreferrer"
-                className="group inline-flex items-center gap-2 border border-paper/25 bg-paper/5 px-3 py-2 font-mono text-[11px] uppercase tracking-[0.18em] text-paper transition-colors hover:border-glow hover:text-glow"
-              >
-                <span className="text-glow">npm</span> subly402-sdk
-                <ExternalLink className="h-3.5 w-3.5 opacity-60 transition-transform group-hover:translate-x-0.5" />
-              </a>
-              <a
-                href="https://www.npmjs.com/package/subly402-express"
-                target="_blank"
-                rel="noreferrer"
-                className="group inline-flex items-center gap-2 border border-paper/25 bg-paper/5 px-3 py-2 font-mono text-[11px] uppercase tracking-[0.18em] text-paper transition-colors hover:border-glow hover:text-glow"
-              >
-                <span className="text-glow">npm</span> subly402-express
-                <ExternalLink className="h-3.5 w-3.5 opacity-60 transition-transform group-hover:translate-x-0.5" />
-              </a>
-            </div>
           </div>
-
-          {/* Terminal */}
-          <div className="mt-6 overflow-hidden border border-paper/15 bg-black">
-            <div className="flex items-center justify-between border-b border-paper/10 px-4 py-2">
-              <div className="flex items-center gap-1.5">
-                <span className="h-2.5 w-2.5 rounded-full bg-alert/80" />
-                <span className="h-2.5 w-2.5 rounded-full bg-glow/70" />
-                <span className="h-2.5 w-2.5 rounded-full bg-ok/80" />
-                <span className="ml-3 font-mono text-[10px] uppercase tracking-[0.22em] text-paper/45">
-                  zsh — install
-                </span>
-              </div>
-              <button
-                type="button"
-                onClick={() =>
-                  copy(
-                    "npm install subly402-sdk subly402-express",
-                    "install-cmd",
-                  )
-                }
-                className="inline-flex h-7 items-center gap-1.5 border border-paper/20 px-2.5 font-mono text-[10px] uppercase tracking-[0.18em] text-paper transition-colors hover:border-glow hover:text-glow"
-              >
-                {copied === "install-cmd" ? (
-                  <CheckCircle2 className="h-3.5 w-3.5" />
-                ) : (
-                  <Clipboard className="h-3.5 w-3.5" />
-                )}
-                {copied === "install-cmd" ? "Copied" : "Copy"}
-              </button>
-            </div>
-            <pre className="overflow-auto p-5 font-mono text-[14px] leading-[1.7] text-paper">
-              <code>
-                <span className="text-glow">$</span>{" "}
-                <span className="text-paper">npm install</span>{" "}
-                <span className="text-paper/85">subly402-sdk</span>{" "}
-                <span className="text-paper/85">subly402-express</span>
-              </code>
-            </pre>
+          <div className="mt-5 flex flex-col gap-3 sm:flex-row">
+            <input
+              value={recipient}
+              onChange={(event) => setRecipient(event.target.value)}
+              placeholder="Devnet wallet address"
+              className="h-11 min-w-0 flex-1 border border-paper/25 bg-ink px-3 font-mono text-[12px] text-paper outline-none transition-colors placeholder:text-paper/35 focus:border-glow"
+            />
+            <button
+              type="button"
+              onClick={requestTestUsdc}
+              disabled={faucetBusy || recipient.length < 32}
+              className="inline-flex h-11 items-center justify-center gap-2 border border-paper/25 px-4 font-mono text-[11px] uppercase tracking-[0.16em] text-paper transition-colors hover:border-glow hover:text-glow disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              {faucetBusy ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <Droplets className="h-4 w-4" />
+              )}
+              Faucet
+            </button>
           </div>
+          {faucetResult && (
+            <div className="mt-5 border-t border-paper/15 pt-4">
+              <DataRow label="Amount" value={faucetResult.amount} />
+              <DataRow
+                label="ATA"
+                value={faucetResult.tokenAccount}
+                href={addressUrl(faucetResult.tokenAccount)}
+              />
+              <TxRow label="Faucet tx" signature={faucetResult.faucetTx} />
+            </div>
+          )}
         </div>
 
-        <div className="mt-6 grid min-w-0 gap-6 lg:grid-cols-2">
-          <ComparePanel
-            title="Seller"
-            subtitle="One middleware route per path · receiving wallet only"
-            blocks={[
-              {
-                key: "seller-x402",
-                label: "Official x402",
-                tone: "risk",
-                code: sellerCodeX402,
-              },
-              {
-                key: "seller-subly",
-                label: "Subly-x402",
-                tone: "private",
-                code: sellerCodeSubly,
-              },
-            ]}
-            copied={copied}
-            onCopy={copy}
-          />
-          <ComparePanel
-            title="Buyer"
-            subtitle="@solana/kit signer · autoDeposit hook for Subly-x402"
-            blocks={[
-              {
-                key: "buyer-x402",
-                label: "Official x402",
-                tone: "risk",
-                code: buyerCodeX402,
-              },
-              {
-                key: "buyer-subly",
-                label: "Subly-x402",
-                tone: "private",
-                code: buyerCodeSubly,
-              },
-            ]}
-            copied={copied}
-            onCopy={copy}
-          />
+        {/* For developers — install + Seller/Buyer code comparison */}
+        <div className="mt-20 border-t border-paper/15 pt-16">
+          <div className="mb-10 grid gap-6 md:grid-cols-12">
+            <div className="md:col-span-7">
+              <div className="font-mono text-[11px] uppercase tracking-[0.28em] text-glow">
+                ▌ For developers
+              </div>
+              <h3 className="mt-3 font-display text-[40px] font-semibold leading-[0.95] tracking-tight text-paper md:text-[64px]">
+                Two npm packages.
+                <br />
+                <span className="font-feature text-glow">No Subly API key.</span>
+              </h3>
+            </div>
+            <div className="md:col-span-5">
+              <p className="font-feature text-[20px] leading-[1.4] text-paper md:text-[22px]">
+                Subly-x402 ships as two open-source packages — a Buyer SDK and
+                an Express middleware for Sellers. Drop them into any
+                TypeScript project; there is no API key, no waitlist, no
+                gatekeeper.
+              </p>
+            </div>
+          </div>
+
+          {/* Install block */}
+          <div className="border border-paper/20 bg-paper/5 p-5 md:p-7">
+            <div className="grid gap-6 md:grid-cols-[1fr_auto] md:items-start">
+              <div className="min-w-0">
+                <div className="flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.22em] text-glow">
+                  <Terminal className="h-4 w-4" />
+                  Install
+                </div>
+                <h4 className="mt-3 font-display text-[24px] font-semibold leading-[1.1] text-paper md:text-[28px]">
+                  One{" "}
+                  <code className="font-mono text-[18px] text-glow md:text-[22px]">
+                    npm install
+                  </code>{" "}
+                  and you're an x402 buyer or seller.
+                </h4>
+              </div>
+
+              <div className="flex flex-col gap-3 md:items-end">
+                <a
+                  href="https://www.npmjs.com/package/subly402-sdk"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="group inline-flex items-center gap-2 border border-paper/25 bg-paper/5 px-3 py-2 font-mono text-[11px] uppercase tracking-[0.18em] text-paper transition-colors hover:border-glow hover:text-glow"
+                >
+                  <span className="text-glow">npm</span> subly402-sdk
+                  <ExternalLink className="h-3.5 w-3.5 opacity-60 transition-transform group-hover:translate-x-0.5" />
+                </a>
+                <a
+                  href="https://www.npmjs.com/package/subly402-express"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="group inline-flex items-center gap-2 border border-paper/25 bg-paper/5 px-3 py-2 font-mono text-[11px] uppercase tracking-[0.18em] text-paper transition-colors hover:border-glow hover:text-glow"
+                >
+                  <span className="text-glow">npm</span> subly402-express
+                  <ExternalLink className="h-3.5 w-3.5 opacity-60 transition-transform group-hover:translate-x-0.5" />
+                </a>
+              </div>
+            </div>
+
+            {/* Terminal */}
+            <div className="mt-6 overflow-hidden border border-paper/15 bg-black">
+              <div className="flex items-center justify-between border-b border-paper/10 px-4 py-2">
+                <div className="flex items-center gap-1.5">
+                  <span className="h-2.5 w-2.5 rounded-full bg-alert/80" />
+                  <span className="h-2.5 w-2.5 rounded-full bg-glow/70" />
+                  <span className="h-2.5 w-2.5 rounded-full bg-ok/80" />
+                  <span className="ml-3 font-mono text-[10px] uppercase tracking-[0.22em] text-paper/45">
+                    zsh — install
+                  </span>
+                </div>
+                <button
+                  type="button"
+                  onClick={() =>
+                    copy(
+                      "npm install subly402-sdk subly402-express",
+                      "install-cmd",
+                    )
+                  }
+                  className="inline-flex h-7 items-center gap-1.5 border border-paper/20 px-2.5 font-mono text-[10px] uppercase tracking-[0.18em] text-paper transition-colors hover:border-glow hover:text-glow"
+                >
+                  {copied === "install-cmd" ? (
+                    <CheckCircle2 className="h-3.5 w-3.5" />
+                  ) : (
+                    <Clipboard className="h-3.5 w-3.5" />
+                  )}
+                  {copied === "install-cmd" ? "Copied" : "Copy"}
+                </button>
+              </div>
+              <pre className="overflow-auto p-5 font-mono text-[14px] leading-[1.7] text-paper">
+                <code>
+                  <span className="text-glow">$</span>{" "}
+                  <span className="text-paper">npm install</span>{" "}
+                  <span className="text-paper/85">subly402-sdk</span>{" "}
+                  <span className="text-paper/85">subly402-express</span>
+                </code>
+              </pre>
+            </div>
+          </div>
+
+          {/* Seller and Buyer code comparison — each panel takes full width */}
+          <div className="mt-10 space-y-10">
+            <ComparePanel
+              title="Seller"
+              subtitle="One middleware route per path · receiving wallet only"
+              blocks={[
+                {
+                  key: "seller-x402",
+                  label: "Official x402",
+                  tone: "risk",
+                  code: sellerCodeX402,
+                },
+                {
+                  key: "seller-subly",
+                  label: "Subly-x402",
+                  tone: "private",
+                  code: sellerCodeSubly,
+                },
+              ]}
+              copied={copied}
+              onCopy={copy}
+            />
+            <ComparePanel
+              title="Buyer"
+              subtitle="@solana/kit signer · autoDeposit hook for Subly-x402"
+              blocks={[
+                {
+                  key: "buyer-x402",
+                  label: "Official x402",
+                  tone: "risk",
+                  code: buyerCodeX402,
+                },
+                {
+                  key: "buyer-subly",
+                  label: "Subly-x402",
+                  tone: "private",
+                  code: buyerCodeSubly,
+                },
+              ]}
+              copied={copied}
+              onCopy={copy}
+            />
+          </div>
         </div>
       </div>
     </section>
