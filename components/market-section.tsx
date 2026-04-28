@@ -41,25 +41,22 @@ export function MarketSection() {
             <div className="font-mono text-[11px] uppercase tracking-[0.28em] text-subly">
               ▌ Market
             </div>
-            <h2 className="mt-3 font-display text-[52px] font-semibold leading-[0.92] tracking-tight text-ink md:text-[80px]">
-              A market the size of every
-              <br />
+            <h2 className="mt-3 font-display text-[52px] font-semibold leading-[0.92] tracking-tight text-ink md:text-[72px]">
+              Sizing the{" "}
               <span className="font-feature text-subly">
-                API call an agent will make.
+                agent payment market.
               </span>
             </h2>
           </div>
           <div className="md:col-span-5">
             <p className="font-feature text-[22px] leading-[1.4] text-ink md:text-[24px]">
               Autonomous agents are about to become the largest single
-              consumer of paid APIs. Subly captures the per-call payment
-              layer.
+              consumer of paid APIs.
             </p>
             <p className="mt-5 font-sans text-[14px] leading-[1.75] text-ink-soft">
-              The agent-payment market sized top-down. The wedge we attack
-              first — every per-call API payment an agent makes — is already a
-              $100M annual run-rate and compounds with every new autonomous
-              workflow shipped.
+              We start by targeting API Payments via AI Agents — the per-call
+              API payments an agent makes via x402-style HTTP 402 — and grow
+              into the broader agent economy from there.
             </p>
           </div>
         </div>
