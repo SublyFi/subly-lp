@@ -52,11 +52,6 @@ export function Footer() {
               A privacy-first PayFi protocol for AI agents that would rather
               not wait for a human to top them up.
             </p>
-            <p className="mt-6 max-w-md font-sans text-[13px] leading-[1.75] text-paper/60">
-              Built for Solana. Assembled inside enclaves. Audited by keys you
-              control.{" "}
-              <span className="text-subly-glow">Use Now, Pay Never.</span>
-            </p>
           </div>
 
           <div className="md:col-span-3">

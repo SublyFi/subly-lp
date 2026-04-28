@@ -54,63 +54,8 @@ export function PrivacySection() {
           </div>
         </div>
 
-        {/* Redaction comparison */}
-        <div className="grid gap-6 md:grid-cols-2">
-          <RedactedLedger
-            label="Without Subly · Official x402"
-            status="plaintext · indexable · forever"
-            statusColor="text-alert"
-            rows={[
-              {
-                t: "14:02",
-                amt: "$0.40",
-                note: "LLM API · competitor pricing analysis",
-              },
-              {
-                t: "14:03",
-                amt: "$2.10",
-                note: "Vector DB · M&A target shortlist query",
-              },
-              {
-                t: "14:03",
-                amt: "$1.25",
-                note: "Market data API · microcap alpha feed",
-              },
-              {
-                t: "14:04",
-                amt: "$0.90",
-                note: "Legal research · patent freedom-to-operate",
-              },
-              {
-                t: "14:05",
-                amt: "$3.00",
-                note: "Clinical dataset · rare-disease cohort",
-              },
-              {
-                t: "14:05",
-                amt: "$0.15",
-                note: "Geo API · supplier route reconnaissance",
-              },
-            ]}
-          />
-          <RedactedLedger
-            variant="subly"
-            label="With Subly"
-            status="encrypted · aggregated · attested"
-            statusColor="text-subly-glow"
-            rows={[
-              {
-                t: "14:06",
-                amt: "$7.80",
-                note: "Settlement · batch #4217 · 6 providers",
-              },
-            ]}
-            footer
-          />
-        </div>
-
         {/* Privacy pillars */}
-        <div className="mt-20 grid gap-px border border-paper/15 bg-paper/10 md:grid-cols-3">
+        <div className="grid gap-px border border-paper/15 bg-paper/10 md:grid-cols-3">
           <Pillar
             kicker="On-chain privacy"
             logo="/ArciumWhite.svg"
@@ -131,82 +76,6 @@ export function PrivacySection() {
         </div>
       </div>
     </section>
-  );
-}
-
-function RedactedLedger({
-  label,
-  status,
-  statusColor,
-  rows,
-  variant,
-  footer,
-}: {
-  label: string;
-  status: string;
-  statusColor: string;
-  rows: { t: string; amt: string; note: string }[];
-  variant?: "subly";
-  footer?: boolean;
-}) {
-  const isSubly = variant === "subly";
-  return (
-    <div
-      className={`relative border p-6 md:p-8 ${
-        isSubly
-          ? "border-subly bg-subly/10 shadow-[6px_6px_0_0_var(--subly-deep)]"
-          : "border-paper/25 bg-paper/5"
-      }`}
-    >
-      <div className="mb-6 flex items-baseline justify-between">
-        <div className="font-mono text-[10px] uppercase tracking-[0.22em] text-paper/70">
-          ▌ {label}
-        </div>
-        <div
-          className={`font-mono text-[10px] uppercase tracking-[0.22em] ${statusColor}`}
-        >
-          {status}
-        </div>
-      </div>
-
-      <div className="space-y-3">
-        {rows.map((r, i) => (
-          <div
-            key={i}
-            className="grid grid-cols-12 items-baseline gap-3 border-b border-paper/15 pb-3 font-mono text-[12px] last:border-0"
-          >
-            <span className="col-span-2 text-paper/50">{r.t}</span>
-            <span
-              className={`col-span-3 ${
-                isSubly ? "text-subly-glow" : "text-paper"
-              }`}
-            >
-              {r.amt}
-            </span>
-            <span className={`col-span-7 ${isSubly ? "text-paper" : ""}`}>
-              {isSubly ? r.note : <span className="redact">{r.note}</span>}
-            </span>
-          </div>
-        ))}
-      </div>
-
-      {footer && (
-        <div className="mt-6 border-t border-paper/15 pt-5 font-mono text-[10px] uppercase tracking-[0.18em] text-paper/60">
-          <div className="flex items-center justify-between">
-            <span>Enclave PCR0</span>
-            <span className="text-subly-glow">0xa9c7…3f1e ✓</span>
-          </div>
-          <div className="mt-2 flex items-center justify-between">
-            <span>Providers paid</span>
-            <span className="text-paper">6 · batch atomic</span>
-          </div>
-          <div className="mt-2 flex items-center justify-between">
-            <span>Observer visibility</span>
-            <span className="text-paper">total only</span>
-          </div>
-        </div>
-      )}
-    </div>
   );
 }
 
