@@ -4,36 +4,28 @@ export function WaitlistCTA() {
   return (
     <section
       id="waitlist"
-      className="relative overflow-hidden border-b border-rule bg-ink text-paper"
+      className="relative overflow-hidden border-b border-rule bg-paper text-ink"
     >
       <div
         aria-hidden
         className="pointer-events-none absolute inset-0"
         style={{
           background:
-            "radial-gradient(ellipse at 50% 0%, rgba(94,23,235,0.35) 0%, transparent 60%), radial-gradient(circle at 100% 100%, rgba(94,23,235,0.20) 0%, transparent 50%)",
+            "radial-gradient(ellipse at 50% 0%, rgba(94,23,235,0.18) 0%, transparent 60%), radial-gradient(circle at 100% 100%, rgba(94,23,235,0.10) 0%, transparent 50%)",
         }}
       />
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-0 opacity-[0.10]"
-        style={{
-          backgroundImage:
-            "linear-gradient(to right, rgba(200,179,255,0.5) 1px, transparent 1px), linear-gradient(to bottom, rgba(200,179,255,0.5) 1px, transparent 1px)",
-          backgroundSize: "80px 80px",
-        }}
-      />
+      <div className="gridlines-purple pointer-events-none absolute inset-0 opacity-40" />
 
       <div className="relative mx-auto max-w-[1360px] px-6 py-24 md:px-10 md:py-32">
         <div className="mx-auto flex max-w-2xl flex-col items-center text-center">
-          <div className="font-mono text-[11px] uppercase tracking-[0.28em] text-subly-glow">
+          <div className="font-mono text-[11px] uppercase tracking-[0.28em] text-subly">
             ▌ Waitlist
           </div>
           <h2 className="mt-3 font-display text-[52px] font-semibold leading-[0.95] tracking-tight md:text-[72px]">
             Join the{" "}
-            <span className="font-feature text-subly-glow">waitlist.</span>
+            <span className="font-feature text-subly">waitlist.</span>
           </h2>
-          <p className="mt-6 max-w-xl font-feature text-[20px] leading-[1.4] text-paper md:text-[24px]">
+          <p className="mt-6 max-w-xl font-feature text-[20px] leading-[1.4] text-ink md:text-[24px]">
             Be first in line when Subly opens to AI agent builders.
           </p>
           <div className="mt-10 w-full">
