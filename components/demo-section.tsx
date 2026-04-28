@@ -904,16 +904,13 @@ export function DemoSection() {
               </div>
               <h3 className="mt-3 font-display text-[40px] font-semibold leading-[0.95] tracking-tight text-paper md:text-[64px]">
                 Two npm packages.
-                <br />
-                <span className="font-feature text-glow">No Subly API key.</span>
               </h3>
             </div>
             <div className="md:col-span-5">
               <p className="font-feature text-[20px] leading-[1.4] text-paper md:text-[22px]">
                 Subly-x402 ships as two open-source packages — a Buyer SDK and
                 an Express middleware for Sellers. Drop them into any
-                TypeScript project; there is no API key, no waitlist, no
-                gatekeeper.
+                TypeScript project; there is no API key, no gatekeeper.
               </p>
             </div>
           </div>
