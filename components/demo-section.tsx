@@ -1250,8 +1250,7 @@ function FlowLane({
             icon={Store}
             label="Seller wallet"
             detail="Seller"
-            active={batchState === "complete"}
-            pending={batchState === "pending"}
+            active={batchState !== "idle"}
             tone="private"
           />
         </div>
