@@ -29,24 +29,24 @@ export function PrivacySection() {
         <div className="mb-16 grid gap-8 md:grid-cols-12">
           <div className="md:col-span-7">
             <div className="font-mono text-[11px] uppercase tracking-[0.28em] text-subly-glow">
-              ▌ Proof · same call, different edge
+              ▌ Privacy
             </div>
-            <h2 className="mt-3 font-display text-[56px] font-semibold leading-[0.92] tracking-tight md:text-[80px]">
-              The receipt{" "}
-              <span className="font-feature text-subly-glow">disappears.</span>
+            <h2 className="mt-3 font-display text-[52px] font-semibold leading-[0.95] tracking-tight md:text-[72px]">
+              How the Buyer ↔ Seller{" "}
+              <span className="font-feature text-subly-glow">link breaks.</span>
             </h2>
           </div>
           <div className="md:col-span-5">
-            <p className="font-feature text-[22px] leading-[1.4] text-paper md:text-[24px]">
-              Below is the same window of payments rendered two ways. With
-              official x402, every Buyer→Seller line is plaintext. With Subly,
-              observers see one aggregate settlement.
+            <p className="font-sans text-[15px] leading-[1.75] text-paper/85 md:text-[16px]">
+              Subly settles payments through a shared user vault. Buyers
+              deposit into the vault; sellers are paid out from the vault on
+              its own schedule. The on-chain ledger sees Buyer → Vault and
+              Vault → Seller separately, so the direct Buyer → Seller link
+              that x402 normally exposes is no longer present.
             </p>
-            <p className="mt-5 font-sans text-[13px] leading-[1.75] text-paper/70">
-              Subly&apos;s facilitator signs inside an AWS Nitro Enclave. Yield
-              routing and application logic move into Arcium MPC as
-              Confidential SPL lands. You still get an audit trail —
-              selectively disclosed, on your terms.
+            <p className="mt-4 font-sans text-[13px] leading-[1.75] text-paper/65">
+              Settlement bookkeeping runs inside a TEE; the on-chain privacy
+              layer migrates to Arcium MPC as Confidential SPL ships.
             </p>
           </div>
         </div>
@@ -54,7 +54,7 @@ export function PrivacySection() {
         {/* Redaction comparison */}
         <div className="grid gap-6 md:grid-cols-2">
           <RedactedLedger
-            label="Without Subly"
+            label="Without Subly · Official x402"
             status="plaintext · indexable · forever"
             statusColor="text-alert"
             rows={[
@@ -119,7 +119,7 @@ export function PrivacySection() {
             kicker="MPC"
             title="Arcium MXE"
             body="Phase 5 moves yield routing and confidential SPL into Arcium's Multi-Party eXecution environment on Solana Mainnet Alpha (live Feb 2026)."
-            logo="/arcium-logo.svg"
+            logo="/ArciumWhite.svg"
             logoAlt="Arcium"
             dark
           />

@@ -2,22 +2,22 @@ const FLOW_STEPS = [
   {
     n: "01",
     tag: "DEPOSIT",
-    title: "Agent deposits once.",
-    body: "A single USDC transfer into the shared Subly vault. No cron jobs, no human surveillance, no second deposit ever required.",
+    title: "Deposit once.",
+    body: "The agent makes a single USDC transfer into the shared Subly vault. No top-ups, no human supervision after that.",
     ornament: "$",
   },
   {
     n: "02",
     tag: "EARN",
-    title: "Vault earns yield.",
-    body: "Capital routes into senior DeFi positions targeting 10%+ APY. Principal stays yours; only the yield is spent on agent payments.",
+    title: "Earn yield.",
+    body: "The vault routes capital into DeFi, targeting 10%+ APY. Principal stays put; only the yield is used to fund payments.",
     ornament: "%",
   },
   {
     n: "03",
     tag: "PAY",
-    title: "TEE pays providers — privately.",
-    body: "Buyers pay providers via x402-style HTTP calls. The TEE batches and time-shifts the actual on-chain settlement so observers can't link Buyer to Seller.",
+    title: "Pay providers.",
+    body: "Buyers call providers via x402-style HTTP. Settlement is batched from the shared vault inside a TEE, so observers can't link Buyer to Seller.",
     ornament: "→",
   },
 ];
@@ -45,33 +45,24 @@ export function SolutionSection() {
             <div className="font-mono text-[11px] uppercase tracking-[0.28em] text-subly">
               ▌ Solution
             </div>
-            <h2 className="mt-3 font-display text-[52px] font-semibold leading-[0.92] tracking-tight text-ink md:text-[80px]">
-              Deposit once.
-              <br />
-              <span className="text-subly">Earn yield.</span>
-              <br />
-              <span className="font-feature">
-                Pay agents — privately.
-              </span>
+            <h2 className="mt-3 font-display text-[52px] font-semibold leading-[0.95] tracking-tight text-ink md:text-[72px]">
+              Deposit once.{" "}
+              <span className="text-subly">Earn yield.</span>{" "}
+              <span className="font-feature">Pay agents privately.</span>
             </h2>
-            <p className="mt-8 max-w-xl font-feature text-[22px] leading-[1.35] text-ink md:text-[26px]">
+            <p className="mt-8 max-w-xl font-feature text-[20px] leading-[1.4] text-ink md:text-[24px]">
               Turn your yield into AI agent payments without revealing
               anything.
             </p>
           </div>
           <div className="md:col-span-5">
-            <div className="border border-ink bg-paper p-6 shadow-stamp">
-              <div className="font-mono text-[10px] uppercase tracking-[0.24em] text-subly">
-                ▌ The Subly answer
-              </div>
-              <p className="mt-3 font-sans text-[14px] leading-[1.75] text-ink-soft">
-                A single deposit funds your agent forever. Capital sits in a
-                Solana vault earning DeFi yield. The yield — not the principal
-                — settles every x402-style call your agent makes. And because
-                a TEE-managed shared vault breaks the Buyer-Seller link, the
-                public ledger never sees what your agent bought from whom.
-              </p>
-            </div>
+            <p className="font-sans text-[15px] leading-[1.75] text-ink-soft md:text-[16px]">
+              An agent deposits USDC into Subly once. The vault earns DeFi
+              yield, and that yield is what pays for x402 calls — the
+              principal never leaves. Settlement runs through a shared user
+              vault managed inside a TEE, so the on-chain Buyer → Seller link
+              that x402 normally exposes is broken.
+            </p>
           </div>
         </div>
 
@@ -79,23 +70,23 @@ export function SolutionSection() {
         <div className="grid gap-0 border-y-2 border-ink md:grid-cols-3">
           <Pillar
             kicker="01 · Capital"
-            title="One deposit, forever."
-            body="Your agent transfers USDC into the Subly vault once. The Solana program mints a non-transferable receipt bound to its pubkey. Withdrawal is one instruction — principal never leaves your custody."
+            title="One deposit, ongoing payments."
+            body="The agent transfers USDC into the Subly vault once. Principal stays in your custody and can be withdrawn at any time."
             metric="1×"
             metricLabel="Deposit required"
           />
           <Pillar
             mid
             kicker="02 · Yield"
-            title="DeFi works the night shift."
-            body="The vault routes idle capital into whitelisted senior DeFi positions, targeting 10%+ APY. Yield accrues continuously and replenishes the spend bucket without any human action."
+            title="Yield funds the payments."
+            body="The vault deploys idle capital into DeFi positions targeting 10%+ APY. The yield — not the principal — is what gets spent on agent calls."
             metric="10%+"
             metricLabel="APY target"
           />
           <Pillar
             kicker="03 · Privacy"
-            title="The receipt disappears."
-            body="Buyers and Sellers still talk over HTTP, just like x402. But payments flow into a shared user vault first; the TEE batches and time-shifts the on-chain settlement, so no observer can link Buyer to Seller."
+            title="Buyer ↔ Seller link, broken."
+            body="Buyers and sellers still use x402-style HTTP. But payments flow into a shared user vault first; settlement is batched and delayed inside a TEE, so the direct on-chain link disappears."
             metric="0"
             metricLabel="Buyer↔Seller links"
             accent
@@ -106,7 +97,7 @@ export function SolutionSection() {
         <div className="mt-20">
           <div className="mb-10 flex items-baseline justify-between">
             <h3 className="font-display text-[32px] font-semibold tracking-tight text-ink md:text-[42px]">
-              How the money moves.
+              How it works.
             </h3>
             <span className="font-mono text-[10px] uppercase tracking-[0.24em] text-ink-muted">
               fig. 02 · capital flow
@@ -157,7 +148,7 @@ function Pillar({
         <span className="h-px flex-1 bg-rule" />
       </div>
       <h3
-        className={`font-display text-[26px] font-semibold leading-[1.05] tracking-tight ${
+        className={`font-display text-[24px] font-semibold leading-[1.1] tracking-tight ${
           accent ? "text-subly" : "text-ink"
         }`}
       >
@@ -166,7 +157,7 @@ function Pillar({
       <p className="text-[14px] leading-[1.75] text-ink-muted">{body}</p>
       <div className="mt-auto border-t border-rule pt-4">
         <div
-          className={`font-display text-[44px] font-semibold leading-none tracking-tight ${
+          className={`font-display text-[40px] font-semibold leading-none tracking-tight ${
             accent ? "text-subly" : "text-ink"
           }`}
         >
@@ -214,7 +205,7 @@ function Step({
           ▌{tag}
         </span>
       </div>
-      <h4 className="font-display text-[24px] font-semibold tracking-tight text-ink md:text-[28px]">
+      <h4 className="font-display text-[22px] font-semibold tracking-tight text-ink md:text-[26px]">
         {title}
       </h4>
       <p className="mt-4 text-[14px] leading-[1.7] text-ink-muted">{body}</p>

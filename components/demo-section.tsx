@@ -866,13 +866,13 @@ export function DemoSection() {
               value={recipient}
               onChange={(event) => setRecipient(event.target.value)}
               placeholder="Devnet wallet address"
-              className="h-11 min-w-0 flex-1 border border-paper/25 bg-ink px-3 font-mono text-[12px] text-paper outline-none transition-colors placeholder:text-paper/35 focus:border-glow"
+              className="h-14 min-w-0 flex-1 border border-paper/25 bg-ink px-4 font-mono text-[14px] text-paper outline-none transition-colors placeholder:text-paper/40 focus:border-glow sm:h-12 sm:text-[13px]"
             />
             <button
               type="button"
               onClick={requestTestUsdc}
               disabled={faucetBusy || recipient.length < 32}
-              className="inline-flex h-11 items-center justify-center gap-2 border border-paper/25 px-4 font-mono text-[11px] uppercase tracking-[0.16em] text-paper transition-colors hover:border-glow hover:text-glow disabled:cursor-not-allowed disabled:opacity-50"
+              className="inline-flex h-14 items-center justify-center gap-2 border border-paper/25 px-5 font-mono text-[12px] uppercase tracking-[0.18em] text-paper transition-colors hover:border-glow hover:text-glow disabled:cursor-not-allowed disabled:opacity-50 sm:h-12 sm:px-4 sm:text-[11px] sm:tracking-[0.16em]"
             >
               {faucetBusy ? (
                 <Loader2 className="h-4 w-4 animate-spin" />
