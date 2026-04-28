@@ -224,7 +224,7 @@ const privacyDemoSteps = [
     label: "Payment",
     phase: "Commit",
     title: "The buyer signs payment.",
-    body: "x402 pays the seller directly. Subly-x402 keeps the x402-style retry flow, but the buyer deposits into the vault after checking attestation.",
+    body: "x402 pays the seller directly. Subly-x402 keeps the same x402-style HTTP retry flow, but the buyer deposits into a shared user Vault — the same Vault every Subly buyer uses — after verifying the enclave attestation.",
     x402: "Buyer signs a direct USDC transfer to the seller.",
     subly402:
       "Buyer signs a vault deposit and a paid request bound to the attested policy.",
@@ -236,7 +236,7 @@ const privacyDemoSteps = [
     label: "Visible edge",
     phase: "Reveal",
     title: "The visible payment edge is different.",
-    body: "This is the core point: x402 exposes who paid which seller. Subly-x402 exposes that the buyer funded a vault, not the seller they called.",
+    body: "This is the core point: x402 exposes who paid which seller. Subly-x402 only exposes that the buyer funded the shared Vault — never which seller they actually called.",
     x402: "Explorer shows Buyer token account -> Seller token account.",
     subly402:
       "Explorer shows Buyer token account -> Subly vault. No Buyer -> Seller transfer appears in the buyer request.",
@@ -248,7 +248,7 @@ const privacyDemoSteps = [
     label: "Payout",
     phase: "Resolve",
     title: "Seller still gets paid.",
-    body: "Subly-x402 is not hiding payment from the seller. It changes the onchain settlement shape so the seller receives a later vault payout instead of a direct buyer transfer.",
+    body: "Subly-x402 doesn't hide the payout from the seller — they still get paid. What changes is the on-chain shape: the Vault pays sellers in batches on its own schedule, so the Vault → Seller payout cannot be tied back to any single buyer's call.",
     x402: "The request is already linkable to this seller.",
     subly402:
       "Seller receives a batched Vault -> Seller payout, separate from the buyer deposit.",
@@ -1361,11 +1361,7 @@ function PathFlowSummary({
   batchState: FlowState;
 }) {
   const isSubly = variant === "subly402";
-  const tone: FlowTone = isSubly
-    ? batchState === "complete" || batchState === "pending"
-      ? "resolve"
-      : "private"
-    : "risk";
+  const tone: FlowTone = isSubly ? "private" : "risk";
   const Icon = isSubly ? LockKeyhole : Eye;
   const state = isSubly
     ? batchState === "complete" || batchState === "pending"
