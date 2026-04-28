@@ -79,7 +79,7 @@ export function SolutionSection() {
             mid
             kicker="02 · Yield"
             title="Yield funds the payments."
-            body="The vault deploys idle capital into DeFi positions targeting 10%+ APY. The yield — not the principal — is what gets spent on agent calls."
+            body="Deposited capital earns yield in DeFi, with a 10%+ APY target. The yield — not the principal — is what funds your agent's calls."
             metric="10%+"
             metricLabel="APY target"
           />
