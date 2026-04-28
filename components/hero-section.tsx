@@ -113,55 +113,6 @@ export function HeroSection() {
               <Row label="Watchtower" value="6 tests · force-settle ready" />
               <Row label="Batch" value="Up to 20 settlements / tx" />
             </dl>
-
-            <div className="mt-6 border-t border-rule pt-4">
-              <div className="flex items-center justify-between font-mono text-[10px] uppercase tracking-[0.2em] text-ink-muted">
-                <span>Vault snapshot</span>
-                <span className="inline-flex items-center gap-1.5 text-subly">
-                  <span className="h-1.5 w-1.5 rounded-full bg-subly blink" />
-                  T+0
-                </span>
-              </div>
-              <div className="mt-3 flex items-end justify-between">
-                <div>
-                  <div className="font-display text-[44px] font-semibold leading-none tracking-tight text-ink">
-                    8.42<span className="text-subly">%</span>
-                  </div>
-                  <div className="mt-2 font-mono text-[10px] uppercase tracking-[0.2em] text-ink-muted">
-                    APY · devnet sim
-                  </div>
-                </div>
-                <svg
-                  viewBox="0 0 96 40"
-                  className="h-12 w-28"
-                  fill="none"
-                  aria-hidden
-                >
-                  <defs>
-                    <linearGradient id="spark" x1="0" x2="0" y1="0" y2="1">
-                      <stop offset="0%" stopColor="#5e17eb" stopOpacity="0.35" />
-                      <stop offset="100%" stopColor="#5e17eb" stopOpacity="0" />
-                    </linearGradient>
-                  </defs>
-                  <path
-                    d="M0 32 L12 28 L24 30 L36 22 L48 24 L60 14 L72 16 L84 8 L96 6 L96 40 L0 40 Z"
-                    fill="url(#spark)"
-                  />
-                  <path
-                    d="M0 32 L12 28 L24 30 L36 22 L48 24 L60 14 L72 16 L84 8 L96 6"
-                    stroke="#5e17eb"
-                    strokeWidth="1.75"
-                  />
-                  <path
-                    d="M0 36 L12 34 L24 32 L36 30 L48 28 L60 26 L72 22 L84 20 L96 16"
-                    stroke="currentColor"
-                    className="text-ink-muted"
-                    strokeWidth="1"
-                    strokeDasharray="2 3"
-                  />
-                </svg>
-              </div>
-            </div>
           </div>
 
           <p className="mt-5 font-feature text-[15px] leading-[1.55] text-ink-muted">
