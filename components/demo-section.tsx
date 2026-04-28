@@ -153,8 +153,7 @@ type ApiError = {
   missing?: string[];
 };
 
-const sellerCode = `// Official x402 route
-app.use(x402PaymentMiddleware({
+const sellerCodeX402 = `app.use(x402PaymentMiddleware({
   "GET /x402/weather": {
     accepts: [{
       scheme: "exact",
@@ -166,10 +165,9 @@ app.use(x402PaymentMiddleware({
       },
     }],
   },
-}, officialX402ResourceServer));
+}, officialX402ResourceServer));`;
 
-// Subly402 route
-const sublyResourceServer = new Subly402ResourceServer(facilitator)
+const sellerCodeSubly = `const sublyResourceServer = new Subly402ResourceServer(facilitator)
   .register("solana:devnet", new Subly402ExactScheme());
 
 app.use(sublyPaymentMiddleware({
@@ -183,17 +181,15 @@ app.use(sublyPaymentMiddleware({
   },
 }, sublyResourceServer));`;
 
-const buyerCode = `// Official x402 Buyer
-const x402Client = new X402Client()
+const buyerCodeX402 = `const x402Client = new X402Client()
   .register(
     "solana:EtWTRABZaYq6iMfeYKouRu166VU2xqa1",
     new X402ExactSvmScheme(buyer, { rpcUrl })
   );
 const x402Fetch = wrapX402FetchWithPayment(fetch, x402Client);
-await x402Fetch("http://seller.demo.sublyfi.com/x402/weather");
+await x402Fetch("http://seller.demo.sublyfi.com/x402/weather");`;
 
-// Subly402 Buyer
-const client = new Subly402Client({
+const buyerCodeSubly = `const client = new Subly402Client({
   trustedFacilitators: ["https://api.demo.sublyfi.com"],
   autoDeposit: {
     maxDepositPerRequest: "1100000",
@@ -619,16 +615,20 @@ export function DemoSection() {
 
         <div className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
           <div className="border border-paper/20 bg-paper/5 shadow-[6px_6px_0_0_var(--glow)]">
-            <div className="flex flex-col gap-4 border-b border-paper/15 p-5 md:flex-row md:items-center md:justify-between">
-              <div>
+            <div className="flex flex-col gap-4 border-b border-paper/15 p-5 md:flex-row md:items-start md:justify-between">
+              <div className="md:flex-1">
                 <div className="flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.2em] text-glow">
                   <Terminal className="h-4 w-4" />
-                  Live devnet proof
+                  Live on-chain proof · Solana devnet
                 </div>
-                <div className="mt-2 text-[13px] text-paper/60">
-                  Same seller · hosted buyer ·{" "}
-                  {attestation?.network || "solana:devnet"}
-                </div>
+                <p className="mt-3 max-w-2xl text-[13px] leading-[1.6] text-paper/75">
+                  Press <span className="text-glow">Run live demo</span> and
+                  the hosted buyer makes two real x402 calls against the same
+                  seller — one through Official x402, one through Subly-x402.
+                  The three cards below light up with the actual on-chain
+                  transactions as they confirm on devnet, so you can see for
+                  yourself which payment edges become public.
+                </p>
               </div>
               <button
                 type="button"
@@ -641,44 +641,47 @@ export function DemoSection() {
                 ) : (
                   <Play className="h-4 w-4" />
                 )}
-                Run proof
+                Run live demo
               </button>
             </div>
 
             <div className="grid border-b border-paper/15 md:grid-cols-3">
               <StepCell
                 n="01"
-                label="x402 direct edge"
+                label="Official x402: Buyer → Seller"
+                description="A direct USDC transfer from buyer to seller. This is the linkable on-chain edge — anyone can read it forever."
                 value={
                   runResult?.x402.settlementTx
-                    ? "direct tx settled"
+                    ? "Settlement tx confirmed"
                     : attestation?.routes?.x402
-                      ? "seller route ready"
-                      : "pending"
+                      ? "Ready · awaiting Run live demo"
+                      : "Pending"
                 }
                 active={runBusy}
                 done={Boolean(runResult?.x402.settlementTx)}
               />
               <StepCell
                 n="02"
-                label="Subly vault edge"
+                label="Subly-x402: Buyer → Vault"
+                description="The buyer deposits into the Private Shared Vault. This is the only on-chain tx tied to the buyer in Subly-x402."
                 value={
                   runResult?.subly402.depositTx
-                    ? "vault deposit tx"
+                    ? "Vault deposit confirmed"
                     : attestation?.routes?.subly402
-                      ? "seller route ready"
-                      : "pending"
+                      ? "Ready · awaiting Run live demo"
+                      : "Pending"
                 }
                 active={runBusy}
                 done={Boolean(runResult?.subly402.depositTx)}
               />
               <StepCell
                 n="03"
-                label="Seller payout"
+                label="Subly-x402: Vault → Seller"
+                description="A batched payout from the Vault to the seller. Settled later on the Vault's own schedule, so it can't be tied back to the buyer's call."
                 value={
                   runResult?.subly402.settlementStatus?.status ||
                   sublySettlementId ||
-                  "pending"
+                  "Pending"
                 }
                 active={runBusy}
                 done={Boolean(sublySettlementId)}
@@ -936,20 +939,131 @@ export function DemoSection() {
           </div>
         </div>
 
-        <div className="mt-10 grid min-w-0 gap-6 lg:grid-cols-2">
-          <CodePanel
+        {/* Getting started — install the published packages */}
+        <div className="mt-12 border border-paper/20 bg-paper/5 p-5 md:p-7">
+          <div className="grid gap-6 md:grid-cols-[1fr_auto] md:items-start">
+            <div className="min-w-0">
+              <div className="flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.22em] text-glow">
+                <Terminal className="h-4 w-4" />
+                Get started · install the packages
+              </div>
+              <h3 className="mt-3 font-display text-[28px] font-semibold leading-[1.05] text-paper md:text-[34px]">
+                One{" "}
+                <code className="font-mono text-[20px] text-glow md:text-[26px]">
+                  npm install
+                </code>{" "}
+                and you're an x402 buyer or seller — without revealing the
+                edge.
+              </h3>
+              <p className="mt-3 max-w-2xl text-[13px] leading-[1.7] text-paper/70">
+                Subly-x402 is shipped as two open-source npm packages: a
+                Buyer SDK and an Express middleware for Sellers. Drop them
+                into any TypeScript project — there is no Subly API key.
+              </p>
+            </div>
+
+            <div className="flex flex-col gap-3 md:items-end">
+              <a
+                href="https://www.npmjs.com/package/subly402-sdk"
+                target="_blank"
+                rel="noreferrer"
+                className="group inline-flex items-center gap-2 border border-paper/25 bg-paper/5 px-3 py-2 font-mono text-[11px] uppercase tracking-[0.18em] text-paper transition-colors hover:border-glow hover:text-glow"
+              >
+                <span className="text-glow">npm</span> subly402-sdk
+                <ExternalLink className="h-3.5 w-3.5 opacity-60 transition-transform group-hover:translate-x-0.5" />
+              </a>
+              <a
+                href="https://www.npmjs.com/package/subly402-express"
+                target="_blank"
+                rel="noreferrer"
+                className="group inline-flex items-center gap-2 border border-paper/25 bg-paper/5 px-3 py-2 font-mono text-[11px] uppercase tracking-[0.18em] text-paper transition-colors hover:border-glow hover:text-glow"
+              >
+                <span className="text-glow">npm</span> subly402-express
+                <ExternalLink className="h-3.5 w-3.5 opacity-60 transition-transform group-hover:translate-x-0.5" />
+              </a>
+            </div>
+          </div>
+
+          {/* Terminal */}
+          <div className="mt-6 overflow-hidden border border-paper/15 bg-black">
+            <div className="flex items-center justify-between border-b border-paper/10 px-4 py-2">
+              <div className="flex items-center gap-1.5">
+                <span className="h-2.5 w-2.5 rounded-full bg-alert/80" />
+                <span className="h-2.5 w-2.5 rounded-full bg-glow/70" />
+                <span className="h-2.5 w-2.5 rounded-full bg-ok/80" />
+                <span className="ml-3 font-mono text-[10px] uppercase tracking-[0.22em] text-paper/45">
+                  zsh — install
+                </span>
+              </div>
+              <button
+                type="button"
+                onClick={() =>
+                  copy(
+                    "npm install subly402-sdk subly402-express",
+                    "install-cmd",
+                  )
+                }
+                className="inline-flex h-7 items-center gap-1.5 border border-paper/20 px-2.5 font-mono text-[10px] uppercase tracking-[0.18em] text-paper transition-colors hover:border-glow hover:text-glow"
+              >
+                {copied === "install-cmd" ? (
+                  <CheckCircle2 className="h-3.5 w-3.5" />
+                ) : (
+                  <Clipboard className="h-3.5 w-3.5" />
+                )}
+                {copied === "install-cmd" ? "Copied" : "Copy"}
+              </button>
+            </div>
+            <pre className="overflow-auto p-5 font-mono text-[14px] leading-[1.7] text-paper">
+              <code>
+                <span className="text-glow">$</span>{" "}
+                <span className="text-paper">npm install</span>{" "}
+                <span className="text-paper/85">subly402-sdk</span>{" "}
+                <span className="text-paper/85">subly402-express</span>
+              </code>
+            </pre>
+          </div>
+        </div>
+
+        <div className="mt-6 grid min-w-0 gap-6 lg:grid-cols-2">
+          <ComparePanel
             title="Seller"
-            subtitle="one middleware route, receiving wallet only"
-            code={sellerCode}
-            copied={copied === "seller-code"}
-            onCopy={() => copy(sellerCode, "seller-code")}
+            subtitle="One middleware route per path · receiving wallet only"
+            blocks={[
+              {
+                key: "seller-x402",
+                label: "Official x402",
+                tone: "risk",
+                code: sellerCodeX402,
+              },
+              {
+                key: "seller-subly",
+                label: "Subly-x402",
+                tone: "private",
+                code: sellerCodeSubly,
+              },
+            ]}
+            copied={copied}
+            onCopy={copy}
           />
-          <CodePanel
+          <ComparePanel
             title="Buyer"
-            subtitle="@solana/kit signer + autoDeposit hook"
-            code={buyerCode}
-            copied={copied === "buyer-code"}
-            onCopy={() => copy(buyerCode, "buyer-code")}
+            subtitle="@solana/kit signer · autoDeposit hook for Subly-x402"
+            blocks={[
+              {
+                key: "buyer-x402",
+                label: "Official x402",
+                tone: "risk",
+                code: buyerCodeX402,
+              },
+              {
+                key: "buyer-subly",
+                label: "Subly-x402",
+                tone: "private",
+                code: buyerCodeSubly,
+              },
+            ]}
+            copied={copied}
+            onCopy={copy}
           />
         </div>
       </div>
@@ -1586,18 +1700,20 @@ function VerdictRow({
 function StepCell({
   n,
   label,
+  description,
   value,
   active,
   done,
 }: {
   n: string;
   label: string;
+  description?: string;
   value?: string | number | null;
   active: boolean;
   done: boolean;
 }) {
   return (
-    <div className="min-h-[116px] border-b border-paper/15 p-5 last:border-b-0 md:border-b-0 md:border-r md:last:border-r-0">
+    <div className="flex min-h-[180px] flex-col border-b border-paper/15 p-5 last:border-b-0 md:border-b-0 md:border-r md:last:border-r-0">
       <div className="flex items-center justify-between">
         <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-paper/50">
           {n}
@@ -1610,11 +1726,17 @@ function StepCell({
           <span className="h-2 w-2 rounded-full bg-paper/25" />
         )}
       </div>
-      <div className="mt-5 font-display text-[24px] font-semibold text-paper">
+      <div className="mt-4 font-display text-[20px] font-semibold leading-[1.1] text-paper md:text-[22px]">
         {label}
       </div>
-      <div className="mt-2 truncate font-mono text-[11px] text-paper/55">
-        {value || "ready"}
+      {description && (
+        <p className="mt-2 text-[12px] leading-[1.55] text-paper/65">
+          {description}
+        </p>
+      )}
+      <div className="mt-auto pt-3 truncate font-mono text-[10px] uppercase tracking-[0.16em] text-glow">
+        {done ? "✓ " : ""}
+        {value || "waiting"}
       </div>
     </div>
   );
@@ -1794,46 +1916,73 @@ function EdgeRow({ edge, hidden }: { edge: ChainEdge; hidden?: boolean }) {
   );
 }
 
-function CodePanel({
+type CompareBlock = {
+  key: string;
+  label: string;
+  tone: "risk" | "private";
+  code: string;
+};
+
+function ComparePanel({
   title,
   subtitle,
-  code,
+  blocks,
   copied,
   onCopy,
 }: {
   title: string;
   subtitle: string;
-  code: string;
-  copied: boolean;
-  onCopy: () => void;
+  blocks: CompareBlock[];
+  copied: string | null;
+  onCopy: (text: string, key: string) => void;
 }) {
   return (
     <div className="min-w-0 border border-paper/20 bg-paper/5">
-      <div className="flex items-center justify-between gap-4 border-b border-paper/15 p-4">
-        <div className="min-w-0">
-          <div className="font-display text-[24px] font-semibold text-paper">
-            {title}
-          </div>
-          <div className="mt-1 truncate font-mono text-[10px] uppercase tracking-[0.18em] text-paper/50">
-            {subtitle}
-          </div>
+      <div className="border-b border-paper/15 p-4">
+        <div className="font-display text-[24px] font-semibold text-paper">
+          {title}
         </div>
-        <button
-          type="button"
-          onClick={onCopy}
-          className="inline-flex h-9 items-center gap-2 border border-paper/20 px-3 font-mono text-[10px] uppercase tracking-[0.16em] text-paper transition-colors hover:border-glow hover:text-glow"
-        >
-          {copied ? (
-            <CheckCircle2 className="h-4 w-4" />
-          ) : (
-            <Clipboard className="h-4 w-4" />
-          )}
-          {copied ? "Copied" : "Copy"}
-        </button>
+        <div className="mt-1 truncate font-mono text-[10px] uppercase tracking-[0.18em] text-paper/50">
+          {subtitle}
+        </div>
       </div>
-      <pre className="max-h-[430px] max-w-full overflow-auto p-4 text-[12px] leading-[1.65] text-paper/75">
-        <code>{code}</code>
-      </pre>
+
+      <div className="grid divide-y divide-paper/15 md:grid-cols-2 md:divide-x md:divide-y-0">
+        {blocks.map((block) => (
+          <div key={block.key} className="flex min-w-0 flex-col">
+            <div className="flex items-center justify-between gap-3 border-b border-paper/10 p-3">
+              <span
+                className={`inline-flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.22em] ${
+                  block.tone === "risk" ? "text-alert" : "text-ok"
+                }`}
+              >
+                <span
+                  className={`h-1.5 w-1.5 rounded-full ${
+                    block.tone === "risk" ? "bg-alert" : "bg-ok"
+                  }`}
+                />
+                {block.label}
+              </span>
+              <button
+                type="button"
+                onClick={() => onCopy(block.code, block.key)}
+                className="inline-flex h-8 items-center gap-1.5 border border-paper/20 px-2.5 font-mono text-[10px] uppercase tracking-[0.16em] text-paper transition-colors hover:border-glow hover:text-glow"
+              >
+                {copied === block.key ? (
+                  <CheckCircle2 className="h-3.5 w-3.5" />
+                ) : (
+                  <Clipboard className="h-3.5 w-3.5" />
+                )}
+                {copied === block.key ? "Copied" : "Copy"}
+              </button>
+            </div>
+            <pre className="max-h-[430px] min-w-0 overflow-auto p-4 text-[12px] leading-[1.65] text-paper/75">
+              <code>{block.code}</code>
+            </pre>
+          </div>
+        ))}
+      </div>
+
       <div className="flex items-center justify-between border-t border-paper/15 p-4 font-mono text-[10px] uppercase tracking-[0.18em] text-paper/45">
         <span>No Subly API key</span>
         <a

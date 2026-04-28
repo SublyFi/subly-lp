@@ -13,7 +13,6 @@ const NAV = [
   { label: "Privacy", href: "#privacy" },
   { label: "Market", href: "#market" },
   { label: "Architecture", href: "#architecture" },
-  { label: "Roadmap", href: "#roadmap" },
 ];
 
 export function Header() {
