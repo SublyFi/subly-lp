@@ -591,14 +591,19 @@ export function DemoSection() {
           </div>
           <div className="md:col-span-5">
             <p className="font-feature text-[24px] leading-[1.3] text-paper md:text-[28px]">
-              Press through the flow. Official x402 makes the Buyer to Seller
-              payment edge visible. Subly-x402 keeps the x402-style HTTP flow,
-              but changes what the chain reveals.
+              Press through the flow. Official x402 settles each call as a
+              direct Buyer&nbsp;→&nbsp;Seller transfer — and that on-chain edge
+              is permanent. Subly-x402 keeps the same HTTP flow, but{" "}
+              <span className="text-subly-glow">
+                breaks the on-chain link between Buyer and Seller
+              </span>{" "}
+              by routing settlement through an attested Vault.
             </p>
             <p className="mt-6 max-w-xl text-[14px] leading-[1.7] text-paper/70">
               The live proof below calls the same Seller twice: once through
-              official x402, once through Subly-x402. The important difference
-              is not the API response. It is the visible onchain edge.
+              official x402, once through Subly-x402. The API response is
+              identical. What changes is the visible on-chain edge — and
+              whether any observer can tell who paid whom.
             </p>
           </div>
         </div>
