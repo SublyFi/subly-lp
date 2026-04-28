@@ -38,13 +38,6 @@ export function PrivacySection() {
           </div>
           <div className="md:col-span-5">
             <p className="font-sans text-[15px] leading-[1.75] text-paper/85 md:text-[16px]">
-              Subly settles payments through a shared user vault. Buyers
-              deposit into the vault; sellers are paid out from the vault on
-              its own schedule. The on-chain ledger sees Buyer → Vault and
-              Vault → Seller separately, so the direct Buyer → Seller link
-              that x402 normally exposes is no longer present.
-            </p>
-            <p className="mt-4 font-sans text-[13px] leading-[1.75] text-paper/65">
               Subly&apos;s on-chain programs — including the Shared Vault — are
               encrypted by Arcium, while the per-buyer ledger lives inside an
               AWS Nitro Enclave. Once Solana&apos;s Confidential SPL transfers
