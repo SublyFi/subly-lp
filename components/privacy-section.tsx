@@ -28,10 +28,7 @@ export function PrivacySection() {
       <div className="relative mx-auto max-w-[1360px] px-6 py-24 md:px-10 md:py-32">
         <div className="mb-16 grid gap-8 md:grid-cols-12">
           <div className="md:col-span-5">
-            <span className="inline-flex items-center gap-2 border border-subly-glow px-2.5 py-1 font-mono text-[10px] uppercase tracking-[0.24em] text-subly-glow">
-              § 04 · Declassified
-            </span>
-            <h2 className="mt-5 font-display text-[56px] font-semibold leading-[0.92] tracking-tight md:text-[88px]">
+            <h2 className="font-display text-[56px] font-semibold leading-[0.92] tracking-tight md:text-[88px]">
               Privacy is the{" "}
               <span className="font-feature text-subly-glow">feature.</span>
             </h2>

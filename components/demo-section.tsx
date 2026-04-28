@@ -569,10 +569,7 @@ export function DemoSection() {
       <div className="relative mx-auto max-w-[1360px] px-6 py-20 md:px-10 md:py-28">
         <div className="mb-12 grid gap-8 md:grid-cols-12">
           <div className="md:col-span-5">
-            <span className="inline-flex items-center gap-2 border border-subly-glow/60 px-2.5 py-1 font-mono text-[10px] uppercase tracking-[0.24em] text-subly-glow">
-              § 01 · Privacy flow demo
-            </span>
-            <h2 className="mt-5 font-display text-[54px] font-semibold leading-[0.94] tracking-tight text-paper md:text-[78px]">
+            <h2 className="font-display text-[54px] font-semibold leading-[0.94] tracking-tight text-paper md:text-[78px]">
               Same API call.
               <br />
               <span className="text-subly-glow">Different</span> payment

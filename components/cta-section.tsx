@@ -26,14 +26,6 @@ export function CTASection() {
       />
 
       <div className="relative mx-auto max-w-[1360px] px-6 py-28 md:px-10 md:py-36">
-        <div className="mb-8 flex items-center gap-4">
-          <span className="stamp">§ 07 · Invitation</span>
-          <span className="hair-rule-subly w-24" />
-          <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-ink-muted">
-            Private devnet · builders first
-          </span>
-        </div>
-
         <h2 className="max-w-5xl font-display text-[14vw] font-black leading-[0.84] tracking-tight text-ink md:text-[140px] lg:text-[180px]">
           Stop topping{" "}
           <span className="font-feature text-subly">up.</span>

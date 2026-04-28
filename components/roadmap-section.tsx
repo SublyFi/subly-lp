@@ -49,8 +49,7 @@ export function RoadmapSection() {
       <div className="mx-auto max-w-[1360px] px-6 py-20 md:px-10 md:py-28">
         <div className="mb-16 grid gap-8 md:grid-cols-12">
           <div className="md:col-span-6">
-            <span className="stamp">§ 06 · Calendar of intent</span>
-            <h2 className="mt-5 font-display text-[52px] font-semibold leading-[0.92] tracking-tight text-ink md:text-[72px]">
+            <h2 className="font-display text-[52px] font-semibold leading-[0.92] tracking-tight text-ink md:text-[72px]">
               Shipped, shipping,
               <br />
               <span className="font-feature text-subly">and scheduled.</span>

@@ -45,8 +45,7 @@ export function ProblemSection() {
       />
       <div className="relative mx-auto grid max-w-[1360px] gap-12 px-6 py-20 md:grid-cols-12 md:px-10 md:py-24">
         <div className="md:col-span-5">
-          <span className="stamp">§ 02 · The Top-Up Loop</span>
-          <h2 className="mt-5 font-display text-[52px] font-semibold leading-[0.92] tracking-tight text-ink md:text-[68px]">
+          <h2 className="font-display text-[52px] font-semibold leading-[0.92] tracking-tight text-ink md:text-[68px]">
             Autonomous until
             <br />
             <span className="font-feature text-subly">a human</span>

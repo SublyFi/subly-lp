@@ -8,8 +8,7 @@ export function ThesisSection() {
       <div className="mx-auto grid max-w-[1360px] gap-12 px-6 py-20 md:grid-cols-12 md:px-10 md:py-28">
         <div className="md:col-span-4">
           <div className="sticky top-8">
-            <span className="stamp">§ 01 · Thesis</span>
-            <h2 className="mt-5 font-display text-[44px] font-semibold leading-[0.95] tracking-tight text-ink md:text-[60px]">
+            <h2 className="font-display text-[44px] font-semibold leading-[0.95] tracking-tight text-ink md:text-[60px]">
               A quieter economy,
               <br />
               <span className="font-feature text-subly">

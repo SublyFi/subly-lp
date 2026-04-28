@@ -11,8 +11,7 @@ export function ArchitectureSection() {
       <div className="relative mx-auto max-w-[1360px] px-6 py-20 md:px-10 md:py-28">
         <div className="mb-16 grid gap-8 md:grid-cols-12">
           <div className="md:col-span-5">
-            <span className="stamp">§ 05 · Architecture</span>
-            <h2 className="mt-5 font-display text-[48px] font-semibold leading-[0.92] tracking-tight text-ink md:text-[64px]">
+            <h2 className="font-display text-[48px] font-semibold leading-[0.92] tracking-tight text-ink md:text-[64px]">
               A <span className="font-feature text-subly">working</span>
               <br />
               protocol —
