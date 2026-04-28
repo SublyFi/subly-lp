@@ -33,8 +33,8 @@ export const metadata: Metadata = {
   title: "Subly — Use Now, Pay Never",
   description:
     "A privacy-first PayFi protocol for AI agents on Solana. Try a live Subly-x402 devnet payment, faucet test USDC, and see how x402-style Buyer and Seller integrations work without API keys.",
-  generator: "subly.fi",
-  metadataBase: new URL("https://subly.fi"),
+  generator: "sublyfi.com",
+  metadataBase: new URL("https://www.sublyfi.com"),
   icons: {
     icon: "/subly-purple.png",
     shortcut: "/subly-purple.png",

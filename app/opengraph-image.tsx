@@ -71,7 +71,7 @@ export default async function Image() {
               }}
             />
             <span style={{ color: "#101522", fontWeight: 600 }}>Subly</span>
-            <span>· Vol. 01 · Edition α · 2026</span>
+            <span>· Privacy protocol for agents</span>
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
             <div
@@ -79,11 +79,11 @@ export default async function Image() {
                 width: 10,
                 height: 10,
                 borderRadius: 999,
-                background: "#FF5F57",
+                background: "#7C3AED",
                 display: "flex",
               }}
             />
-            <span>Devnet live · Phase 4 / 6</span>
+            <span>Live · Devnet</span>
           </div>
         </div>
 
@@ -109,7 +109,7 @@ export default async function Image() {
               display: "flex",
             }}
           >
-            § The privacy protocol for agents
+            § Deposit once · Earn yield · Pay agents privately
           </div>
 
           <div
@@ -150,8 +150,8 @@ export default async function Image() {
               display: "flex",
             }}
           >
-            Agents deposit once. Yield settles every x402 call inside a TEE
-            vault.
+            Turn your yield into AI agent payments — without revealing
+            anything.
           </div>
         </div>
 
@@ -181,7 +181,7 @@ export default async function Image() {
             <span>x402</span>
           </div>
           <div style={{ color: "#667085", display: "flex" }}>
-            subly.fi · @subly_fi
+            sublyfi.com · @subly_fi
           </div>
         </div>
       </div>
