@@ -5,7 +5,6 @@ import { ProblemSection } from "@/components/problem-section";
 import { SolutionSection } from "@/components/solution-section";
 import { PrivacySection } from "@/components/privacy-section";
 import { MarketSection } from "@/components/market-section";
-import { ArchitectureSection } from "@/components/architecture-section";
 import { CTASection } from "@/components/cta-section";
 import { Footer } from "@/components/footer";
 
@@ -19,7 +18,6 @@ export default function Home() {
       <SolutionSection />
       <PrivacySection />
       <MarketSection />
-      <ArchitectureSection />
       <CTASection />
       <Footer />
     </main>

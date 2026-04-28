@@ -45,7 +45,6 @@ export function Footer() {
                 ["#solution", "Solution"],
                 ["#privacy", "Privacy"],
                 ["#market", "Market"],
-                ["#architecture", "Architecture"],
               ].map(([href, label]) => (
                 <li key={href}>
                   <a

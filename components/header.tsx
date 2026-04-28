@@ -12,7 +12,6 @@ const NAV = [
   { label: "Solution", href: "#solution" },
   { label: "Privacy", href: "#privacy" },
   { label: "Market", href: "#market" },
-  { label: "Architecture", href: "#architecture" },
 ];
 
 export function Header() {
