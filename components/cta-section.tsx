@@ -1,11 +1,7 @@
-"use client";
-
-import Script from "next/script";
-
 export function CTASection() {
   return (
     <section
-      id="waitlist"
+      id="contact"
       className="relative overflow-hidden border-b border-rule bg-paper"
     >
       <div
@@ -25,56 +21,21 @@ export function CTASection() {
         }}
       />
 
-      <div className="relative mx-auto max-w-[1360px] px-6 py-28 md:px-10 md:py-36">
-        <h2 className="max-w-5xl font-display text-[14vw] font-black leading-[0.84] tracking-tight text-ink md:text-[140px] lg:text-[180px]">
-          Stop topping{" "}
-          <span className="font-feature text-subly">up.</span>
-          <br />
-          Start deploying agents{" "}
-          <span className="font-feature text-subly">
-            that pay themselves.
-          </span>
-        </h2>
-
-        <p className="mt-10 max-w-2xl font-feature text-[24px] leading-[1.35] text-ink md:text-[28px]">
-          If you ship AI agents to production — research agents, trading agents,
-          autonomous DevOps, data-buying pipelines — Subly is the funding layer
-          you&apos;ve been manually impersonating.
-        </p>
-
-        <div className="mt-12 grid gap-10 border-t-2 border-ink pt-10 md:grid-cols-12">
-          <div className="md:col-span-6">
-            <div className="mb-4 inline-flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.22em] text-subly">
-              <span className="h-1.5 w-1.5 rounded-full bg-subly blink" />
-              Request early access
+      <div className="relative mx-auto max-w-[1360px] px-6 py-24 md:px-10 md:py-32">
+        <div className="grid gap-10 md:grid-cols-12">
+          <div className="md:col-span-5">
+            <div className="font-mono text-[11px] uppercase tracking-[0.28em] text-subly">
+              ▌ Find us
             </div>
-            <div
-              id="getWaitlistContainer"
-              data-waitlist_id="31247"
-              data-widget_type="WIDGET_2"
-              className="subly-waitlist"
-            />
-            <link
-              rel="stylesheet"
-              type="text/css"
-              href="https://prod-waitlist-widget.s3.us-east-2.amazonaws.com/getwaitlist.min.css"
-            />
-            <Script
-              src="https://prod-waitlist-widget.s3.us-east-2.amazonaws.com/getwaitlist.min.js"
-              strategy="afterInteractive"
-            />
-            <p className="mt-4 max-w-md font-sans text-[13px] leading-[1.7] text-ink-muted">
-              We&apos;ll reach out with a devnet invite, SDK access, and the
-              attestation verifier. Single deposit, zero cron jobs, your agents
-              keep running while you sleep.
-            </p>
+            <h2 className="mt-4 font-display text-[44px] font-semibold leading-[0.95] tracking-tight text-ink md:text-[64px]">
+              Stay in
+              <br />
+              <span className="font-feature text-subly">the loop.</span>
+            </h2>
           </div>
 
-          <div className="md:col-span-5 md:col-start-8">
-            <div className="mb-4 font-mono text-[11px] uppercase tracking-[0.22em] text-subly">
-              ▌ Or find us
-            </div>
-            <ul className="space-y-4">
+          <div className="md:col-span-6 md:col-start-7">
+            <ul className="space-y-2">
               <Social
                 label="Follow the build"
                 handle="x.com/subly_fi"
@@ -118,9 +79,9 @@ function Social({
         href={href}
         target="_blank"
         rel="noreferrer"
-        className="group flex items-baseline justify-between gap-4 border-b border-rule py-3 font-mono text-[13px] uppercase tracking-[0.16em] text-ink transition-colors hover:border-subly"
+        className="group flex items-baseline justify-between gap-4 border-b border-rule py-4 font-mono text-[13px] uppercase tracking-[0.16em] text-ink transition-colors hover:border-subly"
       >
-        <span className="text-ink-muted group-hover:text-subly transition-colors">
+        <span className="text-ink-muted transition-colors group-hover:text-subly">
           {label}
         </span>
         <span className="flex items-center gap-3 text-ink transition-colors group-hover:text-subly">
