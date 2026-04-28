@@ -45,8 +45,8 @@ export function PrivacySection() {
               that x402 normally exposes is no longer present.
             </p>
             <p className="mt-4 font-sans text-[13px] leading-[1.75] text-paper/65">
-              Settlement bookkeeping runs inside a TEE; the on-chain privacy
-              layer migrates to Arcium MPC as Confidential SPL ships.
+              Settlement bookkeeping runs inside a TEE, and the on-chain
+              privacy layer runs through Arcium MPC.
             </p>
           </div>
         </div>
@@ -106,27 +106,24 @@ export function PrivacySection() {
           />
         </div>
 
-        {/* Architecture pillars */}
+        {/* Privacy pillars */}
         <div className="mt-20 grid gap-px border border-paper/15 bg-paper/10 md:grid-cols-3">
           <Pillar
-            kicker="TEE"
-            title="AWS Nitro Enclave"
-            body="Vault signer, facilitator API, and batch construction all live in attested memory. PCR0 is verifiable by any client with our SDK in one command."
-            logo="/subly-purple.png"
-            logoAlt="Nitro vault"
-          />
-          <Pillar
-            kicker="MPC"
-            title="Arcium MXE"
-            body="Phase 5 moves yield routing and confidential SPL into Arcium's Multi-Party eXecution environment on Solana Mainnet Alpha (live Feb 2026)."
+            kicker="On-chain privacy"
             logo="/ArciumWhite.svg"
             logoAlt="Arcium"
-            dark
+            logoAsTitle
+            body="On-chain settlement runs through Arcium so the sensitive parts of the payment — who paid, how much, and which seller is being paid — are processed under MPC instead of in the clear. The chain still verifies, but it does not learn the link."
           />
           <Pillar
-            kicker="Audit"
-            title="Selective disclosure"
-            body="Phase 2 adds hierarchical key derivation + ElGamal audit records. Flip a switch and hand one regulator — and only that regulator — a readable view."
+            kicker="Off-chain bookkeeping"
+            title="AWS Nitro Enclave"
+            body="The shared-vault ledger and the facilitator that authorizes payouts run inside an AWS Nitro Enclave. Balances and the per-Buyer accounting live in attested memory; the host instance only sees ciphertext."
+          />
+          <Pillar
+            kicker="Selective disclosure"
+            title="Audit on your terms"
+            body="Each buyer holds the keys to their own ledger view. You can hand a regulator, an auditor, or a counter-party a readable copy of just the records they need — without exposing anything else."
           />
         </div>
       </div>
@@ -216,35 +213,34 @@ function Pillar({
   body,
   logo,
   logoAlt,
-  dark,
+  logoAsTitle,
 }: {
   kicker: string;
-  title: string;
+  title?: string;
   body: string;
   logo?: string;
   logoAlt?: string;
-  dark?: boolean;
+  logoAsTitle?: boolean;
 }) {
   return (
-    <div className={`flex flex-col gap-4 p-8 ${dark ? "bg-ink" : "bg-ink"}`}>
-      <div className="flex items-center justify-between">
-        <span className="font-mono text-[10px] uppercase tracking-[0.28em] text-subly-glow">
-          ▌ {kicker}
-        </span>
-        {logo && (
-          <div className="relative h-6 w-20">
-            <Image
-              src={logo}
-              alt={logoAlt || ""}
-              fill
-              className="object-contain object-right opacity-80"
-            />
-          </div>
-        )}
-      </div>
-      <h3 className="font-display text-[24px] font-semibold tracking-tight text-paper">
-        {title}
-      </h3>
+    <div className="flex flex-col gap-5 bg-ink p-8">
+      <span className="font-mono text-[10px] uppercase tracking-[0.28em] text-subly-glow">
+        ▌ {kicker}
+      </span>
+      {logoAsTitle && logo ? (
+        <div className="relative h-14 w-44 md:h-16 md:w-52">
+          <Image
+            src={logo}
+            alt={logoAlt || ""}
+            fill
+            className="object-contain object-left"
+          />
+        </div>
+      ) : (
+        <h3 className="font-display text-[26px] font-semibold leading-[1.1] tracking-tight text-paper">
+          {title}
+        </h3>
+      )}
       <p className="text-[13px] leading-[1.7] text-paper/70">{body}</p>
     </div>
   );
