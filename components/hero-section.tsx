@@ -44,24 +44,11 @@ export function HeroSection() {
           </span>
         </h1>
 
-        <p className="mt-12 max-w-3xl font-feature text-[26px] leading-[1.25] text-ink md:text-[36px]">
-          Your AI agent deposits once.
-          <span className="text-subly"> The yield —</span> not the principal —
-          quietly settles every x402 call, inside a vault no provider, relay,
-          or indexer can read.
+        <p className="mt-8 font-feature text-[28px] leading-[1.2] text-ink md:text-[40px] lg:text-[48px]">
+          Privacy protocol for agents.
         </p>
 
-        <p className="mt-6 max-w-2xl font-sans text-[15px] leading-[1.75] text-ink-soft md:text-[16px]">
-          AI agents can already pay. Funding them is still a human chore.
-          Subly ends the top-up loop: a single USDC deposit, routed into
-          senior DeFi yield inside an AWS Nitro Enclave, pays for every API
-          call your agent makes via{" "}
-          <span className="font-mono text-[13px] text-subly">x402</span>.
-          Yield routing and application privacy migrate to Arcium MPC as
-          Confidential SPL lands in Q3 2026.
-        </p>
-
-        <div className="mt-10 flex flex-col items-start gap-5">
+        <div className="mt-12 flex flex-col items-start gap-5">
           <div
             id="getWaitlistContainer"
             data-waitlist_id="31247"
