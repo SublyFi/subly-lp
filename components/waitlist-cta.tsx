@@ -28,7 +28,7 @@ export function WaitlistCTA() {
           <p className="mt-6 max-w-xl font-feature text-[20px] leading-[1.4] text-ink md:text-[24px]">
             Be first in line when Subly opens to AI agent builders.
           </p>
-          <div className="mt-10">
+          <div className="mt-10 w-full max-w-md">
             <div
               id="getWaitlistContainerBottom"
               data-waitlist_id="31247"
