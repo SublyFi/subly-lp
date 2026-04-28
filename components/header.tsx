@@ -61,7 +61,7 @@ export function Header() {
             aria-label="Subly on X"
             className="hidden h-10 w-10 items-center justify-center transition-transform hover:-translate-y-0.5 hover:scale-110 md:inline-flex"
           >
-            <Image src="/xicon.svg" alt="" width={40} height={40} />
+            <Image src="/x.svg" alt="" width={24} height={24} />
           </a>
           <a
             href="https://t.me/+hR5mDS-l7bBhNjFl"
@@ -70,7 +70,7 @@ export function Header() {
             aria-label="Subly Telegram group"
             className="hidden h-10 w-10 items-center justify-center transition-transform hover:-translate-y-0.5 hover:scale-110 md:inline-flex"
           >
-            <Image src="/telegram.png" alt="" width={32} height={32} />
+            <Image src="/telegram.svg" alt="" width={26} height={26} />
           </a>
           <a
             href="#demo"
@@ -125,7 +125,7 @@ export function Header() {
               className="inline-flex h-10 w-10 items-center justify-center"
               onClick={() => setOpen(false)}
             >
-              <Image src="/xicon.svg" alt="" width={40} height={40} />
+              <Image src="/x.svg" alt="" width={24} height={24} />
             </a>
             <a
               href="https://t.me/+hR5mDS-l7bBhNjFl"
@@ -135,7 +135,7 @@ export function Header() {
               className="inline-flex h-10 w-10 items-center justify-center"
               onClick={() => setOpen(false)}
             >
-              <Image src="/telegram.png" alt="" width={32} height={32} />
+              <Image src="/telegram.svg" alt="" width={26} height={26} />
             </a>
             <a
               href="#demo"
