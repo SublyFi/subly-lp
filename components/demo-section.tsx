@@ -233,9 +233,9 @@ const privacyDemoSteps = [
     phase: "Reveal",
     title: "The visible payment edge is different.",
     body: "This is the core point: official x402 exposes who paid which seller. Subly-x402 only exposes that the buyer funded the shared Vault — never which seller they actually called.",
-    x402: "Explorer shows Buyer token account -> Seller token account.",
+    x402: "Explorer shows Buyer -> Seller.",
     subly402:
-      "Explorer shows Buyer token account -> Subly vault. No Buyer -> Seller transfer appears in the buyer request.",
+      "Explorer shows Buyer -> Vault. No direct Buyer -> Seller transfer appears in the buyer request.",
     observer:
       "A block explorer can link buyer and seller in x402. With Subly-x402, that direct link is not visible.",
   },
@@ -1245,14 +1245,14 @@ function FlowLane({
 
   const visibleValue = isSubly
     ? runResult?.subly402.depositTx
-      ? "Buyer ATA -> Vault ATA"
+      ? "Buyer -> Vault"
       : publicTrailActive
-        ? "Buyer ATA -> Subly vault"
+        ? "Buyer -> Vault"
         : "Waiting for vault deposit"
     : runResult?.x402.settlementTx
-      ? "Buyer ATA -> Seller ATA"
+      ? "Buyer -> Seller"
       : publicTrailActive
-        ? "Buyer ATA -> Seller ATA"
+        ? "Buyer -> Seller"
         : "Waiting for direct payment";
 
   const payoutValue = runResult?.subly402.settlementStatus?.txSignature
@@ -1391,7 +1391,7 @@ function FlowLane({
               label="Hidden from observers"
               value={
                 publicTrailActive
-                  ? "No Buyer → Seller transfer in this tx"
+                  ? "No direct Buyer → Seller transfer in this tx"
                   : "Vault deposit not made yet"
               }
               tone="private"
