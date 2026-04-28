@@ -17,7 +17,7 @@ export function WaitlistCTA() {
       <div className="gridlines-purple pointer-events-none absolute inset-0 opacity-40" />
 
       <div className="relative mx-auto max-w-[1360px] px-6 py-24 md:px-10 md:py-32">
-        <div className="mx-auto flex max-w-2xl flex-col items-center text-center">
+        <div className="mx-auto max-w-2xl text-center">
           <div className="font-mono text-[11px] uppercase tracking-[0.28em] text-subly">
             ▌ Waitlist
           </div>
@@ -25,16 +25,18 @@ export function WaitlistCTA() {
             Join the{" "}
             <span className="font-feature text-subly">waitlist.</span>
           </h2>
-          <p className="mt-6 max-w-xl font-feature text-[20px] leading-[1.4] text-ink md:text-[24px]">
+          <p className="mt-6 mx-auto max-w-xl font-feature text-[20px] leading-[1.4] text-ink md:text-[24px]">
             Be first in line when Subly opens to AI agent builders.
           </p>
-          <div className="mt-10 w-full max-w-md">
-            <div
-              id="getWaitlistContainerBottom"
-              data-waitlist_id="31247"
-              data-widget_type="WIDGET_2"
-              className="subly-waitlist"
-            />
+          <div className="mt-10 flex justify-center">
+            <div className="flex flex-col items-start gap-5">
+              <div
+                id="getWaitlistContainerBottom"
+                data-waitlist_id="31247"
+                data-widget_type="WIDGET_2"
+                className="subly-waitlist"
+              />
+            </div>
           </div>
         </div>
       </div>
