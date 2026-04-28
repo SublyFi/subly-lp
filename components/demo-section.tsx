@@ -1078,36 +1078,6 @@ function PrivacyStoryboard({
         />
       </div>
 
-      <div className="grid border-t border-ink/10 lg:grid-cols-[1fr_320px]">
-        <div className="p-5">
-          <div className="flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.2em] text-ink-muted">
-            <Eye className="h-4 w-4" />
-            What observer learns
-          </div>
-          <p className="mt-3 max-w-4xl font-feature text-[23px] leading-[1.25] text-ink md:text-[28px]">
-            {step.observer}
-          </p>
-        </div>
-        <div className="border-t border-ink/10 p-5 lg:border-l lg:border-t-0">
-          <div className="font-mono text-[10px] uppercase tracking-[0.2em] text-ink-muted">
-            Verdict
-          </div>
-          <div className="mt-3 grid gap-2">
-            <VerdictRow
-              icon={Eye}
-              label="x402"
-              value="Buyer -> Seller is visible"
-              tone="risk"
-            />
-            <VerdictRow
-              icon={EyeOff}
-              label="Subly-x402"
-              value="Direct buyer-seller edge is not visible"
-              tone="private"
-            />
-          </div>
-        </div>
-      </div>
     </div>
   );
 }
