@@ -1701,7 +1701,6 @@ function StepCell({
   n,
   label,
   description,
-  value,
   active,
   done,
 }: {
@@ -1713,7 +1712,7 @@ function StepCell({
   done: boolean;
 }) {
   return (
-    <div className="flex min-h-[180px] flex-col border-b border-paper/15 p-5 last:border-b-0 md:border-b-0 md:border-r md:last:border-r-0">
+    <div className="flex min-h-[160px] flex-col border-b border-paper/15 p-5 last:border-b-0 md:border-b-0 md:border-r md:last:border-r-0">
       <div className="flex items-center justify-between">
         <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-paper/50">
           {n}
@@ -1734,10 +1733,6 @@ function StepCell({
           {description}
         </p>
       )}
-      <div className="mt-auto pt-3 truncate font-mono text-[10px] uppercase tracking-[0.16em] text-glow">
-        {done ? "✓ " : ""}
-        {value || "waiting"}
-      </div>
     </div>
   );
 }
