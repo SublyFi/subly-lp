@@ -1,10 +1,10 @@
 import { Header } from "@/components/header";
 import { HeroSection } from "@/components/hero-section";
 import { DemoSection } from "@/components/demo-section";
-import { ThesisSection } from "@/components/thesis-section";
 import { ProblemSection } from "@/components/problem-section";
 import { SolutionSection } from "@/components/solution-section";
 import { PrivacySection } from "@/components/privacy-section";
+import { MarketSection } from "@/components/market-section";
 import { ArchitectureSection } from "@/components/architecture-section";
 import { RoadmapSection } from "@/components/roadmap-section";
 import { CTASection } from "@/components/cta-section";
@@ -16,10 +16,10 @@ export default function Home() {
       <Header />
       <HeroSection />
       <DemoSection />
-      <ThesisSection />
       <ProblemSection />
       <SolutionSection />
       <PrivacySection />
+      <MarketSection />
       <ArchitectureSection />
       <RoadmapSection />
       <CTASection />

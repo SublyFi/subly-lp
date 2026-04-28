@@ -41,9 +41,10 @@ export function Footer() {
             </div>
             <ul className="space-y-2 font-mono text-[12px] uppercase tracking-[0.16em]">
               {[
-                ["#thesis", "Thesis"],
-                ["#how", "How it works"],
+                ["#problem", "Problem"],
+                ["#solution", "Solution"],
                 ["#privacy", "Privacy"],
+                ["#market", "Market"],
                 ["#architecture", "Architecture"],
                 ["#roadmap", "Roadmap"],
               ].map(([href, label]) => (

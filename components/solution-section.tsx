@@ -1,7 +1,31 @@
+const FLOW_STEPS = [
+  {
+    n: "01",
+    tag: "DEPOSIT",
+    title: "Agent deposits once.",
+    body: "A single USDC transfer into the shared Subly vault. No cron jobs, no human surveillance, no second deposit ever required.",
+    ornament: "$",
+  },
+  {
+    n: "02",
+    tag: "EARN",
+    title: "Vault earns yield.",
+    body: "Capital routes into senior DeFi positions targeting 10%+ APY. Principal stays yours; only the yield is spent on agent payments.",
+    ornament: "%",
+  },
+  {
+    n: "03",
+    tag: "PAY",
+    title: "TEE pays providers — privately.",
+    body: "Buyers pay providers via x402-style HTTP calls. The TEE batches and time-shifts the actual on-chain settlement so observers can't link Buyer to Seller.",
+    ornament: "→",
+  },
+];
+
 export function SolutionSection() {
   return (
     <section
-      id="how"
+      id="solution"
       className="relative overflow-hidden border-b border-rule bg-paper"
     >
       <div
@@ -9,74 +33,150 @@ export function SolutionSection() {
         className="pointer-events-none absolute inset-0"
         style={{
           background:
-            "radial-gradient(circle at 12% 18%, rgba(94,23,235,0.08) 0%, transparent 38%)",
+            "radial-gradient(ellipse at 95% 10%, rgba(94,23,235,0.18) 0%, transparent 55%), radial-gradient(circle at 0% 100%, rgba(94,23,235,0.10) 0%, transparent 50%)",
         }}
       />
+      <div className="gridlines-purple pointer-events-none absolute inset-0 opacity-40" />
+
       <div className="relative mx-auto max-w-[1360px] px-6 py-20 md:px-10 md:py-28">
+        {/* Tagline block */}
         <div className="mb-16 grid gap-8 md:grid-cols-12">
-          <div className="md:col-span-5">
-            <h2 className="font-display text-[52px] font-semibold leading-[0.92] tracking-tight text-ink md:text-[72px]">
-              How the
+          <div className="md:col-span-7">
+            <div className="font-mono text-[11px] uppercase tracking-[0.28em] text-subly">
+              ▌ Solution
+            </div>
+            <h2 className="mt-3 font-display text-[52px] font-semibold leading-[0.92] tracking-tight text-ink md:text-[80px]">
+              Deposit once.
               <br />
-              <span className="font-feature text-subly">vault</span>
+              <span className="text-subly">Earn yield.</span>
               <br />
-              pays you back.
+              <span className="font-feature">
+                Pay agents — privately.
+              </span>
             </h2>
+            <p className="mt-8 max-w-xl font-feature text-[22px] leading-[1.35] text-ink md:text-[26px]">
+              Turn your yield into AI agent payments without revealing
+              anything.
+            </p>
           </div>
-          <div className="md:col-span-6 md:col-start-7">
-            <p className="font-feature text-[26px] leading-[1.3] text-ink md:text-[32px]">
-              Three movements. One deposit. A yield curve that keeps your agent
-              paid up — call after call, without ever touching principal.
-            </p>
-            <p className="mt-6 font-sans text-[15px] leading-[1.75] text-ink-muted">
-              Everything between the agent&apos;s deposit and the
-              provider&apos;s settlement happens inside an AWS Nitro Enclave.
-              The parent instance sees only ciphertexts; the vault signer lives
-              in attested memory. Providers are paid in batches; observers see
-              only aggregate totals.
-            </p>
+          <div className="md:col-span-5">
+            <div className="border border-ink bg-paper p-6 shadow-stamp">
+              <div className="font-mono text-[10px] uppercase tracking-[0.24em] text-subly">
+                ▌ The Subly answer
+              </div>
+              <p className="mt-3 font-sans text-[14px] leading-[1.75] text-ink-soft">
+                A single deposit funds your agent forever. Capital sits in a
+                Solana vault earning DeFi yield. The yield — not the principal
+                — settles every x402-style call your agent makes. And because
+                a TEE-managed shared vault breaks the Buyer-Seller link, the
+                public ledger never sees what your agent bought from whom.
+              </p>
+            </div>
           </div>
         </div>
 
-        {/* Timeline */}
-        <ol className="relative grid gap-0 md:grid-cols-3">
-          <span
-            className="absolute left-0 right-0 top-[54px] hidden h-px bg-gradient-to-r from-rule via-subly to-rule md:block"
-            aria-hidden
+        {/* Three pillars */}
+        <div className="grid gap-0 border-y-2 border-ink md:grid-cols-3">
+          <Pillar
+            kicker="01 · Capital"
+            title="One deposit, forever."
+            body="Your agent transfers USDC into the Subly vault once. The Solana program mints a non-transferable receipt bound to its pubkey. Withdrawal is one instruction — principal never leaves your custody."
+            metric="1×"
+            metricLabel="Deposit required"
           />
-          <Step
-            n="01"
-            tag="DEPOSIT"
-            title="Seed the agent vault"
-            body="Your agent sends USDC into a Subly program-derived vault. The Solana program mints a non-transferable receipt bound to its pubkey. Withdrawal is one instruction — principal never leaves your custody envelope."
-            ornament="$"
-          />
-          <Step
-            n="02"
-            tag="EARN"
-            title="Yield accrues — silently"
-            body="The enclave allocates capital to a whitelisted senior DeFi vault (Kormos-class fractional reserve, or a plain Kamino/Marinade position). Ed25519 adaptor signatures keep every move atomic and auditable."
-            ornament="↻"
+          <Pillar
             mid
+            kicker="02 · Yield"
+            title="DeFi works the night shift."
+            body="The vault routes idle capital into whitelisted senior DeFi positions, targeting 10%+ APY. Yield accrues continuously and replenishes the spend bucket without any human action."
+            metric="10%+"
+            metricLabel="APY target"
           />
-          <Step
-            n="03"
-            tag="SETTLE"
-            title="Pay per call — invisibly"
-            body="Your agent pays providers via x402; Subly's facilitator signs each commitment inside the enclave and batch-settles up to 20 payments in a single Solana transaction. The agent never pauses; the ledger never reveals what it bought."
-            ornament="→"
+          <Pillar
+            kicker="03 · Privacy"
+            title="The receipt disappears."
+            body="Buyers and Sellers still talk over HTTP, just like x402. But payments flow into a shared user vault first; the TEE batches and time-shifts the on-chain settlement, so no observer can link Buyer to Seller."
+            metric="0"
+            metricLabel="Buyer↔Seller links"
+            accent
           />
-        </ol>
+        </div>
 
-        {/* Numeric ribbon */}
-        <div className="mt-20 grid grid-cols-2 border-y-2 border-ink md:grid-cols-4">
-          <Figure value="1×" label="Deposit required" />
-          <Figure value="20" label="Batch size / tx" divider />
-          <Figure value="120s" label="Settlement window" divider />
-          <Figure value="0" label="Principal spent" divider accent />
+        {/* Mechanism timeline */}
+        <div className="mt-20">
+          <div className="mb-10 flex items-baseline justify-between">
+            <h3 className="font-display text-[32px] font-semibold tracking-tight text-ink md:text-[42px]">
+              How the money moves.
+            </h3>
+            <span className="font-mono text-[10px] uppercase tracking-[0.24em] text-ink-muted">
+              fig. 02 · capital flow
+            </span>
+          </div>
+          <ol className="relative grid gap-0 md:grid-cols-3">
+            <span
+              className="absolute left-0 right-0 top-[54px] hidden h-px bg-gradient-to-r from-rule via-subly to-rule md:block"
+              aria-hidden
+            />
+            {FLOW_STEPS.map((step, i) => (
+              <Step key={step.n} {...step} mid={i === 1} />
+            ))}
+          </ol>
         </div>
       </div>
     </section>
+  );
+}
+
+function Pillar({
+  kicker,
+  title,
+  body,
+  metric,
+  metricLabel,
+  mid,
+  accent,
+}: {
+  kicker: string;
+  title: string;
+  body: string;
+  metric: string;
+  metricLabel: string;
+  mid?: boolean;
+  accent?: boolean;
+}) {
+  return (
+    <div
+      className={`flex flex-col gap-5 px-6 py-10 md:px-8 ${
+        mid ? "md:border-x md:border-rule" : ""
+      } ${accent ? "bg-subly-tint/40" : ""}`}
+    >
+      <div className="flex items-center gap-3">
+        <span className="font-mono text-[10px] uppercase tracking-[0.28em] text-subly">
+          {kicker}
+        </span>
+        <span className="h-px flex-1 bg-rule" />
+      </div>
+      <h3
+        className={`font-display text-[26px] font-semibold leading-[1.05] tracking-tight ${
+          accent ? "text-subly" : "text-ink"
+        }`}
+      >
+        {title}
+      </h3>
+      <p className="text-[14px] leading-[1.75] text-ink-muted">{body}</p>
+      <div className="mt-auto border-t border-rule pt-4">
+        <div
+          className={`font-display text-[44px] font-semibold leading-none tracking-tight ${
+            accent ? "text-subly" : "text-ink"
+          }`}
+        >
+          {metric}
+        </div>
+        <div className="mt-2 font-mono text-[10px] uppercase tracking-[0.24em] text-ink-muted">
+          {metricLabel}
+        </div>
+      </div>
+    </div>
   );
 }
 
@@ -114,41 +214,10 @@ function Step({
           ▌{tag}
         </span>
       </div>
-      <h3 className="font-display text-[26px] font-semibold tracking-tight text-ink md:text-[30px]">
+      <h4 className="font-display text-[24px] font-semibold tracking-tight text-ink md:text-[28px]">
         {title}
-      </h3>
+      </h4>
       <p className="mt-4 text-[14px] leading-[1.7] text-ink-muted">{body}</p>
     </li>
-  );
-}
-
-function Figure({
-  value,
-  label,
-  divider,
-  accent,
-}: {
-  value: string;
-  label: string;
-  divider?: boolean;
-  accent?: boolean;
-}) {
-  return (
-    <div
-      className={`flex flex-col items-start px-4 py-8 md:px-8 ${
-        divider ? "md:border-l md:border-rule" : ""
-      } ${accent ? "bg-subly-tint/40" : ""}`}
-    >
-      <span
-        className={`font-display text-[64px] font-semibold leading-none tracking-tight md:text-[88px] ${
-          accent ? "text-subly" : "text-ink"
-        }`}
-      >
-        {value}
-      </span>
-      <span className="mt-3 font-mono text-[10px] uppercase tracking-[0.24em] text-ink-muted">
-        {label}
-      </span>
-    </div>
   );
 }

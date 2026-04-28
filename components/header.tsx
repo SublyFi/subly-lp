@@ -3,9 +3,10 @@ import { SublyLogo } from "./subly-logo";
 
 const NAV = [
   { label: "Demo", href: "#demo" },
-  { label: "Thesis", href: "#thesis" },
-  { label: "How it works", href: "#how" },
+  { label: "Problem", href: "#problem" },
+  { label: "Solution", href: "#solution" },
   { label: "Privacy", href: "#privacy" },
+  { label: "Market", href: "#market" },
   { label: "Architecture", href: "#architecture" },
   { label: "Roadmap", href: "#roadmap" },
 ];

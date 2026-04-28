@@ -27,23 +27,26 @@ export function PrivacySection() {
 
       <div className="relative mx-auto max-w-[1360px] px-6 py-24 md:px-10 md:py-32">
         <div className="mb-16 grid gap-8 md:grid-cols-12">
-          <div className="md:col-span-5">
-            <h2 className="font-display text-[56px] font-semibold leading-[0.92] tracking-tight md:text-[88px]">
-              Privacy is the{" "}
-              <span className="font-feature text-subly-glow">feature.</span>
+          <div className="md:col-span-7">
+            <div className="font-mono text-[11px] uppercase tracking-[0.28em] text-subly-glow">
+              ▌ Proof · same call, different edge
+            </div>
+            <h2 className="mt-3 font-display text-[56px] font-semibold leading-[0.92] tracking-tight md:text-[80px]">
+              The receipt{" "}
+              <span className="font-feature text-subly-glow">disappears.</span>
             </h2>
           </div>
-          <div className="md:col-span-6 md:col-start-7">
-            <p className="font-feature text-[26px] leading-[1.35] text-paper md:text-[30px]">
-              Every x402 call your agent makes is a confession — what it
-              researched, who it traded with, which dataset it bought.
-              That&apos;s a strategy leak on a public ledger.
+          <div className="md:col-span-5">
+            <p className="font-feature text-[22px] leading-[1.4] text-paper md:text-[24px]">
+              Below is the same window of payments rendered two ways. With
+              official x402, every Buyer→Seller line is plaintext. With Subly,
+              observers see one aggregate settlement.
             </p>
-            <p className="mt-6 max-w-md font-sans text-[14px] leading-[1.75] text-paper/70">
+            <p className="mt-5 font-sans text-[13px] leading-[1.75] text-paper/70">
               Subly&apos;s facilitator signs inside an AWS Nitro Enclave. Yield
-              routing and application logic move into Arcium&apos;s Mainnet
-              Alpha MXE as Confidential SPL lands. You still get an audit trail
-              — selectively disclosed, on your terms.
+              routing and application logic move into Arcium MPC as
+              Confidential SPL lands. You still get an audit trail —
+              selectively disclosed, on your terms.
             </p>
           </div>
         </div>
