@@ -53,22 +53,22 @@ export function Header() {
           ))}
         </nav>
 
-        <div className="flex items-center gap-3 font-mono text-[11px] uppercase tracking-[0.2em]">
+        <div className="flex items-center gap-5 font-mono text-[11px] uppercase tracking-[0.2em]">
           <a
             href="https://x.com/subly_fi"
             target="_blank"
             rel="noreferrer"
             aria-label="Subly on X"
-            className="hidden h-10 w-10 items-center justify-center transition-transform hover:-translate-y-0.5 hover:scale-110 md:inline-flex"
+            className="hidden items-center justify-center text-ink transition-transform hover:-translate-y-0.5 hover:scale-110 md:inline-flex"
           >
-            <Image src="/x.svg" alt="" width={24} height={24} />
+            <Image src="/x.svg" alt="" width={26} height={26} />
           </a>
           <a
             href="https://t.me/+hR5mDS-l7bBhNjFl"
             target="_blank"
             rel="noreferrer"
             aria-label="Subly Telegram group"
-            className="hidden h-10 w-10 items-center justify-center transition-transform hover:-translate-y-0.5 hover:scale-110 md:inline-flex"
+            className="hidden items-center justify-center text-ink transition-transform hover:-translate-y-0.5 hover:scale-110 md:inline-flex"
           >
             <Image src="/telegram.svg" alt="" width={26} height={26} />
           </a>
@@ -116,26 +116,26 @@ export function Header() {
             </a>
           ))}
 
-          <div className="mt-6 flex items-center gap-5">
+          <div className="mt-6 flex items-center gap-6">
             <a
               href="https://x.com/subly_fi"
               target="_blank"
               rel="noreferrer"
               aria-label="Subly on X"
-              className="inline-flex h-10 w-10 items-center justify-center"
+              className="inline-flex items-center justify-center text-ink"
               onClick={() => setOpen(false)}
             >
-              <Image src="/x.svg" alt="" width={24} height={24} />
+              <Image src="/x.svg" alt="" width={28} height={28} />
             </a>
             <a
               href="https://t.me/+hR5mDS-l7bBhNjFl"
               target="_blank"
               rel="noreferrer"
               aria-label="Subly Telegram group"
-              className="inline-flex h-10 w-10 items-center justify-center"
+              className="inline-flex items-center justify-center text-ink"
               onClick={() => setOpen(false)}
             >
-              <Image src="/telegram.svg" alt="" width={26} height={26} />
+              <Image src="/telegram.svg" alt="" width={28} height={28} />
             </a>
             <a
               href="#demo"
