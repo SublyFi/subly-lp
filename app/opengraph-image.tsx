@@ -155,35 +155,6 @@ export default async function Image() {
           </div>
         </div>
 
-        {/* footer */}
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            fontFamily: "JetBrains Mono",
-            fontSize: 17,
-            letterSpacing: "0.22em",
-            textTransform: "uppercase",
-            color: "#101522",
-            borderTop: "1px solid #B8C0B8",
-            paddingTop: 20,
-            position: "relative",
-          }}
-        >
-          <div style={{ display: "flex", alignItems: "center", gap: 28 }}>
-            <span>Solana</span>
-            <span style={{ color: "#B8C0B8" }}>·</span>
-            <span>Nitro Enclave</span>
-            <span style={{ color: "#B8C0B8" }}>·</span>
-            <span>Arcium</span>
-            <span style={{ color: "#B8C0B8" }}>·</span>
-            <span>x402</span>
-          </div>
-          <div style={{ color: "#667085", display: "flex" }}>
-            sublyfi.com · @subly_fi
-          </div>
-        </div>
       </div>
     ),
     {
