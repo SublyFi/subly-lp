@@ -224,31 +224,31 @@ const privacyDemoSteps = [
     label: "Payment",
     phase: "Commit",
     title: "The buyer signs payment.",
-    body: "x402 pays the seller directly. Subly402 keeps the x402-style retry flow, but the buyer deposits into the vault after checking attestation.",
+    body: "x402 pays the seller directly. Subly-x402 keeps the x402-style retry flow, but the buyer deposits into the vault after checking attestation.",
     x402: "Buyer signs a direct USDC transfer to the seller.",
     subly402:
       "Buyer signs a vault deposit and a paid request bound to the attested policy.",
     observer:
-      "x402 creates a buyer-to-seller edge. Subly402 creates a buyer-to-vault edge.",
+      "x402 creates a buyer-to-seller edge. Subly-x402 creates a buyer-to-vault edge.",
   },
   {
     n: "03",
     label: "Visible edge",
     phase: "Reveal",
     title: "The visible payment edge is different.",
-    body: "This is the core point: x402 exposes who paid which seller. Subly402 exposes that the buyer funded a vault, not the seller they called.",
+    body: "This is the core point: x402 exposes who paid which seller. Subly-x402 exposes that the buyer funded a vault, not the seller they called.",
     x402: "Explorer shows Buyer token account -> Seller token account.",
     subly402:
       "Explorer shows Buyer token account -> Subly vault. No Buyer -> Seller transfer appears in the buyer request.",
     observer:
-      "A block explorer can link buyer and seller in x402. With Subly402, that direct link is not visible.",
+      "A block explorer can link buyer and seller in x402. With Subly-x402, that direct link is not visible.",
   },
   {
     n: "04",
     label: "Payout",
     phase: "Resolve",
     title: "Seller still gets paid.",
-    body: "Subly402 is not hiding payment from the seller. It changes the onchain settlement shape so the seller receives a later vault payout instead of a direct buyer transfer.",
+    body: "Subly-x402 is not hiding payment from the seller. It changes the onchain settlement shape so the seller receives a later vault payout instead of a direct buyer transfer.",
     x402: "The request is already linkable to this seller.",
     subly402:
       "Seller receives a batched Vault -> Seller payout, separate from the buyer deposit.",
@@ -373,7 +373,7 @@ export function DemoSection() {
         tone: "text-alert",
       },
       {
-        label: "Subly402",
+        label: "Subly-x402",
         value:
           "The buyer's visible transaction is a vault deposit. Seller payout is delayed and batched from the vault.",
         tone: "text-glow",
@@ -567,26 +567,38 @@ export function DemoSection() {
         }}
       />
       <div className="relative mx-auto max-w-[1360px] px-6 py-20 md:px-10 md:py-28">
+        <div className="mb-14 flex items-center gap-4">
+          <span className="inline-flex items-center gap-2 border border-subly-glow/60 px-3 py-1.5 font-mono text-[11px] uppercase tracking-[0.28em] text-subly-glow">
+            <span className="relative inline-flex h-1.5 w-1.5">
+              <span className="absolute inset-0 rounded-full bg-subly-glow blink" />
+            </span>
+            Live demo · Solana devnet
+          </span>
+          <span className="hidden h-px flex-1 bg-paper/20 md:block" />
+        </div>
         <div className="mb-12 grid gap-8 md:grid-cols-12">
-          <div className="md:col-span-5">
-            <h2 className="font-display text-[54px] font-semibold leading-[0.94] tracking-tight text-paper md:text-[78px]">
-              Same API call.
-              <br />
-              <span className="text-subly-glow">Different</span> payment
-              <br />
-              edge.
+          <div className="md:col-span-7">
+            <h2 className="font-display font-black leading-[0.86] tracking-tight text-paper">
+              <span className="block text-[14vw] md:text-[120px] lg:text-[160px]">
+                Live Demo.
+              </span>
+              <span className="mt-4 block font-feature text-[28px] font-normal leading-[1.15] text-paper/85 md:text-[40px] lg:text-[52px]">
+                Same API call.{" "}
+                <span className="text-subly-glow">Different</span> payment
+                edge.
+              </span>
             </h2>
           </div>
-          <div className="md:col-span-6 md:col-start-7">
-            <p className="font-feature text-[26px] leading-[1.3] text-paper md:text-[32px]">
+          <div className="md:col-span-5">
+            <p className="font-feature text-[24px] leading-[1.3] text-paper md:text-[28px]">
               Press through the flow. Official x402 makes the Buyer to Seller
-              payment edge visible. Subly402 keeps the x402-style HTTP flow,
+              payment edge visible. Subly-x402 keeps the x402-style HTTP flow,
               but changes what the chain reveals.
             </p>
             <p className="mt-6 max-w-xl text-[14px] leading-[1.7] text-paper/70">
               The live proof below calls the same Seller twice: once through
-              official x402, once through Subly402. The important difference is
-              not the API response. It is the visible onchain edge.
+              official x402, once through Subly-x402. The important difference
+              is not the API response. It is the visible onchain edge.
             </p>
           </div>
         </div>
@@ -673,7 +685,7 @@ export function DemoSection() {
                 Demo batch window
               </div>
               <p className="mt-2 max-w-3xl text-[12px] leading-[1.6] text-paper/70">
-                This hosted proof targets an approximately 1 minute Subly402
+                This hosted proof targets an approximately 1 minute Subly-x402
                 batch so the Vault -&gt; Seller movement is visible during the
                 demo. Public deployments should use longer anonymity windows;
                 low-volume 1 minute batches can make participant correlation
@@ -783,7 +795,7 @@ export function DemoSection() {
                       onCopy={copy}
                     />
                     <FlowPanel
-                      title="Subly402"
+                      title="Subly-x402"
                       subtitle="vault deposit, batched payout"
                       flow={runResult.subly402}
                       onCopy={copy}
@@ -975,28 +987,30 @@ function PrivacyStoryboard({
           <div className="mt-5 flex flex-col gap-3 sm:flex-row">
             <button
               type="button"
-              onClick={onNextStep}
-              className="inline-flex h-11 items-center justify-center gap-2 border border-ink bg-ink px-4 font-mono text-[11px] uppercase tracking-[0.16em] text-paper transition-colors hover:border-subly hover:bg-subly"
-            >
-              {isLastStep ? (
-                <RefreshCw className="h-4 w-4" />
-              ) : (
-                <ArrowRight className="h-4 w-4" />
-              )}
-              {isLastStep ? "Replay flow" : "Next step"}
-            </button>
-            <button
-              type="button"
               onClick={onRunLive}
               disabled={runBusy}
-              className="inline-flex h-11 items-center justify-center gap-2 border border-ink/25 px-4 font-mono text-[11px] uppercase tracking-[0.16em] text-ink transition-colors hover:border-subly hover:text-subly disabled:cursor-not-allowed disabled:opacity-60"
+              className="inline-flex h-11 items-center justify-center gap-2 border border-subly bg-subly px-5 font-mono text-[11px] uppercase tracking-[0.18em] text-white transition-colors hover:bg-subly-deep hover:border-subly-deep disabled:cursor-not-allowed disabled:opacity-60"
             >
               {runBusy ? (
                 <Loader2 className="h-4 w-4 animate-spin" />
               ) : (
                 <Play className="h-4 w-4" />
               )}
-              Run live proof
+              Run live demo
+            </button>
+            <button
+              type="button"
+              onClick={onNextStep}
+              className="inline-flex h-11 items-center justify-center gap-2 border border-ink/25 px-4 font-mono text-[11px] uppercase tracking-[0.16em] text-ink-muted transition-colors hover:border-ink hover:text-ink"
+            >
+              {isLastStep ? (
+                <RefreshCw className="h-4 w-4" />
+              ) : (
+                <ArrowRight className="h-4 w-4" />
+              )}
+              {isLastStep
+                ? "Replay walkthrough"
+                : "Walk through the steps"}
             </button>
           </div>
         </div>
@@ -1082,7 +1096,7 @@ function PrivacyStoryboard({
             />
             <VerdictRow
               icon={EyeOff}
-              label="Subly402"
+              label="Subly-x402"
               value="Direct buyer-seller edge is not visible"
               tone="private"
             />
@@ -1367,7 +1381,7 @@ function PathFlowSummary({
       ? "The buyer-facing transfer is Buyer -> Vault. After the batch succeeds, the final highlighted edge is Vault -> Seller."
       : depositState === "complete" || batchState === "pending"
         ? "The visible buyer transaction stops at the Vault. The Seller edge stays pending until the batch payout succeeds."
-        : "The first highlighted edge is Buyer -> Vault. The second edge appears only after Subly402 batch payout succeeds."
+        : "The first highlighted edge is Buyer -> Vault. The second edge appears only after Subly-x402 batch payout succeeds."
     : directState === "complete"
       ? "The highlighted edge is the payment: Buyer -> Seller. The seller is paid in that same visible transaction."
       : "When the proof runs, the payment edge is Buyer -> Seller. That direct edge is what becomes visible onchain.";

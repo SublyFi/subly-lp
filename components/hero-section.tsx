@@ -48,7 +48,13 @@ export function HeroSection() {
           Privacy protocol for agents.
         </p>
 
-        <div className="mt-12 flex flex-col items-start gap-5">
+        <p className="mt-8 max-w-3xl font-feature text-[20px] leading-[1.4] text-ink-soft md:text-[24px]">
+          Deposit once.{" "}
+          <span className="text-subly">Earn yield.</span> Turn your yield into
+          AI agent payments without revealing anything.
+        </p>
+
+        <div className="mt-10 flex flex-col items-start gap-5">
           <div
             id="getWaitlistContainer"
             data-waitlist_id="31247"
