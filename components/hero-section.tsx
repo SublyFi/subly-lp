@@ -61,18 +61,18 @@ export function HeroSection() {
           Confidential SPL lands in Q3 2026.
         </p>
 
-        <div className="mt-12 flex flex-col items-stretch gap-5 md:flex-row md:items-stretch md:gap-5">
+        <div className="mt-10 flex flex-col items-start gap-5">
           <div
             id="getWaitlistContainer"
             data-waitlist_id="31247"
             data-widget_type="WIDGET_2"
-            className="subly-waitlist w-full md:max-w-[520px] md:flex-1"
+            className="subly-waitlist"
           />
           <a
             href="#demo"
-            className="group inline-flex items-center justify-center gap-3 border border-subly bg-subly px-7 py-4 font-mono text-[13px] uppercase tracking-[0.22em] text-white shadow-stamp-glow transition-all hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-[8px_8px_0_0_var(--subly-deep),12px_12px_0_0_var(--ink)] md:px-8"
+            className="group inline-flex items-center gap-3 border border-subly bg-subly px-5 py-3 font-mono text-[11px] uppercase tracking-[0.2em] text-white shadow-stamp-glow transition-all hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-[8px_8px_0_0_var(--subly-deep),12px_12px_0_0_var(--ink)]"
           >
-            <span className="relative inline-flex h-2 w-2">
+            <span className="relative inline-flex h-1.5 w-1.5">
               <span className="absolute inset-0 rounded-full bg-glow blink" />
             </span>
             Run the live demo
@@ -95,55 +95,25 @@ export function HeroSection() {
 
       <style jsx global>{`
         .subly-waitlist .waitlist-container,
-        .subly-waitlist .waitlist-form {
-          width: 100% !important;
-          max-width: 100% !important;
-        }
-        .subly-waitlist form {
-          display: flex !important;
-          flex-wrap: nowrap !important;
-          gap: 10px !important;
-          align-items: stretch !important;
-          justify-content: flex-start !important;
-          width: 100% !important;
-          max-width: 100% !important;
-          margin: 0 !important;
-        }
+        .subly-waitlist .waitlist-form,
+        .subly-waitlist form,
         .subly-waitlist input,
         .subly-waitlist button {
           border-radius: 2px !important;
           font-family: var(--font-mono) !important;
           text-transform: uppercase;
-          letter-spacing: 0.18em;
-          font-size: 13px !important;
-          line-height: 1 !important;
-          box-sizing: border-box !important;
+          letter-spacing: 0.16em;
+          font-size: 11px !important;
         }
         .subly-waitlist input[type="email"] {
           background: var(--paper) !important;
           border: 1px solid var(--ink) !important;
           color: var(--ink) !important;
-          padding: 16px 18px !important;
-          height: auto !important;
-          flex: 1 1 auto !important;
-          min-width: 0 !important;
-          width: auto !important;
-          margin: 0 !important;
-        }
-        .subly-waitlist input[type="email"]::placeholder {
-          color: var(--ink-muted) !important;
-          letter-spacing: 0.14em;
         }
         .subly-waitlist button {
           background: var(--subly) !important;
           color: #ffffff !important;
           border: 1px solid var(--subly) !important;
-          padding: 16px 24px !important;
-          height: auto !important;
-          font-weight: 600 !important;
-          flex: 0 0 auto !important;
-          white-space: nowrap !important;
-          margin: 0 !important;
         }
         .subly-waitlist button:hover {
           background: var(--subly-deep) !important;
