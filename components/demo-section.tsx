@@ -1231,7 +1231,7 @@ function FlowLane({
           <FlowConnector
             state={batchState}
             label="Vault -> Seller"
-            tone="resolve"
+            tone="private"
             status={
               sublyPayoutConfirmed
                 ? "batch payout"
@@ -1247,7 +1247,7 @@ function FlowLane({
             detail="Seller"
             active={batchState === "complete"}
             pending={batchState === "pending"}
-            tone="resolve"
+            tone="private"
           />
         </div>
       ) : (
