@@ -73,18 +73,6 @@ export default async function Image() {
             <span style={{ color: "#101522", fontWeight: 600 }}>Subly</span>
             <span>· Privacy protocol for agents</span>
           </div>
-          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-            <div
-              style={{
-                width: 10,
-                height: 10,
-                borderRadius: 999,
-                background: "#7C3AED",
-                display: "flex",
-              }}
-            />
-            <span>Live · Devnet</span>
-          </div>
         </div>
 
         {/* main */}
