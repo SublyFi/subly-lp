@@ -46,7 +46,7 @@ export function PrivacySection() {
             </p>
             <p className="mt-4 font-sans text-[13px] leading-[1.75] text-paper/65">
               Settlement bookkeeping runs inside a TEE, and the on-chain
-              privacy layer is handled by Arcium MPC. The moment Solana&apos;s
+              privacy layer is handled by Arcium. The moment Solana&apos;s
               Confidential SPL transfers ship to mainnet, Subly will integrate
               them on day one so the transfer amounts themselves are also kept
               private.

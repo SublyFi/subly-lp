@@ -176,7 +176,7 @@ export default async function Image() {
             <span style={{ color: "#B8C0B8" }}>·</span>
             <span>Nitro Enclave</span>
             <span style={{ color: "#B8C0B8" }}>·</span>
-            <span>Arcium MPC</span>
+            <span>Arcium</span>
             <span style={{ color: "#B8C0B8" }}>·</span>
             <span>x402</span>
           </div>
