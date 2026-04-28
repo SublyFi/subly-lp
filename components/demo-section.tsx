@@ -1180,7 +1180,7 @@ function FlowLane({
       : "Not paid out yet";
 
   return (
-    <div className="bg-paper p-5">
+    <div className="flex h-full flex-col bg-paper p-5">
       <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
         <div>
           <div
@@ -1191,7 +1191,7 @@ function FlowLane({
             {isSubly ? "Privacy-preserving x402 path" : "Official x402 path"}
           </div>
           <h4 className="mt-2 font-display text-[32px] font-semibold leading-none text-ink">
-            {isSubly ? "Subly x402" : "Official x402"}
+            {isSubly ? "Subly-x402" : "Official x402"}
           </h4>
         </div>
         <div
@@ -1480,7 +1480,7 @@ function ActorNode({
 
   return (
     <div
-      className={`min-h-[108px] min-w-0 border p-4 transition-colors ${toneClass}`}
+      className={`flex h-full min-h-[148px] min-w-0 flex-col border p-4 transition-colors ${toneClass}`}
     >
       <div className="flex h-full flex-col justify-between gap-3">
         <span
@@ -1524,7 +1524,7 @@ function FlowConnector({
 
   return (
     <div
-      className={`flex min-h-[70px] items-center justify-center gap-2 border px-2 text-center transition-colors md:min-h-[108px] md:flex-col ${
+      className={`flex h-full min-h-[70px] items-center justify-center gap-2 border px-2 text-center transition-colors md:min-h-[148px] md:flex-col ${
         active ? activeClass : "border-ink/15 bg-paper-deep text-ink-muted"
       }`}
     >
