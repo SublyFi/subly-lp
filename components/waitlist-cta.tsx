@@ -28,37 +28,16 @@ export function WaitlistCTA() {
           <p className="mt-6 max-w-xl font-feature text-[20px] leading-[1.4] text-ink md:text-[24px]">
             Be first in line when Subly opens to AI agent builders.
           </p>
-          <div className="mt-10 w-full">
+          <div className="mt-10">
             <div
               id="getWaitlistContainerBottom"
               data-waitlist_id="31247"
               data-widget_type="WIDGET_2"
-              className="subly-waitlist subly-waitlist-cta"
+              className="subly-waitlist"
             />
           </div>
         </div>
       </div>
-
-      <style jsx global>{`
-        .subly-waitlist-cta .waitlist-container,
-        .subly-waitlist-cta .waitlist-form,
-        .subly-waitlist-cta form {
-          width: 100% !important;
-          max-width: 560px !important;
-          margin-left: auto !important;
-          margin-right: auto !important;
-        }
-        .subly-waitlist-cta input[type="email"] {
-          height: 52px !important;
-          font-size: 13px !important;
-        }
-        .subly-waitlist-cta button {
-          height: 52px !important;
-          padding-left: 24px !important;
-          padding-right: 24px !important;
-          font-size: 13px !important;
-        }
-      `}</style>
     </section>
   );
 }
