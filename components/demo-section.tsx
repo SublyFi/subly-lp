@@ -1467,7 +1467,7 @@ function PathFlowSummary({
         ? "The visible buyer transaction stops at the Vault. The Seller edge stays pending until the batch payout succeeds."
         : "The first highlighted edge is Buyer -> Vault. The second edge appears only after Subly-x402 batch payout succeeds."
     : directState === "complete"
-      ? "The highlighted edge is the payment: Buyer -> Seller. The seller is paid in that same visible transaction."
+      ? "The highlighted edge is the payment: Buyer -> Seller. That direct edge is what stays visible onchain."
       : "When the proof runs, the payment edge is Buyer -> Seller. That direct edge is what becomes visible onchain.";
 
   return (
@@ -1563,7 +1563,7 @@ function ActorNode({
 
   return (
     <div
-      className={`flex h-full min-h-[148px] min-w-0 flex-col border p-4 transition-colors ${toneClass}`}
+      className={`flex h-full min-h-[180px] min-w-0 flex-col border p-4 transition-colors md:h-[200px] ${toneClass}`}
     >
       <div className="flex h-full flex-col justify-between gap-3">
         <span
@@ -1607,20 +1607,20 @@ function FlowConnector({
 
   return (
     <div
-      className={`flex h-full min-h-[70px] items-center justify-center gap-2 border px-2 text-center transition-colors md:min-h-[148px] md:flex-col ${
+      className={`flex h-full min-h-[80px] items-center justify-center gap-2 border px-2 text-center transition-colors md:h-[200px] md:flex-col ${
         active ? activeClass : "border-ink/15 bg-paper-deep text-ink-muted"
       }`}
     >
       <ArrowRight
-        className={`h-4 w-4 rotate-90 md:rotate-0 ${
+        className={`h-5 w-5 rotate-90 md:rotate-0 ${
           active ? "" : "opacity-45"
         }`}
       />
       <div className="grid min-w-0 gap-1">
-        <span className="font-mono text-[9px] uppercase tracking-[0.14em]">
+        <span className="font-mono text-[10px] uppercase tracking-[0.16em]">
           {label}
         </span>
-        <span className="font-mono text-[8px] uppercase tracking-[0.1em] opacity-70">
+        <span className="font-mono text-[9px] uppercase tracking-[0.12em] opacity-70">
           {state === "complete" ? "complete" : status}
         </span>
         {txSignature && (
@@ -1629,10 +1629,10 @@ function FlowConnector({
             target="_blank"
             rel="noreferrer"
             aria-label={`Open ${label} transaction in Solana Explorer`}
-            className="mt-1 inline-flex min-w-0 items-center justify-center gap-1 font-mono text-[9px] leading-none underline-offset-2 transition-colors hover:underline"
+            className="mt-1.5 inline-flex min-w-0 items-center justify-center gap-1 border-t border-current/20 pt-1.5 font-mono text-[10px] font-semibold leading-none transition-colors hover:underline"
           >
             <span className="min-w-0 truncate">{short(txSignature)}</span>
-            <ExternalLink className="h-3 w-3 shrink-0 opacity-70" />
+            <ExternalLink className="h-3 w-3 shrink-0" />
           </a>
         )}
       </div>
