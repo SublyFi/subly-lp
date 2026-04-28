@@ -9,42 +9,51 @@ export function CTASection() {
       className="relative overflow-hidden border-b border-rule bg-paper"
     >
       <div
-        className="pointer-events-none absolute inset-0 opacity-[0.06]"
+        className="pointer-events-none absolute inset-0 opacity-[0.08]"
         style={{
           backgroundImage:
-            "repeating-linear-gradient(135deg, transparent 0 48px, var(--ink) 48px 49px)",
+            "repeating-linear-gradient(135deg, transparent 0 48px, var(--subly) 48px 49px)",
         }}
         aria-hidden
+      />
+      <div
+        className="pointer-events-none absolute inset-0"
+        aria-hidden
+        style={{
+          background:
+            "radial-gradient(circle at 90% 20%, rgba(94,23,235,0.18) 0%, transparent 50%)",
+        }}
       />
 
       <div className="relative mx-auto max-w-[1360px] px-6 py-28 md:px-10 md:py-36">
         <div className="mb-8 flex items-center gap-4">
-          <span className="eyebrow">§ 07 · Invitation</span>
-          <span className="hair-rule w-24" />
+          <span className="stamp">§ 07 · Invitation</span>
+          <span className="hair-rule-subly w-24" />
           <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-ink-muted">
             Private devnet · builders first
           </span>
         </div>
 
-        <h2 className="max-w-5xl font-display text-[14vw] font-black leading-[0.84] tracking-normal text-ink md:text-[140px] lg:text-[180px]">
+        <h2 className="max-w-5xl font-display text-[14vw] font-black leading-[0.84] tracking-tight text-ink md:text-[140px] lg:text-[180px]">
           Stop topping{" "}
-          <span className="font-serif-it font-normal text-subly">up.</span>
+          <span className="font-feature text-subly">up.</span>
           <br />
           Start deploying agents{" "}
-          <span className="font-serif-it font-normal">
+          <span className="font-feature text-subly">
             that pay themselves.
           </span>
         </h2>
 
-        <p className="mt-10 max-w-2xl font-serif-it text-[24px] leading-[1.35] text-ink-soft md:text-[28px]">
+        <p className="mt-10 max-w-2xl font-feature text-[24px] leading-[1.35] text-ink md:text-[28px]">
           If you ship AI agents to production — research agents, trading agents,
           autonomous DevOps, data-buying pipelines — Subly is the funding layer
           you&apos;ve been manually impersonating.
         </p>
 
-        <div className="mt-12 grid gap-10 border-t border-ink pt-10 md:grid-cols-12">
+        <div className="mt-12 grid gap-10 border-t-2 border-ink pt-10 md:grid-cols-12">
           <div className="md:col-span-6">
-            <div className="mb-4 font-mono text-[11px] uppercase tracking-[0.22em] text-ink-muted">
+            <div className="mb-4 inline-flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.22em] text-subly">
+              <span className="h-1.5 w-1.5 rounded-full bg-subly blink" />
               Request early access
             </div>
             <div
@@ -70,8 +79,8 @@ export function CTASection() {
           </div>
 
           <div className="md:col-span-5 md:col-start-8">
-            <div className="mb-4 font-mono text-[11px] uppercase tracking-[0.22em] text-ink-muted">
-              Or find us
+            <div className="mb-4 font-mono text-[11px] uppercase tracking-[0.22em] text-subly">
+              ▌ Or find us
             </div>
             <ul className="space-y-4">
               <Social
@@ -119,7 +128,9 @@ function Social({
         rel="noreferrer"
         className="group flex items-baseline justify-between gap-4 border-b border-rule py-3 font-mono text-[13px] uppercase tracking-[0.16em] text-ink transition-colors hover:border-subly"
       >
-        <span className="text-ink-muted">{label}</span>
+        <span className="text-ink-muted group-hover:text-subly transition-colors">
+          {label}
+        </span>
         <span className="flex items-center gap-3 text-ink transition-colors group-hover:text-subly">
           {handle}
           <span

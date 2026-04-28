@@ -4,24 +4,27 @@
 @custom-variant dark (&:is(.dark *));
 
 :root {
-  /* Encrypted Almanac palette */
-  --paper: #f5f7f2;
-  --paper-deep: #e7ece4;
-  --paper-warm: #dce7e0;
-  --ink: #101522;
-  --ink-soft: #263347;
-  --ink-muted: #667085;
-  --rule: #b8c0b8;
-  --rule-soft: #d3d9d0;
+  /* Encrypted Bulletin palette */
+  --paper: #f4f1ea;
+  --paper-deep: #ece6d8;
+  --paper-warm: #e3dccb;
+  --ink: #0b0a14;
+  --ink-soft: #1f1d2e;
+  --ink-muted: #5a5670;
+  --rule: #b9b3a6;
+  --rule-soft: #d3cdbe;
 
-  /* Brand accents — used sparingly */
-  --subly: #7c3aed;
-  --subly-deep: #4f46e5;
+  /* Brand — Subly purple, used boldly */
+  --subly: #5e17eb;
+  --subly-deep: #3a0e9d;
+  --subly-soft: #8e6bff;
+  --subly-tint: #efe7ff;
+  --subly-glow: #c8b3ff;
 
   /* System signal colors */
   --glow: #d9ff3a;
   --alert: #ff5a4c;
-  --ok: #3fb27f;
+  --ok: #2bb673;
 
   /* shadcn mappings */
   --background: var(--paper);
@@ -30,8 +33,8 @@
   --card-foreground: var(--ink);
   --popover: #ffffff;
   --popover-foreground: var(--ink);
-  --primary: var(--ink);
-  --primary-foreground: var(--paper);
+  --primary: var(--subly);
+  --primary-foreground: #ffffff;
   --secondary: var(--paper-deep);
   --secondary-foreground: var(--ink);
   --muted: var(--paper-warm);
@@ -47,21 +50,21 @@
 }
 
 .dark {
-  --paper: #0d1117;
-  --paper-deep: #121820;
-  --paper-warm: #17212b;
-  --ink: #f5f7f2;
-  --ink-soft: #d2d8ce;
-  --ink-muted: #98a2b3;
-  --rule: #2d3742;
-  --rule-soft: #202a34;
+  --paper: #0a0712;
+  --paper-deep: #110d1f;
+  --paper-warm: #19142b;
+  --ink: #f4f1ea;
+  --ink-soft: #d2cbb9;
+  --ink-muted: #968ba8;
+  --rule: #2a2440;
+  --rule-soft: #1c1730;
 
   --background: var(--paper);
   --foreground: var(--ink);
   --card: var(--paper-deep);
   --card-foreground: var(--ink);
-  --primary: var(--ink);
-  --primary-foreground: var(--paper);
+  --primary: var(--subly);
+  --primary-foreground: #ffffff;
   --secondary: var(--paper-deep);
   --secondary-foreground: var(--ink);
   --muted: var(--paper-warm);
@@ -88,6 +91,9 @@
   --color-rule-soft: var(--rule-soft);
   --color-subly: var(--subly);
   --color-subly-deep: var(--subly-deep);
+  --color-subly-soft: var(--subly-soft);
+  --color-subly-tint: var(--subly-tint);
+  --color-subly-glow: var(--subly-glow);
   --color-glow: var(--glow);
   --color-alert: var(--alert);
   --color-ok: var(--ok);
@@ -125,18 +131,15 @@
     @apply bg-paper text-ink font-sans antialiased;
     font-feature-settings: "ss01", "ss02", "cv02", "cv11";
     background-image:
-      /* subtle paper grain */ radial-gradient(
-        rgba(26, 11, 46, 0.035) 1px,
-        transparent 1px
-      ),
-      radial-gradient(rgba(26, 11, 46, 0.02) 1px, transparent 1px);
+      radial-gradient(rgba(94, 23, 235, 0.045) 1px, transparent 1px),
+      radial-gradient(rgba(11, 10, 20, 0.025) 1px, transparent 1px);
     background-position: 0 0, 3px 3px;
     background-size: 6px 6px, 6px 6px;
   }
 
   ::selection {
-    background: var(--ink);
-    color: var(--paper);
+    background: var(--subly);
+    color: #ffffff;
   }
 }
 
@@ -145,17 +148,24 @@
     font-family: var(--font-display);
     font-optical-sizing: auto;
     font-variation-settings: "opsz" 144, "SOFT" 30, "WONK" 0;
-    letter-spacing: 0;
+    letter-spacing: -0.01em;
   }
   .font-display-wonk {
     font-family: var(--font-display);
     font-optical-sizing: auto;
     font-variation-settings: "opsz" 144, "SOFT" 100, "WONK" 1;
+    letter-spacing: -0.01em;
+  }
+  /* Upright serif accent — replaces previous italic feature font */
+  .font-feature {
+    font-family: var(--font-serif);
+    font-style: normal;
     letter-spacing: 0;
   }
+  /* Backwards-compatible alias: previously italic, now upright */
   .font-serif-it {
     font-family: var(--font-serif);
-    font-style: italic;
+    font-style: normal;
     letter-spacing: 0;
   }
   .font-mono {
@@ -164,6 +174,9 @@
   }
 
   .eyebrow {
+    @apply font-mono text-[10px] uppercase tracking-[0.22em] text-subly;
+  }
+  .eyebrow-muted {
     @apply font-mono text-[10px] uppercase tracking-[0.22em] text-ink-muted;
   }
   .hair-rule {
@@ -172,6 +185,16 @@
       transparent,
       var(--rule) 12%,
       var(--rule) 88%,
+      transparent
+    );
+    height: 1px;
+  }
+  .hair-rule-subly {
+    background: linear-gradient(
+      to right,
+      transparent,
+      var(--subly) 12%,
+      var(--subly) 88%,
       transparent
     );
     height: 1px;
@@ -217,6 +240,72 @@
     background-size: 64px 64px;
   }
 
+  .gridlines-purple {
+    background-image: linear-gradient(
+        to right,
+        rgba(94, 23, 235, 0.08) 1px,
+        transparent 1px
+      ),
+      linear-gradient(to bottom, rgba(94, 23, 235, 0.08) 1px, transparent 1px);
+    background-size: 56px 56px;
+  }
+
+  .stamp {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.25rem 0.55rem;
+    border: 1px solid var(--subly);
+    color: var(--subly);
+    background: var(--subly-tint);
+    font-family: var(--font-mono);
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.22em;
+  }
+
+  .pill-ink {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.25rem 0.55rem;
+    border: 1px solid var(--ink);
+    color: var(--ink);
+    background: transparent;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.22em;
+  }
+
+  .crosshatch {
+    background-image: repeating-linear-gradient(
+      135deg,
+      transparent 0 6px,
+      rgba(94, 23, 235, 0.08) 6px 7px
+    );
+  }
+
+  .ascii-corners::before,
+  .ascii-corners::after {
+    position: absolute;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--subly);
+    pointer-events: none;
+  }
+  .ascii-corners::before {
+    content: "+";
+    top: -7px;
+    left: -7px;
+  }
+  .ascii-corners::after {
+    content: "+";
+    bottom: -7px;
+    right: -7px;
+  }
+
   @keyframes marquee {
     0% {
       transform: translateX(0);
@@ -243,6 +332,31 @@
     animation: blink 1.4s steps(2, end) infinite;
   }
 
+  @keyframes pulse-purple {
+    0%,
+    100% {
+      box-shadow: 0 0 0 0 rgba(94, 23, 235, 0.55);
+    }
+    50% {
+      box-shadow: 0 0 0 8px rgba(94, 23, 235, 0);
+    }
+  }
+  .pulse-purple {
+    animation: pulse-purple 2.4s ease-out infinite;
+  }
+
+  @keyframes scanline {
+    0% {
+      transform: translateY(-100%);
+    }
+    100% {
+      transform: translateY(100%);
+    }
+  }
+  .scanline {
+    animation: scanline 6s linear infinite;
+  }
+
   @keyframes sweep {
     0% {
       transform: scaleX(0);
@@ -259,5 +373,15 @@
       transform: scaleX(0);
       transform-origin: right;
     }
+  }
+
+  .shadow-stamp {
+    box-shadow: 6px 6px 0 0 var(--ink);
+  }
+  .shadow-stamp-subly {
+    box-shadow: 6px 6px 0 0 var(--subly);
+  }
+  .shadow-stamp-glow {
+    box-shadow: 4px 4px 0 0 var(--subly), 8px 8px 0 0 var(--ink);
   }
 }

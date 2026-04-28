@@ -22,14 +22,14 @@ function Row() {
             <span className="inline-block h-1.5 w-1.5 rounded-full bg-alert blink" />
           )}
           {t.status === "ok" && (
-            <span className="inline-block h-1.5 w-1.5 rounded-full bg-ok" />
+            <span className="inline-block h-1.5 w-1.5 rounded-full bg-subly-glow" />
           )}
           {t.status === "note" && (
             <span className="inline-block h-1.5 w-1.5 rounded-full bg-glow" />
           )}
-          <span className="text-ink-muted">{t.label}</span>
-          <span className="text-ink">{t.value}</span>
-          <span className="text-ink-muted/40">§</span>
+          <span className="text-subly-glow/70">{t.label}</span>
+          <span className="text-paper">{t.value}</span>
+          <span className="text-subly-glow/40">§</span>
         </span>
       ))}
     </div>
@@ -38,8 +38,16 @@ function Row() {
 
 export function TickerBar() {
   return (
-    <div className="relative z-30 overflow-hidden border-b border-rule bg-ink text-paper">
-      <div className="flex whitespace-nowrap py-2 font-mono text-[10px] uppercase tracking-[0.18em] marquee [--ink-muted:#98a2b3] [--ink:#f5f7f2] [--alert:#ff5f57] [--ok:#14b885] [--glow:#d7ff4a]">
+    <div className="relative z-30 overflow-hidden border-b border-subly bg-ink text-paper">
+      <div
+        className="absolute inset-0 opacity-30"
+        aria-hidden
+        style={{
+          background:
+            "linear-gradient(90deg, transparent 0%, rgba(94,23,235,0.6) 50%, transparent 100%)",
+        }}
+      />
+      <div className="relative flex whitespace-nowrap py-2 font-mono text-[10px] uppercase tracking-[0.18em] marquee">
         <Row />
         <Row />
       </div>

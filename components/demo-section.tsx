@@ -558,25 +558,33 @@ export function DemoSection() {
       className="relative overflow-hidden border-b border-rule bg-ink text-paper"
     >
       <div className="gridlines absolute inset-0 opacity-[0.08]" aria-hidden />
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0"
+        style={{
+          background:
+            "radial-gradient(ellipse at 90% 0%, rgba(94,23,235,0.40) 0%, transparent 55%), radial-gradient(circle at 0% 100%, rgba(94,23,235,0.20) 0%, transparent 50%)",
+        }}
+      />
       <div className="relative mx-auto max-w-[1360px] px-6 py-20 md:px-10 md:py-28">
         <div className="mb-12 grid gap-8 md:grid-cols-12">
           <div className="md:col-span-5">
-            <div className="mb-4 font-mono text-[10px] uppercase tracking-[0.24em] text-glow">
+            <span className="inline-flex items-center gap-2 border border-subly-glow/60 px-2.5 py-1 font-mono text-[10px] uppercase tracking-[0.24em] text-subly-glow">
               § 01 · Privacy flow demo
-            </div>
-            <h2 className="font-display text-[54px] font-semibold leading-[0.94] text-paper md:text-[78px]">
+            </span>
+            <h2 className="mt-5 font-display text-[54px] font-semibold leading-[0.94] tracking-tight text-paper md:text-[78px]">
               Same API call.
               <br />
-              Different payment
+              <span className="text-subly-glow">Different</span> payment
               <br />
               edge.
             </h2>
           </div>
           <div className="md:col-span-6 md:col-start-7">
-            <p className="font-serif-it text-[26px] leading-[1.3] text-paper md:text-[32px]">
+            <p className="font-feature text-[26px] leading-[1.3] text-paper md:text-[32px]">
               Press through the flow. Official x402 makes the Buyer to Seller
-              payment edge visible. Subly402 keeps the x402-style HTTP flow, but
-              changes what the chain reveals.
+              payment edge visible. Subly402 keeps the x402-style HTTP flow,
+              but changes what the chain reveals.
             </p>
             <p className="mt-6 max-w-xl text-[14px] leading-[1.7] text-paper/70">
               The live proof below calls the same Seller twice: once through
@@ -811,7 +819,7 @@ export function DemoSection() {
                   <div className="flex min-h-[260px] flex-col justify-between border border-dashed border-paper/20 p-5">
                     <div>
                       <ShieldCheck className="h-8 w-8 text-glow" />
-                      <p className="mt-5 max-w-sm font-serif-it text-[22px] leading-[1.3] text-paper">
+                      <p className="mt-5 max-w-sm font-feature text-[22px] leading-[1.3] text-paper">
                         A real devnet run returns both Seller route calls,
                         funding txs, the x402 settlement tx, the Subly vault
                         deposit tx, and the Subly settlement id.
@@ -1060,7 +1068,7 @@ function PrivacyStoryboard({
             <Eye className="h-4 w-4" />
             What observer learns
           </div>
-          <p className="mt-3 max-w-4xl font-serif-it text-[23px] leading-[1.25] text-ink md:text-[28px]">
+          <p className="mt-3 max-w-4xl font-feature text-[23px] leading-[1.25] text-ink md:text-[28px]">
             {step.observer}
           </p>
         </div>

@@ -8,33 +8,41 @@ export function PrivacySection() {
     >
       <div className="noise absolute inset-0 opacity-30" aria-hidden />
       <div
-        className="pointer-events-none absolute inset-0 opacity-[0.08]"
+        className="pointer-events-none absolute inset-0 opacity-[0.10]"
         style={{
           backgroundImage:
-            "linear-gradient(to right, rgba(242,235,220,0.4) 1px, transparent 1px), linear-gradient(to bottom, rgba(242,235,220,0.4) 1px, transparent 1px)",
+            "linear-gradient(to right, rgba(200,179,255,0.5) 1px, transparent 1px), linear-gradient(to bottom, rgba(200,179,255,0.5) 1px, transparent 1px)",
           backgroundSize: "80px 80px",
         }}
         aria-hidden
+      />
+      <div
+        className="pointer-events-none absolute inset-0"
+        aria-hidden
+        style={{
+          background:
+            "radial-gradient(ellipse at 80% 0%, rgba(94,23,235,0.45) 0%, transparent 55%), radial-gradient(circle at 0% 100%, rgba(94,23,235,0.25) 0%, transparent 50%)",
+        }}
       />
 
       <div className="relative mx-auto max-w-[1360px] px-6 py-24 md:px-10 md:py-32">
         <div className="mb-16 grid gap-8 md:grid-cols-12">
           <div className="md:col-span-5">
-            <div className="mb-4 font-mono text-[10px] uppercase tracking-[0.24em] text-glow">
+            <span className="inline-flex items-center gap-2 border border-subly-glow px-2.5 py-1 font-mono text-[10px] uppercase tracking-[0.24em] text-subly-glow">
               § 04 · Declassified
-            </div>
-            <h2 className="font-display text-[56px] font-semibold leading-[0.92] tracking-normal md:text-[88px]">
+            </span>
+            <h2 className="mt-5 font-display text-[56px] font-semibold leading-[0.92] tracking-tight md:text-[88px]">
               Privacy is the{" "}
-              <span className="font-serif-it font-normal">feature.</span>
+              <span className="font-feature text-subly-glow">feature.</span>
             </h2>
           </div>
           <div className="md:col-span-6 md:col-start-7">
-            <p className="font-serif-it text-[26px] leading-[1.35] text-paper md:text-[30px]">
+            <p className="font-feature text-[26px] leading-[1.35] text-paper md:text-[30px]">
               Every x402 call your agent makes is a confession — what it
               researched, who it traded with, which dataset it bought.
               That&apos;s a strategy leak on a public ledger.
             </p>
-            <p className="mt-6 max-w-md font-sans text-[14px] leading-[1.7] text-paper/70">
+            <p className="mt-6 max-w-md font-sans text-[14px] leading-[1.75] text-paper/70">
               Subly&apos;s facilitator signs inside an AWS Nitro Enclave. Yield
               routing and application logic move into Arcium&apos;s Mainnet
               Alpha MXE as Confidential SPL lands. You still get an audit trail
@@ -86,7 +94,7 @@ export function PrivacySection() {
             variant="subly"
             label="With Subly"
             status="encrypted · aggregated · attested"
-            statusColor="text-glow"
+            statusColor="text-subly-glow"
             rows={[
               {
                 t: "14:06",
@@ -146,13 +154,13 @@ function RedactedLedger({
     <div
       className={`relative border p-6 md:p-8 ${
         isSubly
-          ? "border-glow bg-[rgba(217,255,58,0.06)]"
+          ? "border-subly bg-subly/10 shadow-[6px_6px_0_0_var(--subly-deep)]"
           : "border-paper/25 bg-paper/5"
       }`}
     >
       <div className="mb-6 flex items-baseline justify-between">
         <div className="font-mono text-[10px] uppercase tracking-[0.22em] text-paper/70">
-          {label}
+          ▌ {label}
         </div>
         <div
           className={`font-mono text-[10px] uppercase tracking-[0.22em] ${statusColor}`}
@@ -168,15 +176,15 @@ function RedactedLedger({
             className="grid grid-cols-12 items-baseline gap-3 border-b border-paper/15 pb-3 font-mono text-[12px] last:border-0"
           >
             <span className="col-span-2 text-paper/50">{r.t}</span>
-            <span className="col-span-3 text-paper">{r.amt}</span>
+            <span
+              className={`col-span-3 ${
+                isSubly ? "text-subly-glow" : "text-paper"
+              }`}
+            >
+              {r.amt}
+            </span>
             <span className={`col-span-7 ${isSubly ? "text-paper" : ""}`}>
-              {isSubly ? (
-                r.note
-              ) : (
-                <>
-                  <span className="redact">{r.note}</span>
-                </>
-              )}
+              {isSubly ? r.note : <span className="redact">{r.note}</span>}
             </span>
           </div>
         ))}
@@ -186,7 +194,7 @@ function RedactedLedger({
         <div className="mt-6 border-t border-paper/15 pt-5 font-mono text-[10px] uppercase tracking-[0.18em] text-paper/60">
           <div className="flex items-center justify-between">
             <span>Enclave PCR0</span>
-            <span className="text-glow">0xa9c7…3f1e ✓</span>
+            <span className="text-subly-glow">0xa9c7…3f1e ✓</span>
           </div>
           <div className="mt-2 flex items-center justify-between">
             <span>Providers paid</span>
@@ -220,8 +228,8 @@ function Pillar({
   return (
     <div className={`flex flex-col gap-4 p-8 ${dark ? "bg-ink" : "bg-ink"}`}>
       <div className="flex items-center justify-between">
-        <span className="font-mono text-[10px] uppercase tracking-[0.24em] text-glow">
-          {kicker}
+        <span className="font-mono text-[10px] uppercase tracking-[0.28em] text-subly-glow">
+          ▌ {kicker}
         </span>
         {logo && (
           <div className="relative h-6 w-20">
@@ -234,10 +242,10 @@ function Pillar({
           </div>
         )}
       </div>
-      <h3 className="font-display text-[24px] font-semibold tracking-normal text-paper">
+      <h3 className="font-display text-[24px] font-semibold tracking-tight text-paper">
         {title}
       </h3>
-      <p className="text-[13px] leading-[1.65] text-paper/70">{body}</p>
+      <p className="text-[13px] leading-[1.7] text-paper/70">{body}</p>
     </div>
   );
 }

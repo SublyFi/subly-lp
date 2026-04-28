@@ -12,15 +12,15 @@ const NAV = [
 
 export function Header() {
   return (
-    <header className="relative z-20 border-b border-rule">
+    <header className="relative z-20 border-b border-ink bg-paper">
       <div className="mx-auto flex max-w-[1360px] items-end justify-between gap-8 px-6 py-5 md:px-10">
-        <Link href="/" className="flex items-end gap-3">
-          <SublyLogo className="h-8 w-8" />
+        <Link href="/" className="group flex items-end gap-3">
+          <SublyLogo className="h-8 w-8 text-subly transition-transform group-hover:rotate-6" />
           <div className="flex flex-col leading-none">
-            <span className="font-display text-[26px] font-semibold tracking-tight">
+            <span className="font-display text-[26px] font-semibold tracking-tight text-ink">
               Subly
             </span>
-            <span className="mt-1 font-mono text-[9px] uppercase tracking-[0.24em] text-ink-muted">
+            <span className="mt-1 font-mono text-[9px] uppercase tracking-[0.28em] text-subly">
               Vol. 01 · Edition α · 2026
             </span>
           </div>
@@ -31,7 +31,7 @@ export function Header() {
             <a
               key={item.href}
               href={item.href}
-              className="relative transition-colors hover:text-ink"
+              className="relative transition-colors hover:text-subly"
             >
               {item.label}
             </a>
@@ -43,13 +43,13 @@ export function Header() {
             href="https://x.com/subly_fi"
             target="_blank"
             rel="noreferrer"
-            className="hidden text-ink-muted transition-colors hover:text-ink md:inline"
+            className="hidden text-ink-muted transition-colors hover:text-subly md:inline"
           >
             x.com/subly_fi
           </a>
           <a
             href="#demo"
-            className="group inline-flex items-center gap-2 border border-ink bg-ink px-3 py-2 text-paper transition-colors hover:bg-subly hover:border-subly"
+            className="group inline-flex items-center gap-2 border border-subly bg-subly px-3 py-2 text-white transition-colors hover:bg-subly-deep hover:border-subly-deep"
           >
             <span className="relative inline-block h-1.5 w-1.5 rounded-full bg-glow">
               <span className="absolute inset-0 animate-ping rounded-full bg-glow/60" />
