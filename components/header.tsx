@@ -41,14 +41,13 @@ export function Header() {
             target="_blank"
             rel="noreferrer"
             aria-label="Subly on X"
-            className="hidden h-9 w-9 items-center justify-center border border-ink bg-paper transition-all hover:-translate-y-0.5 hover:border-subly hover:shadow-[3px_3px_0_0_var(--subly)] md:inline-flex"
+            className="hidden items-center justify-center transition-transform hover:-translate-y-0.5 hover:scale-110 md:inline-flex"
           >
             <Image
               src="/xicon.svg"
               alt=""
-              width={16}
-              height={16}
-              className=""
+              width={32}
+              height={32}
             />
           </a>
           <a
@@ -56,14 +55,13 @@ export function Header() {
             target="_blank"
             rel="noreferrer"
             aria-label="Subly Telegram group"
-            className="hidden h-9 w-9 items-center justify-center border border-ink bg-paper transition-all hover:-translate-y-0.5 hover:border-subly hover:shadow-[3px_3px_0_0_var(--subly)] md:inline-flex"
+            className="hidden items-center justify-center transition-transform hover:-translate-y-0.5 hover:scale-110 md:inline-flex"
           >
             <Image
               src="/telegram.png"
               alt=""
-              width={20}
-              height={20}
-              className=""
+              width={32}
+              height={32}
             />
           </a>
           <a
