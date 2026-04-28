@@ -47,9 +47,9 @@ export function PrivacySection() {
             <p className="mt-4 font-sans text-[13px] leading-[1.75] text-paper/65">
               Subly&apos;s on-chain programs — including the Shared Vault — are
               encrypted by Arcium, while the per-buyer ledger lives inside an
-              AWS Nitro Enclave. When Solana&apos;s Confidential SPL transfers
-              reach mainnet, Subly will adopt them on day one so the amounts
-              moved through the vault are also kept private.
+              AWS Nitro Enclave. Once Solana&apos;s Confidential SPL transfers
+              reach mainnet, Subly plans to integrate them so the amounts
+              moved through the vault can also be kept private.
             </p>
           </div>
         </div>
@@ -70,8 +70,8 @@ export function PrivacySection() {
           />
           <Pillar
             kicker="Coming next"
-            title="Confidential SPL · day one"
-            body="Solana's upcoming Confidential SPL transfers will keep transfer amounts hidden on-chain. The moment they ship to mainnet, Subly will integrate them so the amounts moving through the Shared Vault are also kept private."
+            title="Confidential SPL"
+            body="Solana's upcoming Confidential SPL transfers will keep transfer amounts hidden on-chain. Once they ship to mainnet, Subly plans to integrate them so the amounts moving through the Shared Vault can also be kept private."
           />
         </div>
       </div>
