@@ -173,6 +173,70 @@
     font-feature-settings: "ss02", "ss03";
   }
 
+  .subly-waitlist {
+    display: flex !important;
+    width: 100% !important;
+    max-width: 600px !important;
+  }
+  .subly-waitlist > [class*="gw-flex"][class*="gw-flex-col"] {
+    width: 100% !important;
+    max-width: 600px !important;
+    padding: 8px !important;
+  }
+  .subly-waitlist [class*="gw-flex-row"] {
+    width: 100% !important;
+  }
+  .subly-waitlist .waitlist-container,
+  .subly-waitlist .waitlist-form,
+  .subly-waitlist form,
+  .subly-waitlist input,
+  .subly-waitlist button {
+    border-radius: 2px !important;
+    font-family: var(--font-mono) !important;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    font-size: 11px !important;
+  }
+  .subly-waitlist input {
+    flex: 1 1 auto !important;
+    min-width: 0 !important;
+    min-height: 35px !important;
+    padding: 8px 12px !important;
+    background: var(--paper) !important;
+    border: 1px solid var(--ink) !important;
+    color: var(--ink) !important;
+    line-height: 1 !important;
+  }
+  .subly-waitlist button {
+    flex: 0 0 200px !important;
+    width: 200px !important;
+    max-width: 200px !important;
+    min-height: 35px !important;
+    padding: 8px 16px !important;
+    background: var(--subly) !important;
+    color: #ffffff !important;
+    border: 1px solid var(--subly) !important;
+    line-height: 1 !important;
+    white-space: nowrap !important;
+  }
+  .subly-waitlist button:hover {
+    background: var(--subly-deep) !important;
+    border-color: var(--subly-deep) !important;
+  }
+
+  @media (max-width: 480px) {
+    .subly-waitlist [class*="gw-flex-row"] {
+      flex-direction: column !important;
+      gap: 8px !important;
+    }
+    .subly-waitlist input,
+    .subly-waitlist button {
+      width: 100% !important;
+      max-width: none !important;
+      flex-basis: auto !important;
+    }
+  }
+
   .eyebrow {
     @apply font-mono text-[10px] uppercase tracking-[0.22em] text-subly;
   }

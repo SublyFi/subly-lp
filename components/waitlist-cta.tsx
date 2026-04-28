@@ -29,7 +29,7 @@ export function WaitlistCTA() {
             Be first in line when Subly opens to AI agent builders.
           </p>
           <div className="mt-10 flex justify-center">
-            <div className="flex flex-col items-start gap-5">
+            <div className="w-full max-w-[600px]">
               <div
                 id="getWaitlistContainerBottom"
                 data-waitlist_id="31247"

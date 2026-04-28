@@ -85,34 +85,6 @@ export function HeroSection() {
           strategy="afterInteractive"
         />
       </div>
-
-      <style jsx global>{`
-        .subly-waitlist .waitlist-container,
-        .subly-waitlist .waitlist-form,
-        .subly-waitlist form,
-        .subly-waitlist input,
-        .subly-waitlist button {
-          border-radius: 2px !important;
-          font-family: var(--font-mono) !important;
-          text-transform: uppercase;
-          letter-spacing: 0.16em;
-          font-size: 11px !important;
-        }
-        .subly-waitlist input[type="email"] {
-          background: var(--paper) !important;
-          border: 1px solid var(--ink) !important;
-          color: var(--ink) !important;
-        }
-        .subly-waitlist button {
-          background: var(--subly) !important;
-          color: #ffffff !important;
-          border: 1px solid var(--subly) !important;
-        }
-        .subly-waitlist button:hover {
-          background: var(--subly-deep) !important;
-          border-color: var(--subly-deep) !important;
-        }
-      `}</style>
     </section>
   );
 }
