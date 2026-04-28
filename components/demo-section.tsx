@@ -1228,7 +1228,7 @@ function FlowLane({
           />
           <ActorNode
             icon={Landmark}
-            label="Shared vault"
+            label="Private Shared Vault"
             detail="Vault"
             active={depositState !== "idle" || batchState !== "idle"}
             tone="private"
@@ -1304,11 +1304,11 @@ function FlowLane({
           <>
             <EvidenceTile
               icon={EyeOff}
-              label="Not directly visible"
+              label="Hidden from observers"
               value={
                 publicTrailActive
-                  ? "Buyer ATA -> Seller ATA"
-                  : "Direct seller link has not appeared"
+                  ? "No Buyer → Seller transfer in this tx"
+                  : "Vault deposit not made yet"
               }
               tone="private"
             />
@@ -1323,20 +1323,20 @@ function FlowLane({
           <>
             <EvidenceTile
               icon={Eye}
-              label="Observer can infer"
+              label="What an observer learns"
               value={
                 publicTrailActive
-                  ? "Buyer, seller, amount, and timing"
+                  ? "Buyer, seller, amount, and timing — all public"
                   : "Nothing until settlement"
               }
               tone="risk"
             />
             <EvidenceTile
               icon={Server}
-              label="API privacy"
+              label="Buyer ↔ Seller link"
               value={
                 publicTrailActive
-                  ? "The paid provider is linkable"
+                  ? "Permanent on-chain — any explorer can name the seller"
                   : "Payment not broadcast yet"
               }
               tone="neutral"
