@@ -825,7 +825,7 @@ export function DemoSection() {
               value={recipient}
               onChange={(event) => setRecipient(event.target.value)}
               placeholder="Devnet wallet address"
-              className="h-16 min-w-0 flex-1 border border-paper/25 bg-ink px-4 font-mono text-[15px] text-paper outline-none transition-colors placeholder:text-paper/40 focus:border-glow sm:h-12 sm:text-[13px]"
+              className="h-[64px] min-w-0 w-full border border-paper/25 bg-ink px-4 font-mono text-[16px] text-paper outline-none transition-colors placeholder:text-paper/40 focus:border-glow sm:h-12 sm:flex-1 sm:text-[13px]"
             />
             <button
               type="button"
