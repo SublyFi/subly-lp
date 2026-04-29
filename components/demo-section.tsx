@@ -244,7 +244,7 @@ const privacyDemoSteps = [
     label: "Payout",
     phase: "Resolve",
     title: "Seller gets paid.",
-    body: "Subly-x402 does not hide the payout from the seller. They get paid in full. What changes is the on-chain shape: the Vault pays sellers in scheduled batches, so the payout cannot be tied back to any single buyer's call.",
+    body: "Subly-x402 does not hide the payout from the seller. They get paid in full. What changes is the on-chain shape: the Vault pays sellers in batches, so the payout cannot be tied back to any single buyer's call.",
     x402: "The request is already linkable to this seller.",
     subly402:
       "The seller receives a batched payout from the Vault, separate from the buyer's deposit.",
