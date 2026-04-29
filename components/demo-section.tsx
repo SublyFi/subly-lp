@@ -359,6 +359,8 @@ export function DemoSection() {
     runResult?.subly402.settlementStatus?.status === "BatchedOnchain" &&
       runResult?.subly402.settlementStatus?.txSignature
   );
+  const demoBusy =
+    runBusy || (Boolean(sublySettlementId) && !settlementReady);
 
   useEffect(() => {
     void refreshAttestation();
@@ -585,7 +587,7 @@ export function DemoSection() {
           onStepChange={setActiveStep}
           onNextStep={advancePrivacyStep}
           onRunLive={runLivePayment}
-          runBusy={runBusy}
+          runBusy={demoBusy}
           runResult={runResult}
         />
 
@@ -609,10 +611,10 @@ export function DemoSection() {
               <button
                 type="button"
                 onClick={runLivePayment}
-                disabled={runBusy}
+                disabled={demoBusy}
                 className="inline-flex h-11 items-center justify-center gap-2 border border-glow bg-glow px-4 font-mono text-[11px] uppercase tracking-[0.16em] text-ink transition-colors hover:bg-paper disabled:cursor-not-allowed disabled:opacity-60"
               >
-                {runBusy ? (
+                {demoBusy ? (
                   <Loader2 className="h-4 w-4 animate-spin" />
                 ) : (
                   <Play className="h-4 w-4" />
@@ -659,8 +661,10 @@ export function DemoSection() {
                   sublySettlementId ||
                   "Pending"
                 }
-                active={runBusy}
-                done={Boolean(sublySettlementId)}
+                active={
+                  !settlementReady && (runBusy || Boolean(sublySettlementId))
+                }
+                done={settlementReady}
               />
             </div>
 
@@ -1306,7 +1310,8 @@ function FlowLane({
             icon={Store}
             label="Seller wallet"
             detail="Seller"
-            active={batchState !== "idle"}
+            active={batchState === "complete" || batchState === "active"}
+            pending={batchState === "pending"}
             tone="private"
           />
         </div>
@@ -1416,7 +1421,11 @@ function PathFlowSummary({
   batchState: FlowState;
 }) {
   const isSubly = variant === "subly402";
-  const tone: FlowTone = isSubly ? "private" : "risk";
+  const tone: FlowTone = isSubly
+    ? batchState === "complete"
+      ? "resolve"
+      : "private"
+    : "risk";
   const Icon = isSubly ? LockKeyhole : Eye;
   const state = isSubly
     ? batchState === "complete" || batchState === "pending"
@@ -1570,18 +1579,20 @@ function FlowConnector({
   txSignature?: string | null;
 }) {
   const active = state !== "idle";
-  const activeClass =
-    tone === "risk"
-      ? "border-alert bg-alert/10 text-alert"
-      : tone === "resolve"
-        ? "border-glow bg-glow/20 text-ink"
-        : "border-ok bg-ok/10 text-ink";
+  const stateClass =
+    state === "idle"
+      ? "border-ink/15 bg-paper-deep text-ink-muted"
+      : state === "pending"
+        ? "border-glow bg-glow/15 text-ink"
+        : tone === "risk"
+          ? "border-alert bg-alert/10 text-alert"
+          : tone === "resolve"
+            ? "border-glow bg-glow/20 text-ink"
+            : "border-ok bg-ok/10 text-ink";
 
   return (
     <div
-      className={`flex h-full min-h-[80px] items-center justify-center gap-2 border px-2 text-center transition-colors md:h-[200px] md:flex-col ${
-        active ? activeClass : "border-ink/15 bg-paper-deep text-ink-muted"
-      }`}
+      className={`flex h-full min-h-[80px] items-center justify-center gap-2 border px-2 text-center transition-colors md:h-[200px] md:flex-col ${stateClass}`}
     >
       <ArrowRight
         className={`h-5 w-5 rotate-90 md:rotate-0 ${
