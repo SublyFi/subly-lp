@@ -558,8 +558,8 @@ export function DemoSection() {
               </span>
               <span className="mt-4 block font-feature text-[28px] font-normal leading-[1.15] text-paper/85 md:text-[40px] lg:text-[52px]">
                 Same API call.{" "}
-                <span className="text-subly-glow">Different</span> payment
-                edge.
+                <span className="text-subly-glow">Different</span> on-chain
+                trail.
               </span>
             </h2>
           </div>
@@ -1399,7 +1399,7 @@ function FlowLane({
               label="Buyer ↔ Seller link"
               value={
                 publicTrailActive
-                  ? "Permanent on-chain. Any explorer can name the seller"
+                  ? "Visible to anyone reading the chain"
                   : "Payment not broadcast yet"
               }
               tone="neutral"
