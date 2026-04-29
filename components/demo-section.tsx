@@ -233,9 +233,9 @@ const privacyDemoSteps = [
     phase: "Reveal",
     title: "The visible payment edge is different.",
     body: "This is the core point: official x402 exposes who paid which seller. Subly-x402 only shows that the buyer funded the shared Vault. It does not reveal which seller the buyer actually called.",
-    x402: "Explorer shows Buyer -> Seller.",
+    x402: "The explorer shows the buyer paying the seller directly.",
     subly402:
-      "Explorer shows Buyer -> Vault. No direct Buyer -> Seller transfer appears in the buyer request.",
+      "The explorer only shows the buyer depositing into the Vault. The buyer's request never produces a direct transfer to the seller.",
     observer:
       "A block explorer can link buyer and seller in x402. With Subly-x402, that direct link is not visible.",
   },
@@ -247,7 +247,7 @@ const privacyDemoSteps = [
     body: "Subly-x402 does not hide the payout from the seller. They get paid in full. What changes is the on-chain shape: the Vault pays sellers in scheduled batches, so the payout cannot be tied back to any single buyer's call.",
     x402: "The request is already linkable to this seller.",
     subly402:
-      "Seller receives a batched Vault -> Seller payout, separate from the buyer deposit.",
+      "The seller receives a batched payout from the Vault, separate from the buyer's deposit.",
     observer:
       "The seller payout is visible, but it is no longer the same onchain edge as the buyer's API call.",
   },
@@ -1223,14 +1223,14 @@ function FlowLane({
 
   const visibleValue = isSubly
     ? runResult?.subly402.depositTx
-      ? "Buyer -> Vault"
+      ? "The buyer's deposit into the Vault"
       : publicTrailActive
-        ? "Buyer -> Vault"
+        ? "The buyer's deposit into the Vault"
         : "Waiting for vault deposit"
     : runResult?.x402.settlementTx
-      ? "Buyer -> Seller"
+      ? "A direct transfer from the buyer to the seller"
       : publicTrailActive
-        ? "Buyer -> Seller"
+        ? "A direct transfer from the buyer to the seller"
         : "Waiting for direct payment";
 
   const payoutValue = runResult?.subly402.settlementStatus?.txSignature
@@ -1238,7 +1238,7 @@ function FlowLane({
     : runResult?.subly402.settlementStatus?.status === "SettledOffchain"
       ? "Batch pending"
     : payoutActive
-      ? "Vault -> Seller batch"
+      ? "The Vault paying the seller as a batch"
       : "Not paid out yet";
 
   return (
@@ -1370,7 +1370,7 @@ function FlowLane({
               label="Hidden from observers"
               value={
                 publicTrailActive
-                  ? "No direct Buyer → Seller transfer in this tx"
+                  ? "The buyer's tx never sends funds straight to the seller"
                   : "Vault deposit not made yet"
               }
               tone="private"
@@ -1445,13 +1445,13 @@ function PathFlowSummary({
 
   const body = isSubly
     ? batchState === "complete"
-      ? "The buyer-facing transfer is Buyer -> Vault. After the batch succeeds, the final highlighted edge is Vault -> Seller."
+      ? "The only buyer-facing transfer goes into the Vault. Once the batch succeeds, the Vault pays the seller in a separate transfer."
       : depositState === "complete" || batchState === "pending"
-        ? "The visible buyer transaction stops at the Vault. The Seller edge stays pending until the batch payout succeeds."
-        : "The first highlighted edge is Buyer -> Vault. The second edge appears only after Subly-x402 batch payout succeeds."
+        ? "The visible buyer transaction stops at the Vault. The seller payout stays pending until the batch settles."
+        : "The first highlighted step is the buyer depositing into the Vault. The seller payout only lights up once the Subly-x402 batch settles."
     : directState === "complete"
-      ? "The highlighted edge is the payment: Buyer -> Seller. That direct edge is what stays visible onchain."
-      : "When the proof runs, the payment edge is Buyer -> Seller. That direct edge is what becomes visible onchain.";
+      ? "The highlighted step is the buyer paying the seller directly. That direct transfer is what stays visible onchain."
+      : "When the proof runs, the buyer pays the seller directly. That direct transfer is what becomes visible onchain.";
 
   return (
     <div className="mt-5 border border-ink/10 bg-white p-4">
