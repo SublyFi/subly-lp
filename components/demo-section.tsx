@@ -1876,18 +1876,6 @@ function ComparePanel({
         ))}
       </div>
 
-      <div className="flex items-center justify-between border-t border-paper/15 p-4 font-mono text-[10px] uppercase tracking-[0.18em] text-paper/45">
-        <span>No Subly API key</span>
-        <a
-          href="https://docs.x402.org"
-          target="_blank"
-          rel="noreferrer"
-          className="inline-flex items-center gap-2 transition-colors hover:text-glow"
-        >
-          x402 style
-          <ExternalLink className="h-3.5 w-3.5" />
-        </a>
-      </div>
     </div>
   );
 }
