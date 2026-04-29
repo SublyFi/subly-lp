@@ -831,7 +831,7 @@ export function DemoSection() {
               type="button"
               onClick={requestTestUsdc}
               disabled={faucetBusy || recipient.length < 32}
-              className="inline-flex h-16 items-center justify-center gap-2 border border-paper/25 px-5 font-mono text-[12px] uppercase tracking-[0.18em] text-paper transition-colors hover:border-glow hover:text-glow disabled:cursor-not-allowed disabled:opacity-50 sm:h-12 sm:px-4 sm:text-[11px] sm:tracking-[0.16em]"
+              className="inline-flex h-12 items-center justify-center gap-2 border border-paper/25 px-5 font-mono text-[12px] uppercase tracking-[0.18em] text-paper transition-colors hover:border-glow hover:text-glow disabled:cursor-not-allowed disabled:opacity-50 sm:h-12 sm:px-4 sm:text-[11px] sm:tracking-[0.16em]"
             >
               {faucetBusy ? (
                 <Loader2 className="h-4 w-4 animate-spin" />
