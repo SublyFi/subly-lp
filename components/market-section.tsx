@@ -50,8 +50,8 @@ export function MarketSection() {
           </div>
           <div className="md:col-span-5">
             <p className="font-feature text-[22px] leading-[1.4] text-ink md:text-[24px]">
-              Autonomous agents are about to become the largest single
-              consumer of paid APIs.
+              Agents are becoming one of the fastest-growing consumers of
+              paid APIs.
             </p>
             <p className="mt-5 font-sans text-[14px] leading-[1.75] text-ink-soft">
               Subly starts with API Payments via AI Agents: the per-call API

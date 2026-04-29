@@ -96,13 +96,10 @@ export function SolutionSection() {
 
         {/* Mechanism timeline */}
         <div className="mt-20">
-          <div className="mb-10 flex items-baseline justify-between">
+          <div className="mb-10">
             <h3 className="font-display text-[32px] font-semibold tracking-tight text-ink md:text-[42px]">
               How it works.
             </h3>
-            <span className="font-mono text-[10px] uppercase tracking-[0.24em] text-ink-muted">
-              fig. 02 · capital flow
-            </span>
           </div>
           <ol className="relative grid gap-0 md:grid-cols-3">
             <span

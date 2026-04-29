@@ -32,17 +32,17 @@ export function PrivacySection() {
               ▌ Privacy
             </div>
             <h2 className="mt-3 font-display text-[52px] font-semibold leading-[0.95] tracking-tight md:text-[72px]">
-              How the Buyer ↔ Seller{" "}
-              <span className="font-feature text-subly-glow">link breaks.</span>
+              What Subly{" "}
+              <span className="font-feature text-subly-glow">keeps private.</span>
             </h2>
           </div>
           <div className="md:col-span-5">
             <p className="font-sans text-[15px] leading-[1.75] text-paper/85 md:text-[16px]">
               Subly&apos;s on-chain programs, including the Shared Vault, are
-              encrypted by Arcium. The per-buyer ledger lives inside an AWS
-              Nitro Enclave. Once Solana&apos;s Confidential SPL transfers reach
-              mainnet, Subly plans to integrate them so vault transfer amounts
-              can also stay private.
+              encrypted by Arcium. The per-buyer ledger lives inside a TEE.
+              Once Solana&apos;s Confidential SPL transfers reach mainnet,
+              Subly plans to integrate them so vault transfer amounts can
+              also stay private.
             </p>
           </div>
         </div>
@@ -54,12 +54,12 @@ export function PrivacySection() {
             logo="/ArciumWhite.svg"
             logoAlt="Arcium"
             logoAsTitle
-            body="Subly's on-chain programs, including the Shared Vault that holds user funds, are encrypted by Arcium. Solana executes them and verifies the result, but never sees their internal state in the clear."
+            body="Subly's on-chain programs, including the Shared Vault that holds user funds, are encrypted by Arcium. The on-chain data stays encrypted end to end, and computation runs directly over the ciphertext without ever decrypting it."
           />
           <Pillar
             kicker="Off-chain ledger"
             title="AWS Nitro Enclave"
-            body="When a buyer deposits into the Shared Vault, the per-buyer accounting that tracks who spent what is kept inside an AWS Nitro Enclave. Balances live in attested memory, and the host machine only ever sees ciphertext. The same ledger can be opened to a regulator or auditor on the buyer's terms."
+            body="The per-buyer accounting that tracks who spent what is kept off-chain inside a TEE instead of on Solana. The ledger can still be opened to a regulator or auditor on the buyer's terms."
           />
           <Pillar
             kicker="Coming next"

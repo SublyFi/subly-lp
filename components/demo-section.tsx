@@ -575,10 +575,10 @@ export function DemoSection() {
               by routing settlement through the Private Shared Vault.
             </p>
             <p className="mt-6 max-w-xl text-[14px] leading-[1.7] text-paper/70">
-              The live proof below calls the same Seller twice: once through
-              official x402, once through Subly-x402. The API response is
-              identical. What changes is the visible on-chain trail and
-              whether any observer can tell who paid whom.
+              The live proof below calls the same Seller twice. One call goes
+              through official x402, the other through Subly-x402. The API
+              response is identical. What changes is the visible on-chain
+              trail and whether any observer can tell who paid whom.
             </p>
           </div>
         </div>
@@ -825,13 +825,13 @@ export function DemoSection() {
               value={recipient}
               onChange={(event) => setRecipient(event.target.value)}
               placeholder="Devnet wallet address"
-              className="h-14 min-w-0 flex-1 border border-paper/25 bg-ink px-4 font-mono text-[14px] text-paper outline-none transition-colors placeholder:text-paper/40 focus:border-glow sm:h-12 sm:text-[13px]"
+              className="h-16 min-w-0 flex-1 border border-paper/25 bg-ink px-4 font-mono text-[15px] text-paper outline-none transition-colors placeholder:text-paper/40 focus:border-glow sm:h-12 sm:text-[13px]"
             />
             <button
               type="button"
               onClick={requestTestUsdc}
               disabled={faucetBusy || recipient.length < 32}
-              className="inline-flex h-14 items-center justify-center gap-2 border border-paper/25 px-5 font-mono text-[12px] uppercase tracking-[0.18em] text-paper transition-colors hover:border-glow hover:text-glow disabled:cursor-not-allowed disabled:opacity-50 sm:h-12 sm:px-4 sm:text-[11px] sm:tracking-[0.16em]"
+              className="inline-flex h-16 items-center justify-center gap-2 border border-paper/25 px-5 font-mono text-[12px] uppercase tracking-[0.18em] text-paper transition-colors hover:border-glow hover:text-glow disabled:cursor-not-allowed disabled:opacity-50 sm:h-12 sm:px-4 sm:text-[11px] sm:tracking-[0.16em]"
             >
               {faucetBusy ? (
                 <Loader2 className="h-4 w-4 animate-spin" />
@@ -867,7 +867,7 @@ export function DemoSection() {
             </div>
             <div className="md:col-span-5">
               <p className="font-feature text-[20px] leading-[1.4] text-paper md:text-[22px]">
-                Subly-x402 ships as two open-source packages — a Buyer SDK
+                Subly-x402 ships as two open-source packages. A Buyer SDK
                 and Express middleware for Sellers. Drop them into any
                 TypeScript project. There is no API key, no gatekeeper.
               </p>

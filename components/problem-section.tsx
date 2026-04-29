@@ -25,7 +25,7 @@ export function ProblemSection() {
           <div className="md:col-span-5">
             <p className="font-sans text-[16px] leading-[1.7] text-ink-soft md:text-[17px]">
               x402 lets agents pay providers over HTTP. It still leaves two
-              gaps — durable funding and payment privacy.
+              gaps. Durable funding and payment privacy.
             </p>
           </div>
         </div>
