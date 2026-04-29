@@ -867,8 +867,8 @@ export function DemoSection() {
             </div>
             <div className="md:col-span-5">
               <p className="font-feature text-[20px] leading-[1.4] text-paper md:text-[22px]">
-                Subly-x402 ships as two open-source packages: a Buyer SDK and
-                Express middleware for Sellers. Drop them into any
+                Subly-x402 ships as two open-source packages — a Buyer SDK
+                and Express middleware for Sellers. Drop them into any
                 TypeScript project. There is no API key, no gatekeeper.
               </p>
             </div>
