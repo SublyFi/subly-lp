@@ -565,13 +565,14 @@ export function DemoSection() {
           </div>
           <div className="md:col-span-5">
             <p className="font-feature text-[24px] leading-[1.3] text-paper md:text-[28px]">
-              Press through the flow. Official x402 settles each call as a
-              direct Buyer&nbsp;→&nbsp;Seller transfer. That on-chain edge is
-              permanent. Subly-x402 keeps the same HTTP flow, but{" "}
+              Press through the flow. With official x402, each call settles as
+              a direct USDC transfer from the buyer&apos;s wallet to the
+              seller, so anyone reading the chain can see exactly which buyer
+              paid which seller. Subly-x402 keeps the same HTTP flow, but{" "}
               <span className="text-subly-glow">
-                breaks the on-chain link between Buyer and Seller
+                hides the link between buyer and seller on-chain
               </span>{" "}
-              by routing settlement through an attested Vault.
+              by routing settlement through the Private Shared Vault.
             </p>
             <p className="mt-6 max-w-xl text-[14px] leading-[1.7] text-paper/70">
               The live proof below calls the same Seller twice: once through
