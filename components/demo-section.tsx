@@ -601,13 +601,11 @@ export function DemoSection() {
                   Live on-chain proof · Solana devnet
                 </div>
                 <p className="mt-3 max-w-2xl text-[13px] leading-[1.6] text-paper/75">
-                  Press <span className="text-glow">Run live demo</span> and
-                  the hosted buyer makes two real x402 calls against the same
-                  seller: one through Official x402 and one through
-                  Subly-x402.
-                  The three cards below light up with the actual on-chain
-                  transactions as they confirm on devnet, so you can see for
-                  yourself which on-chain trails become public.
+                  Press <span className="text-glow">Run live demo</span> to
+                  fill the flow above with real Solana devnet transactions.
+                  Below you can verify the Vault, Signer, and Policy this
+                  demo is using, plus the confirmed tx hashes once the run
+                  completes.
                 </p>
               </div>
               <button
@@ -623,51 +621,6 @@ export function DemoSection() {
                 )}
                 Run live demo
               </button>
-            </div>
-
-            <div className="grid border-b border-paper/15 md:grid-cols-3">
-              <StepCell
-                n="01"
-                label="Official x402: Buyer → Seller"
-                description="A direct USDC transfer from buyer to seller. This linkable on-chain trail stays readable forever."
-                value={
-                  runResult?.x402.settlementTx
-                    ? "Settlement tx confirmed"
-                    : attestation?.routes?.x402
-                      ? "Ready · awaiting Run live demo"
-                      : "Pending"
-                }
-                active={runBusy}
-                done={Boolean(runResult?.x402.settlementTx)}
-              />
-              <StepCell
-                n="02"
-                label="Subly-x402: Buyer → Vault"
-                description="The buyer deposits into the Private Shared Vault. This is the only on-chain tx tied to the buyer in Subly-x402."
-                value={
-                  runResult?.subly402.depositTx
-                    ? "Vault deposit confirmed"
-                    : attestation?.routes?.subly402
-                      ? "Ready · awaiting Run live demo"
-                      : "Pending"
-                }
-                active={runBusy}
-                done={Boolean(runResult?.subly402.depositTx)}
-              />
-              <StepCell
-                n="03"
-                label="Subly-x402: Vault → Seller"
-                description="A batched payout from the Vault to the seller. Settled later on the Vault's own schedule, so it can't be tied back to the buyer's call."
-                value={
-                  runResult?.subly402.settlementStatus?.status ||
-                  sublySettlementId ||
-                  "Pending"
-                }
-                active={
-                  !settlementReady && (runBusy || Boolean(sublySettlementId))
-                }
-                done={settlementReady}
-              />
             </div>
 
             <div className="border-b border-paper/15 bg-glow/10 p-5">
@@ -1678,46 +1631,6 @@ function VerdictRow({
         {label}
       </span>
       <span className="text-[12px] leading-[1.4] text-ink-soft">{value}</span>
-    </div>
-  );
-}
-
-function StepCell({
-  n,
-  label,
-  description,
-  active,
-  done,
-}: {
-  n: string;
-  label: string;
-  description?: string;
-  value?: string | number | null;
-  active: boolean;
-  done: boolean;
-}) {
-  return (
-    <div className="flex min-h-[160px] flex-col border-b border-paper/15 p-5 last:border-b-0 md:border-b-0 md:border-r md:last:border-r-0">
-      <div className="flex items-center justify-between">
-        <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-paper/50">
-          {n}
-        </span>
-        {done ? (
-          <CheckCircle2 className="h-4 w-4 text-glow" />
-        ) : active ? (
-          <Loader2 className="h-4 w-4 animate-spin text-glow" />
-        ) : (
-          <span className="h-2 w-2 rounded-full bg-paper/25" />
-        )}
-      </div>
-      <div className="mt-4 font-display text-[20px] font-semibold leading-[1.1] text-paper md:text-[22px]">
-        {label}
-      </div>
-      {description && (
-        <p className="mt-2 text-[12px] leading-[1.55] text-paper/65">
-          {description}
-        </p>
-      )}
     </div>
   );
 }
