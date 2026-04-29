@@ -45,6 +45,17 @@ export const metadata: Metadata = {
     description:
       "Privacy-first PayFi for AI agents. Try a live Subly-x402 devnet payment and see x402-style integrations without API keys.",
     type: "website",
+    url: "https://www.sublyfi.com",
+    siteName: "Subly",
+    images: [
+      {
+        url: "https://www.sublyfi.com/og-image.png",
+        width: 1200,
+        height: 630,
+        type: "image/png",
+        alt: "Subly: Use Now, Pay Never",
+      },
+    ],
   },
   twitter: {
     card: "summary_large_image",
@@ -53,6 +64,7 @@ export const metadata: Metadata = {
     title: "Subly: Use Now, Pay Never",
     description:
       "Privacy-first PayFi for AI agents. Live Subly-x402 devnet demo, faucet, and integration snippets.",
+    images: ["https://www.sublyfi.com/og-image.png"],
   },
 };
 
