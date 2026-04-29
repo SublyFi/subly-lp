@@ -629,9 +629,9 @@ export function DemoSection() {
               </div>
               <p className="mt-2 max-w-3xl text-[12px] leading-[1.6] text-paper/70">
                 This hosted proof targets an approximately 1 minute Subly-x402
-                batch so the Vault -&gt; Seller movement is visible during the
-                demo. Public deployments should use longer anonymity windows;
-                low-volume 1 minute batches can make participant correlation
+                batch so the Vault payout to the seller is visible during the
+                demo. Public deployments should use longer anonymity windows.
+                Low-volume 1 minute batches can make participant correlation
                 easier.
               </p>
             </div>
