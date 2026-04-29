@@ -213,7 +213,7 @@ const privacyDemoSteps = [
     subly402:
       "The seller's 402 challenge points the buyer at an attested Subly vault policy.",
     observer:
-      "No transfer has settled yet. The observer is waiting to see which onchain edge appears.",
+      "No transfer has settled yet. The observer is waiting to see which on-chain trail appears.",
   },
   {
     n: "02",
@@ -225,13 +225,13 @@ const privacyDemoSteps = [
     subly402:
       "Buyer signs a vault deposit and a paid request bound to the attested policy.",
     observer:
-      "x402 creates a buyer-to-seller edge. Subly-x402 creates a buyer-to-vault edge.",
+      "Official x402 puts a direct payment from the buyer to the seller on-chain. Subly-x402 puts a deposit from the buyer into the Vault instead.",
   },
   {
     n: "03",
-    label: "Visible edge",
+    label: "On-chain trail",
     phase: "Reveal",
-    title: "The visible payment edge is different.",
+    title: "The on-chain trail is different.",
     body: "This is the core point: official x402 exposes who paid which seller. Subly-x402 only shows that the buyer funded the shared Vault. It does not reveal which seller the buyer actually called.",
     x402: "The explorer shows the buyer paying the seller directly.",
     subly402:
@@ -249,7 +249,7 @@ const privacyDemoSteps = [
     subly402:
       "The seller receives a batched payout from the Vault, separate from the buyer's deposit.",
     observer:
-      "The seller payout is visible, but it is no longer the same onchain edge as the buyer's API call.",
+      "The seller payout is visible, but it no longer shares an on-chain trail with the buyer's API call.",
   },
 ] as const;
 
@@ -577,8 +577,8 @@ export function DemoSection() {
             <p className="mt-6 max-w-xl text-[14px] leading-[1.7] text-paper/70">
               The live proof below calls the same Seller twice: once through
               official x402, once through Subly-x402. The API response is
-              identical. What changes is the visible on-chain edge and whether
-              any observer can tell who paid whom.
+              identical. What changes is the visible on-chain trail and
+              whether any observer can tell who paid whom.
             </p>
           </div>
         </div>
@@ -607,7 +607,7 @@ export function DemoSection() {
                   Subly-x402.
                   The three cards below light up with the actual on-chain
                   transactions as they confirm on devnet, so you can see for
-                  yourself which payment edges become public.
+                  yourself which on-chain trails become public.
                 </p>
               </div>
               <button
@@ -629,7 +629,7 @@ export function DemoSection() {
               <StepCell
                 n="01"
                 label="Official x402: Buyer → Seller"
-                description="A direct USDC transfer from buyer to seller. This linkable on-chain edge stays readable forever."
+                description="A direct USDC transfer from buyer to seller. This linkable on-chain trail stays readable forever."
                 value={
                   runResult?.x402.settlementTx
                     ? "Settlement tx confirmed"
@@ -780,7 +780,7 @@ export function DemoSection() {
                     />
                     <FlowPanel
                       title="Official x402"
-                      subtitle="direct settlement edge"
+                      subtitle="direct settlement transfer"
                       flow={runResult.x402}
                       onCopy={copy}
                     />
@@ -1073,7 +1073,7 @@ function PrivacyStoryboard({
         <div className="border-b border-ink/10 p-5 lg:border-b-0 lg:border-r">
           <div className="flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.22em] text-ink-muted">
             <ShieldCheck className="h-4 w-4 text-ok" />
-            Press to reveal the payment edge
+            Press to reveal the on-chain trail
           </div>
           <h3 className="mt-4 font-display text-[34px] font-semibold leading-[0.98] text-ink md:text-[46px]">
             {step.title}
