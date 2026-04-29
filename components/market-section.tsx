@@ -54,9 +54,9 @@ export function MarketSection() {
               consumer of paid APIs.
             </p>
             <p className="mt-5 font-sans text-[14px] leading-[1.75] text-ink-soft">
-              We start by targeting API Payments via AI Agents — the per-call
-              API payments an agent makes via x402-style HTTP 402 — and grow
-              into the broader agent economy from there.
+              Subly starts with API Payments via AI Agents: the per-call API
+              payments an agent makes through x402-style HTTP 402. From there,
+              it can grow into the broader agent economy.
             </p>
           </div>
         </div>

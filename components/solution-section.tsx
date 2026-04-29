@@ -3,21 +3,21 @@ const FLOW_STEPS = [
     n: "01",
     tag: "DEPOSIT",
     title: "Deposit once.",
-    body: "The agent makes a single USDC transfer into the shared Subly vault. No top-ups, no human supervision after that.",
+    body: "The agent makes one USDC transfer into the shared Subly vault. After that, payments can keep running without manual top-ups.",
     ornament: "$",
   },
   {
     n: "02",
     tag: "EARN",
     title: "Earn yield.",
-    body: "The vault routes capital into DeFi, targeting 10%+ APY. Principal stays put; only the yield is used to fund payments.",
+    body: "The vault routes capital into DeFi with a 10%+ APY target. Principal stays put, and yield funds the agent's calls.",
     ornament: "%",
   },
   {
     n: "03",
     tag: "PAY",
     title: "Pay providers.",
-    body: "Buyers call providers via x402-style HTTP. The TEE keeps the per-buyer ledger off-chain and instructs the on-chain shared vault to pay sellers in delayed batches, so observers can't link Buyer to Seller.",
+    body: "Buyers call providers through x402-style HTTP. A TEE keeps per-buyer accounting private and schedules batched vault payouts, so observers cannot link Buyer to Seller.",
     ornament: "→",
   },
 ];
@@ -51,18 +51,18 @@ export function SolutionSection() {
               <span className="font-feature">Pay agents privately.</span>
             </h2>
             <p className="mt-8 max-w-xl font-feature text-[20px] leading-[1.4] text-ink md:text-[24px]">
-              Turn your yield into AI agent payments without revealing
-              anything.
+              Turn yield into agent payments without exposing who your agent
+              paid.
             </p>
           </div>
           <div className="md:col-span-5">
             <p className="font-sans text-[15px] leading-[1.75] text-ink-soft md:text-[16px]">
               An agent deposits USDC into Subly once. The vault earns DeFi
-              yield, and that yield is what pays for x402 calls — the
-              principal never leaves. Settlement flows through an on-chain
-              shared vault, with the per-buyer ledger kept inside a TEE that
-              schedules the payouts, so the on-chain Buyer → Seller link that
-              x402 normally exposes is broken.
+              yield that pays for x402 calls while the principal remains
+              withdrawable. Settlement flows through an on-chain shared vault,
+              and a TEE keeps per-buyer accounting private while scheduling
+              payouts. The direct Buyer-to-Seller link that x402 normally
+              exposes disappears.
             </p>
           </div>
         </div>
@@ -80,16 +80,16 @@ export function SolutionSection() {
             mid
             kicker="02 · Yield"
             title="Yield funds the payments."
-            body="Deposited capital earns yield in DeFi, with a 10%+ APY target. The yield — not the principal — is what funds your agent's calls."
+            body="Deposited capital earns yield in DeFi, with a 10%+ APY target. Yield, not principal, funds your agent's calls."
             metric="10%+"
             metricLabel="APY target"
           />
           <Pillar
             kicker="03 · Privacy"
-            title="Buyer ↔ Seller link, broken."
-            body="Buyers and sellers still use x402-style HTTP. Payments flow into the on-chain shared vault first; the TEE keeps the per-buyer ledger off-chain and triggers vault payouts in delayed batches, so the direct on-chain link disappears."
+            title="Buyer-to-Seller link removed."
+            body="Buyers and sellers still use x402-style HTTP. Payments flow into the on-chain shared vault first. The TEE keeps the per-buyer ledger off-chain and triggers delayed vault payouts, so the direct on-chain link disappears."
             metric="0"
-            metricLabel="Buyer↔Seller links"
+            metricLabel="Buyer/Seller links"
             accent
           />
         </div>

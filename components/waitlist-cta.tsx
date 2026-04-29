@@ -26,7 +26,7 @@ export function WaitlistCTA() {
             <span className="font-feature text-subly">waitlist.</span>
           </h2>
           <p className="mt-6 mx-auto max-w-xl font-feature text-[20px] leading-[1.4] text-ink md:text-[24px]">
-            Be first in line when Subly opens to AI agent builders.
+            Join early access for AI agent builders.
           </p>
           <div className="mt-10 flex justify-center">
             <div className="w-full max-w-[600px]">

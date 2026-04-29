@@ -24,9 +24,8 @@ export function ProblemSection() {
           </div>
           <div className="md:col-span-5">
             <p className="font-sans text-[16px] leading-[1.7] text-ink-soft md:text-[17px]">
-              x402 gave agents a way to pay providers over HTTP. But it didn't
-              solve who funds them, and it didn't address the privacy of what
-              they buy.
+              x402 lets agents pay providers over HTTP. It still leaves two
+              gaps: durable funding and payment privacy.
             </p>
           </div>
         </div>
@@ -43,7 +42,7 @@ export function ProblemSection() {
             <p className="mt-4 font-sans text-[15px] leading-[1.7] text-ink-soft">
               An agent's wallet runs out. A human has to top it up. Then it
               runs out again. The autonomy stops the moment the balance hits
-              zero — and somebody has to be there to refill it.
+              zero, and somebody has to be there to refill it.
             </p>
           </article>
 
@@ -55,10 +54,10 @@ export function ProblemSection() {
               x402 ties the Buyer to the Seller.
             </h3>
             <p className="mt-4 font-sans text-[15px] leading-[1.7] text-ink-soft">
-              Every x402 payment settles as a direct Buyer → Seller transfer
-              on-chain. What an agent buys, from whom, and when — all become a
-              public, permanent record. That isn't a privacy-preserving
-              payment protocol.
+              Every x402 payment settles as a direct transfer from Buyer to
+              Seller on-chain. Anyone can see what an agent bought, who it
+              paid, and when. That is not privacy-preserving payment
+              infrastructure.
             </p>
           </article>
         </div>

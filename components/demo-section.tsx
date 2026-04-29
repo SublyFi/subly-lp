@@ -220,7 +220,7 @@ const privacyDemoSteps = [
     label: "Payment",
     phase: "Commit",
     title: "The buyer signs payment.",
-    body: "Official x402 pays the seller directly. Subly-x402 keeps the same x402-style HTTP retry flow, but the buyer deposits into a shared user Vault — the same Vault every Subly buyer uses — after verifying the enclave attestation.",
+    body: "Official x402 pays the seller directly. Subly-x402 keeps the same x402-style HTTP retry flow. After verifying enclave attestation, the buyer deposits into the shared user Vault used by Subly buyers.",
     x402: "Buyer signs a direct USDC transfer to the seller.",
     subly402:
       "Buyer signs a vault deposit and a paid request bound to the attested policy.",
@@ -232,7 +232,7 @@ const privacyDemoSteps = [
     label: "Visible edge",
     phase: "Reveal",
     title: "The visible payment edge is different.",
-    body: "This is the core point: official x402 exposes who paid which seller. Subly-x402 only exposes that the buyer funded the shared Vault — never which seller they actually called.",
+    body: "This is the core point: official x402 exposes who paid which seller. Subly-x402 only shows that the buyer funded the shared Vault. It does not reveal which seller the buyer actually called.",
     x402: "Explorer shows Buyer -> Seller.",
     subly402:
       "Explorer shows Buyer -> Vault. No direct Buyer -> Seller transfer appears in the buyer request.",
@@ -244,7 +244,7 @@ const privacyDemoSteps = [
     label: "Payout",
     phase: "Resolve",
     title: "Seller gets paid.",
-    body: "Subly-x402 doesn't hide the payout from the seller — they get paid in full. What changes is the on-chain shape: the Vault pays sellers in batches on its own schedule, so the Vault → Seller payout cannot be tied back to any single buyer's call.",
+    body: "Subly-x402 does not hide the payout from the seller. They get paid in full. What changes is the on-chain shape: the Vault pays sellers in scheduled batches, so the payout cannot be tied back to any single buyer's call.",
     x402: "The request is already linkable to this seller.",
     subly402:
       "Seller receives a batched Vault -> Seller payout, separate from the buyer deposit.",
@@ -566,8 +566,8 @@ export function DemoSection() {
           <div className="md:col-span-5">
             <p className="font-feature text-[24px] leading-[1.3] text-paper md:text-[28px]">
               Press through the flow. Official x402 settles each call as a
-              direct Buyer&nbsp;→&nbsp;Seller transfer — and that on-chain edge
-              is permanent. Subly-x402 keeps the same HTTP flow, but{" "}
+              direct Buyer&nbsp;→&nbsp;Seller transfer. That on-chain edge is
+              permanent. Subly-x402 keeps the same HTTP flow, but{" "}
               <span className="text-subly-glow">
                 breaks the on-chain link between Buyer and Seller
               </span>{" "}
@@ -576,8 +576,8 @@ export function DemoSection() {
             <p className="mt-6 max-w-xl text-[14px] leading-[1.7] text-paper/70">
               The live proof below calls the same Seller twice: once through
               official x402, once through Subly-x402. The API response is
-              identical. What changes is the visible on-chain edge — and
-              whether any observer can tell who paid whom.
+              identical. What changes is the visible on-chain edge and whether
+              any observer can tell who paid whom.
             </p>
           </div>
         </div>
@@ -602,7 +602,8 @@ export function DemoSection() {
                 <p className="mt-3 max-w-2xl text-[13px] leading-[1.6] text-paper/75">
                   Press <span className="text-glow">Run live demo</span> and
                   the hosted buyer makes two real x402 calls against the same
-                  seller — one through Official x402, one through Subly-x402.
+                  seller: one through Official x402 and one through
+                  Subly-x402.
                   The three cards below light up with the actual on-chain
                   transactions as they confirm on devnet, so you can see for
                   yourself which payment edges become public.
@@ -627,7 +628,7 @@ export function DemoSection() {
               <StepCell
                 n="01"
                 label="Official x402: Buyer → Seller"
-                description="A direct USDC transfer from buyer to seller. This is the linkable on-chain edge — anyone can read it forever."
+                description="A direct USDC transfer from buyer to seller. This linkable on-chain edge stays readable forever."
                 value={
                   runResult?.x402.settlementTx
                     ? "Settlement tx confirmed"
@@ -850,7 +851,7 @@ export function DemoSection() {
           </div>
         </div>
 
-        {/* Test USDC faucet — its own row below the Live proof */}
+        {/* Test USDC faucet: its own row below the Live proof */}
         <div className="mt-6 border border-paper/20 bg-paper/5 p-5 md:p-7">
           <div className="grid gap-6 md:grid-cols-[1fr_auto] md:items-start">
             <div className="min-w-0">
@@ -899,7 +900,7 @@ export function DemoSection() {
           )}
         </div>
 
-        {/* For developers — install + Seller/Buyer code comparison */}
+        {/* For developers: install + Seller/Buyer code comparison */}
         <div className="mt-20 border-t border-paper/15 pt-16">
           <div className="mb-10 grid gap-6 md:grid-cols-12">
             <div className="md:col-span-7">
@@ -912,8 +913,8 @@ export function DemoSection() {
             </div>
             <div className="md:col-span-5">
               <p className="font-feature text-[20px] leading-[1.4] text-paper md:text-[22px]">
-                Subly-x402 ships as two open-source packages — a Buyer SDK and
-                an Express middleware for Sellers. Drop them into any
+                Subly-x402 ships as two open-source packages: a Buyer SDK and
+                Express middleware for Sellers. Drop them into any
                 TypeScript project; there is no API key, no gatekeeper.
               </p>
             </div>
@@ -966,7 +967,7 @@ export function DemoSection() {
                   <span className="h-2.5 w-2.5 rounded-full bg-glow/70" />
                   <span className="h-2.5 w-2.5 rounded-full bg-ok/80" />
                   <span className="ml-3 font-mono text-[10px] uppercase tracking-[0.22em] text-paper/45">
-                    zsh — install
+                    zsh: install
                   </span>
                 </div>
                 <button
@@ -998,7 +999,7 @@ export function DemoSection() {
             </div>
           </div>
 
-          {/* Seller and Buyer code comparison — each panel takes full width */}
+          {/* Seller and Buyer code comparison: each panel takes full width */}
           <div className="mt-10 space-y-10">
             <ComparePanel
               title="Seller"
@@ -1387,7 +1388,7 @@ function FlowLane({
               label="What an observer learns"
               value={
                 publicTrailActive
-                  ? "Buyer, seller, amount, and timing — all public"
+                  ? "Buyer, seller, amount, and timing are all public"
                   : "Nothing until settlement"
               }
               tone="risk"
@@ -1397,7 +1398,7 @@ function FlowLane({
               label="Buyer ↔ Seller link"
               value={
                 publicTrailActive
-                  ? "Permanent on-chain — any explorer can name the seller"
+                  ? "Permanent on-chain. Any explorer can name the seller"
                   : "Payment not broadcast yet"
               }
               tone="neutral"

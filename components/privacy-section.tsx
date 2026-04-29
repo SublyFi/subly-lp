@@ -38,11 +38,11 @@ export function PrivacySection() {
           </div>
           <div className="md:col-span-5">
             <p className="font-sans text-[15px] leading-[1.75] text-paper/85 md:text-[16px]">
-              Subly&apos;s on-chain programs — including the Shared Vault — are
-              encrypted by Arcium, while the per-buyer ledger lives inside an
-              AWS Nitro Enclave. Once Solana&apos;s Confidential SPL transfers
-              reach mainnet, Subly plans to integrate them so the amounts
-              moved through the vault can also be kept private.
+              Subly&apos;s on-chain programs, including the Shared Vault, are
+              encrypted by Arcium. The per-buyer ledger lives inside an AWS
+              Nitro Enclave. Once Solana&apos;s Confidential SPL transfers reach
+              mainnet, Subly plans to integrate them so vault transfer amounts
+              can also stay private.
             </p>
           </div>
         </div>
@@ -54,7 +54,7 @@ export function PrivacySection() {
             logo="/ArciumWhite.svg"
             logoAlt="Arcium"
             logoAsTitle
-            body="Subly's on-chain programs — including the Shared Vault that holds user funds — are encrypted by Arcium. Solana executes them and verifies the result, but never sees their internal state in the clear."
+            body="Subly's on-chain programs, including the Shared Vault that holds user funds, are encrypted by Arcium. Solana executes them and verifies the result, but never sees their internal state in the clear."
           />
           <Pillar
             kicker="Off-chain ledger"

@@ -50,8 +50,8 @@ export function HeroSection() {
 
         <p className="mt-8 max-w-3xl font-feature text-[20px] leading-[1.4] text-ink-soft md:text-[24px]">
           Deposit once.{" "}
-          <span className="text-subly">Earn yield.</span> Turn your yield into
-          AI agent payments without revealing anything.
+          <span className="text-subly">Earn yield.</span> Pay for agent API
+          calls without revealing who you paid.
         </p>
 
         <div className="mt-10 flex flex-col items-start gap-5">

@@ -2,7 +2,7 @@ import { ImageResponse } from "next/og";
 import { readFile } from "node:fs/promises";
 import path from "node:path";
 
-export const alt = "Subly — Use Now, Pay Never";
+export const alt = "Subly: Use Now, Pay Never";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
@@ -138,8 +138,7 @@ export default async function Image() {
               display: "flex",
             }}
           >
-            Turn your yield into AI agent payments — without revealing
-            anything.
+            Turn your yield into AI agent payments without revealing anything.
           </div>
         </div>
 

@@ -30,9 +30,9 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Subly — Use Now, Pay Never",
+  title: "Subly: Use Now, Pay Never",
   description:
-    "A privacy-first PayFi protocol for AI agents on Solana. Try a live Subly-x402 devnet payment, faucet test USDC, and see how x402-style Buyer and Seller integrations work without API keys.",
+    "A privacy-first PayFi protocol for AI agents on Solana. Try the live Subly-x402 devnet payment demo, request test USDC, and see x402-style Buyer and Seller integrations without API keys.",
   generator: "sublyfi.com",
   metadataBase: new URL("https://www.sublyfi.com"),
   icons: {
@@ -41,7 +41,7 @@ export const metadata: Metadata = {
     apple: "/subly-purple.png",
   },
   openGraph: {
-    title: "Subly — Use Now, Pay Never",
+    title: "Subly: Use Now, Pay Never",
     description:
       "Privacy-first PayFi for AI agents. Try a live Subly-x402 devnet payment and see x402-style integrations without API keys.",
     type: "website",
@@ -50,9 +50,9 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     site: "@subly_fi",
     creator: "@subly_fi",
-    title: "Subly — Use Now, Pay Never",
+    title: "Subly: Use Now, Pay Never",
     description:
-      "Privacy-first PayFi for AI agents. Live Subly-x402 devnet payment demo, faucet, and x402-style integration snippets.",
+      "Privacy-first PayFi for AI agents. Live Subly-x402 devnet demo, faucet, and integration snippets.",
   },
 };
 

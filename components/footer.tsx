@@ -49,8 +49,8 @@ export function Footer() {
               </span>
             </div>
             <p className="mt-6 max-w-md font-feature text-[20px] leading-[1.4] text-paper">
-              A privacy-first PayFi protocol for AI agents that would rather
-              not wait for a human to top them up.
+              A privacy-first PayFi protocol for AI agents that need durable
+              funding and payment privacy.
             </p>
           </div>
 
