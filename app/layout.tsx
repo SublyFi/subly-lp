@@ -49,7 +49,7 @@ export const metadata: Metadata = {
     siteName: "Subly",
     images: [
       {
-        url: "https://www.sublyfi.com/og-image.png",
+        url: "https://www.sublyfi.com/og-image.png?v=2",
         width: 1200,
         height: 630,
         type: "image/png",
@@ -64,7 +64,7 @@ export const metadata: Metadata = {
     title: "Subly: Use Now, Pay Never",
     description:
       "Privacy-first PayFi for AI agents. Live Subly-x402 devnet demo, faucet, and integration snippets.",
-    images: ["https://www.sublyfi.com/og-image.png"],
+    images: ["https://www.sublyfi.com/og-image.png?v=2"],
   },
 };
 
