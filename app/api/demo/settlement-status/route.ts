@@ -10,9 +10,15 @@ export async function POST(request: Request) {
     const body = (await request.json().catch(() => ({}))) as {
       settlementId?: string;
       providerId?: string;
+      observedPayoutSinceTx?: string;
+      depositTx?: string;
     };
     return NextResponse.json(
-      await getSettlementStatus(body.settlementId || "", body.providerId)
+      await getSettlementStatus(
+        body.settlementId || "",
+        body.providerId,
+        body.observedPayoutSinceTx || body.depositTx
+      )
     );
   } catch (error) {
     const { body, status } = demoErrorResponse(error);

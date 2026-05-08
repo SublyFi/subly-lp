@@ -73,6 +73,8 @@ type SettlementStatus = {
   status?: string;
   batchId?: number | null;
   txSignature?: string | null;
+  observedPayoutTx?: string | null;
+  observedPayoutAt?: string | null;
 };
 
 type ChainEdge = {
@@ -372,8 +374,13 @@ export function DemoSection() {
     runResult?.subly402.settlementStatus?.status === "BatchedOnchain" &&
       runResult?.subly402.settlementStatus?.txSignature
   );
+  const settlementPayoutObserved = Boolean(
+    runResult?.subly402.settlementStatus?.txSignature ||
+      runResult?.subly402.settlementStatus?.observedPayoutTx ||
+      runResult?.subly402.chainView.delayed?.[0]?.tx
+  );
   const demoBusy =
-    runBusy || (Boolean(sublySettlementId) && !settlementReady);
+    runBusy || (Boolean(sublySettlementId) && !settlementPayoutObserved);
 
   useEffect(() => {
     void refreshAttestation();
@@ -406,6 +413,7 @@ export function DemoSection() {
           {
             settlementId: sublySettlementId,
             providerId,
+            observedPayoutSinceTx: runResult?.subly402.depositTx,
           }
         );
 
@@ -434,8 +442,15 @@ export function DemoSection() {
                     index === 0
                       ? {
                           ...edge,
-                          status: status.status || edge.status,
-                          tx: status.txSignature || edge.tx,
+                          status: status.txSignature
+                            ? status.status || edge.status
+                            : status.observedPayoutTx
+                              ? "ObservedOnchain"
+                              : status.status || edge.status,
+                          tx:
+                            status.txSignature ||
+                            status.observedPayoutTx ||
+                            edge.tx,
                         }
                       : edge
                 ),
@@ -444,7 +459,7 @@ export function DemoSection() {
           };
         });
 
-        if (status.txSignature) {
+        if (status.txSignature || status.observedPayoutTx) {
           setActiveStep(3);
         }
       } catch (err) {
@@ -458,7 +473,11 @@ export function DemoSection() {
         }
       }
     },
-    [runResult?.subly402.providerId, sublySettlementId]
+    [
+      runResult?.subly402.depositTx,
+      runResult?.subly402.providerId,
+      sublySettlementId,
+    ]
   );
 
   useEffect(() => {
@@ -527,7 +546,13 @@ export function DemoSection() {
     try {
       const result = await postJson<RunResult>("/api/demo/run");
       setRunResult(result);
-      setActiveStep(result.subly402.settlementStatus?.txSignature ? 3 : 2);
+      setActiveStep(
+        result.subly402.settlementStatus?.txSignature ||
+          result.subly402.settlementStatus?.observedPayoutTx ||
+          result.subly402.chainView.delayed?.[0]?.tx
+          ? 3
+          : 2
+      );
     } catch (err) {
       setError(err as ApiError);
     } finally {
@@ -1198,9 +1223,18 @@ function FlowLane({
   const sublyDeposited = Boolean(runResult?.subly402.depositTx);
   const sublyPayoutTx =
     runResult?.subly402.settlementStatus?.txSignature ||
+    runResult?.subly402.settlementStatus?.observedPayoutTx ||
     runResult?.subly402.chainView.delayed?.[0]?.tx ||
     null;
   const sublyPayoutConfirmed = Boolean(sublyPayoutTx);
+  const sublyPayoutExact = Boolean(
+    runResult?.subly402.settlementStatus?.txSignature
+  );
+  const sublyPayoutObserved = Boolean(
+    !sublyPayoutExact &&
+      (runResult?.subly402.settlementStatus?.observedPayoutTx ||
+        runResult?.subly402.chainView.delayed?.[0]?.tx)
+  );
   const sublyBatchPending =
     sublyDeposited &&
     !sublyPayoutConfirmed &&
@@ -1278,6 +1312,8 @@ function FlowLane({
 
   const payoutValue = runResult?.subly402.settlementStatus?.txSignature
     ? "Payout tx confirmed"
+    : sublyPayoutObserved
+      ? "Vault payout observed on-chain"
     : runResult?.subly402.settlementStatus?.status === "SettledOffchain"
       ? "Batch pending"
     : payoutActive
@@ -1346,8 +1382,10 @@ function FlowLane({
             label="Vault -> Seller"
             tone="private"
             status={
-              sublyPayoutConfirmed
+              sublyPayoutExact
                 ? "batch payout"
+                : sublyPayoutObserved
+                  ? "payout observed"
                 : sublyBatchPending
                   ? "batch pending"
                   : "seller payout"
@@ -1868,7 +1906,11 @@ function FlowPanel({
   onCopy: (value: string, key: string) => void;
 }) {
   const delayed = flow.chainView.delayed?.[0];
-  const payoutTx = flow.settlementStatus?.txSignature || delayed?.tx || null;
+  const payoutTx =
+    flow.settlementStatus?.txSignature ||
+    flow.settlementStatus?.observedPayoutTx ||
+    delayed?.tx ||
+    null;
   return (
     <div className="border border-paper/15 bg-ink/35">
       <div className="flex items-start justify-between gap-3 border-b border-paper/10 p-3">

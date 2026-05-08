@@ -99,6 +99,8 @@ type SettlementStatus = {
   status?: string;
   batchId?: number | null;
   txSignature?: string | null;
+  observedPayoutTx?: string | null;
+  observedPayoutAt?: string | null;
 };
 
 type PaymentRequiredResponse = {
@@ -585,6 +587,144 @@ async function fetchTokenAmountOrNull(
   }
 }
 
+type RpcSignatureInfo = {
+  signature?: string;
+  blockTime?: number | null;
+  err?: unknown;
+};
+
+type RpcTransaction = {
+  blockTime?: number | null;
+  meta?: {
+    err?: unknown;
+    logMessages?: string[] | null;
+  } | null;
+  transaction?: {
+    message?: {
+      accountKeys?: Array<string | { pubkey?: string }>;
+    };
+  };
+};
+
+async function solanaRpcJson<T>(
+  rpcUrl: string,
+  method: string,
+  params: unknown[]
+): Promise<T | null> {
+  if (!rpcUrl) {
+    return null;
+  }
+  const response = await fetch(rpcUrl, {
+    method: "POST",
+    cache: "no-store",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify({
+      jsonrpc: "2.0",
+      id: `subly-lp-${method}`,
+      method,
+      params,
+    }),
+  });
+  if (!response.ok) {
+    return null;
+  }
+  const body = (await response.json().catch(() => null)) as {
+    result?: T | null;
+  } | null;
+  return body?.result ?? null;
+}
+
+function accountKeyString(key: string | { pubkey?: string }) {
+  return typeof key === "string" ? key : key.pubkey || "";
+}
+
+async function fetchParsedTransaction(
+  rpcUrl: string,
+  signature: string
+): Promise<RpcTransaction | null> {
+  return solanaRpcJson<RpcTransaction>(rpcUrl, "getTransaction", [
+    signature,
+    {
+      encoding: "jsonParsed",
+      maxSupportedTransactionVersion: 0,
+    },
+  ]);
+}
+
+async function findObservedVaultPayout(
+  config: EnvConfig,
+  sinceTx?: string | null
+): Promise<Pick<SettlementStatus, "observedPayoutTx" | "observedPayoutAt"> | null> {
+  if (
+    !config.rpcUrl ||
+    !config.vaultTokenAccount ||
+    !config.sellerTokenAccount
+  ) {
+    return null;
+  }
+
+  const since = sinceTx
+    ? await fetchParsedTransaction(config.rpcUrl, sinceTx).catch(() => null)
+    : null;
+  const sinceBlockTime = since?.blockTime ?? null;
+  const signatures = await solanaRpcJson<RpcSignatureInfo[]>(
+    config.rpcUrl,
+    "getSignaturesForAddress",
+    [config.vaultTokenAccount, { limit: 24 }]
+  );
+
+  for (const item of signatures || []) {
+    if (!item.signature || item.err) {
+      continue;
+    }
+    if (
+      sinceBlockTime !== null &&
+      item.blockTime !== null &&
+      item.blockTime !== undefined &&
+      item.blockTime < sinceBlockTime
+    ) {
+      continue;
+    }
+
+    const tx = await fetchParsedTransaction(config.rpcUrl, item.signature).catch(
+      () => null
+    );
+    if (!tx || tx.meta?.err) {
+      continue;
+    }
+    if (
+      sinceBlockTime !== null &&
+      tx.blockTime !== null &&
+      tx.blockTime !== undefined &&
+      tx.blockTime < sinceBlockTime
+    ) {
+      continue;
+    }
+
+    const logs = tx.meta?.logMessages || [];
+    if (!logs.some((line) => line.includes("Instruction: SettleVault"))) {
+      continue;
+    }
+    const accountKeys = tx.transaction?.message?.accountKeys?.map(accountKeyString) || [];
+    if (
+      !accountKeys.includes(config.vaultTokenAccount) ||
+      !accountKeys.includes(config.sellerTokenAccount)
+    ) {
+      continue;
+    }
+
+    return {
+      observedPayoutTx: item.signature,
+      observedPayoutAt:
+        tx.blockTime || item.blockTime
+          ? new Date((tx.blockTime || item.blockTime || 0) * 1000).toISOString()
+          : null,
+    };
+  }
+
+  return null;
+}
+
 async function demoBuyerFromConfig(config: EnvConfig) {
   if (!config.demoBuyerSecretJson) {
     throw new DemoError(
@@ -712,6 +852,12 @@ function normalizeSettlementStatus(
     txSignature:
       stringField(value, "txSignature") ||
       stringField(value, "tx_signature"),
+    observedPayoutTx:
+      stringField(value, "observedPayoutTx") ||
+      stringField(value, "observed_payout_tx"),
+    observedPayoutAt:
+      stringField(value, "observedPayoutAt") ||
+      stringField(value, "observed_payout_at"),
   };
 }
 
@@ -1682,13 +1828,18 @@ async function runSubly402SellerFlow(args: {
   const settlementId = stringField(paymentResponse, "settlementId");
   const settlementStatus =
     settlementId && providerId
-      ? await getSettlementStatus(settlementId, providerId).catch((error) => ({
-          ok: false,
-          settlementId,
-          providerId,
-          status: error instanceof Error ? error.message : "status unavailable",
-          txSignature: null,
-        }))
+      ? await getSettlementStatus(settlementId, providerId, depositTxs[0]).catch(
+          (error) => ({
+            ok: false,
+            settlementId,
+            providerId,
+            status:
+              error instanceof Error ? error.message : "status unavailable",
+            txSignature: null,
+            observedPayoutTx: null,
+            observedPayoutAt: null,
+          })
+        )
       : null;
   const sellerAfter = await fetchTokenAmountOrNull(
     args.rpc,
@@ -1753,8 +1904,15 @@ async function runSubly402SellerFlow(args: {
           label: "batched seller payout",
           from: args.config.vaultTokenAccount,
           to: sellerTokenAccount,
-          tx: settlementStatus?.txSignature || null,
-          status: settlementStatus?.status || "pending",
+          tx:
+            settlementStatus?.txSignature ||
+            settlementStatus?.observedPayoutTx ||
+            null,
+          status: settlementStatus?.txSignature
+            ? settlementStatus.status || "BatchedOnchain"
+            : settlementStatus?.observedPayoutTx
+              ? "ObservedOnchain"
+              : settlementStatus?.status || "pending",
         },
       ],
       summary:
@@ -1836,7 +1994,8 @@ export async function runPaymentDemo() {
 
 export async function getSettlementStatus(
   settlementId: string,
-  providerId?: string
+  providerId?: string,
+  observedPayoutSinceTx?: string
 ): Promise<SettlementStatus> {
   const config = readConfig();
   if (!settlementId || typeof settlementId !== "string") {
@@ -1849,7 +2008,7 @@ export async function getSettlementStatus(
   if (missingConfig(config).length > 0 && remoteDemoBaseUrl()) {
     const status = await proxyDemoJson<unknown>("/api/demo/settlement-status", {
       method: "POST",
-      body: JSON.stringify({ settlementId, providerId }),
+      body: JSON.stringify({ settlementId, providerId, observedPayoutSinceTx }),
     });
     return normalizeSettlementStatus(status, settlementId, providerId);
   }
@@ -1862,7 +2021,18 @@ export async function getSettlementStatus(
     { settlementId },
     headers
   );
-  return normalizeSettlementStatus(status, settlementId, providerId);
+  const normalized = normalizeSettlementStatus(status, settlementId, providerId);
+  if (!normalized.txSignature) {
+    const observed = await findObservedVaultPayout(
+      config,
+      observedPayoutSinceTx
+    );
+    if (observed?.observedPayoutTx) {
+      normalized.observedPayoutTx = observed.observedPayoutTx;
+      normalized.observedPayoutAt = observed.observedPayoutAt || null;
+    }
+  }
+  return normalized;
 }
 
 export function formatUsdcAtomic(value: bigint | string | number) {
