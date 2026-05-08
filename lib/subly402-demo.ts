@@ -672,6 +672,49 @@ function stringField(value: unknown, key: string) {
   return typeof field === "string" && field ? field : null;
 }
 
+function numberField(value: unknown, key: string) {
+  if (!value || typeof value !== "object") {
+    return null;
+  }
+  const field = (value as Record<string, unknown>)[key];
+  return typeof field === "number" && Number.isFinite(field) ? field : null;
+}
+
+function booleanField(value: unknown, key: string) {
+  if (!value || typeof value !== "object") {
+    return null;
+  }
+  const field = (value as Record<string, unknown>)[key];
+  return typeof field === "boolean" ? field : null;
+}
+
+function normalizeSettlementStatus(
+  value: unknown,
+  settlementIdFallback: string,
+  providerIdFallback?: string
+): SettlementStatus {
+  return {
+    ok: booleanField(value, "ok") ?? true,
+    settlementId:
+      stringField(value, "settlementId") ||
+      stringField(value, "settlement_id") ||
+      settlementIdFallback,
+    verificationId:
+      stringField(value, "verificationId") ||
+      stringField(value, "verification_id") ||
+      undefined,
+    providerId:
+      stringField(value, "providerId") ||
+      stringField(value, "provider_id") ||
+      providerIdFallback,
+    status: stringField(value, "status") || undefined,
+    batchId: numberField(value, "batchId") ?? numberField(value, "batch_id"),
+    txSignature:
+      stringField(value, "txSignature") ||
+      stringField(value, "tx_signature"),
+  };
+}
+
 function nestedRecord(value: unknown, key: string) {
   if (!value || typeof value !== "object") {
     return null;
@@ -1804,20 +1847,22 @@ export async function getSettlementStatus(
     );
   }
   if (missingConfig(config).length > 0 && remoteDemoBaseUrl()) {
-    return proxyDemoJson<SettlementStatus>("/api/demo/settlement-status", {
+    const status = await proxyDemoJson<unknown>("/api/demo/settlement-status", {
       method: "POST",
       body: JSON.stringify({ settlementId, providerId }),
     });
+    return normalizeSettlementStatus(status, settlementId, providerId);
   }
   const headers = providerId
     ? { "x-subly402-provider-id": providerId }
     : undefined;
-  return postJson<SettlementStatus>(
+  const status = await postJson<unknown>(
     config.facilitatorUrl,
     "/v1/settlement/status",
     { settlementId },
     headers
   );
+  return normalizeSettlementStatus(status, settlementId, providerId);
 }
 
 export function formatUsdcAtomic(value: bigint | string | number) {
