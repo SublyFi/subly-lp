@@ -119,6 +119,11 @@ type FlowResult = {
   };
 };
 
+type ActorAddress = {
+  label: string;
+  value?: string | null;
+};
+
 type RunResult = {
   ok: boolean;
   mode: string;
@@ -262,6 +267,14 @@ function short(value?: string | number | null) {
     return text || "n/a";
   }
   return `${text.slice(0, 6)}...${text.slice(-6)}`;
+}
+
+function shortCompact(value?: string | number | null) {
+  const text = String(value || "");
+  if (text.length <= 11) {
+    return text || "n/a";
+  }
+  return `${text.slice(0, 4)}...${text.slice(-4)}`;
 }
 
 function txUrl(signature: string) {
@@ -718,29 +731,68 @@ export function DemoSection() {
                 {runResult ? (
                   <div className="space-y-5">
                     <DataRow
-                      label="Buyer"
+                      label="Buyer owner"
                       value={runResult.buyer}
                       href={addressUrl(runResult.buyer)}
+                      copyKey="result-buyer-owner"
+                      onCopy={copy}
                     />
                     <DataRow
-                      label="Seller"
+                      label="Buyer ATA"
+                      value={
+                        runResult.x402.buyerTokenAccount ||
+                        runResult.subly402.buyerTokenAccount
+                      }
+                      href={addressUrl(
+                        runResult.x402.buyerTokenAccount ||
+                          runResult.subly402.buyerTokenAccount
+                      )}
+                      copyKey="result-buyer-ata"
+                      onCopy={copy}
+                    />
+                    <DataRow
+                      label="Seller owner"
+                      value={
+                        runResult.seller.wallet || runResult.x402.sellerWallet
+                      }
+                      href={
+                        runResult.seller.wallet || runResult.x402.sellerWallet
+                          ? addressUrl(
+                              runResult.seller.wallet ||
+                                runResult.x402.sellerWallet!
+                            )
+                          : undefined
+                      }
+                      copyKey="result-seller-owner"
+                      onCopy={copy}
+                    />
+                    <DataRow
+                      label="Seller ATA"
                       value={runResult.seller.tokenAccount}
                       href={
                         runResult.seller.tokenAccount
                           ? addressUrl(runResult.seller.tokenAccount)
                           : undefined
                       }
+                      copyKey="result-seller-ata"
+                      onCopy={copy}
                     />
                     <FlowPanel
                       title="Official x402"
                       subtitle="direct settlement transfer"
                       flow={runResult.x402}
+                      sellerWallet={
+                        runResult.seller.wallet || runResult.x402.sellerWallet
+                      }
                       onCopy={copy}
                     />
                     <FlowPanel
                       title="Subly-x402"
                       subtitle="vault deposit, batched payout"
                       flow={runResult.subly402}
+                      sellerWallet={
+                        runResult.seller.wallet || runResult.x402.sellerWallet
+                      }
                       onCopy={copy}
                     />
                     {!settlementReady && sublySettlementId && (
@@ -1153,6 +1205,44 @@ function FlowLane({
     sublyDeposited &&
     !sublyPayoutConfirmed &&
     Boolean(runResult?.subly402.settlementStatus);
+  const sellerOwner =
+    runResult?.seller.wallet ||
+    runResult?.x402.sellerWallet ||
+    runResult?.subly402.sellerWallet ||
+    null;
+  const x402BuyerAddresses: ActorAddress[] = runResult
+    ? [
+        { label: "Owner", value: runResult.x402.buyer },
+        { label: "ATA", value: runResult.x402.buyerTokenAccount },
+      ]
+    : [];
+  const x402SellerAddresses: ActorAddress[] = runResult
+    ? [
+        { label: "Owner", value: sellerOwner },
+        { label: "ATA", value: runResult.x402.sellerTokenAccount },
+      ]
+    : [];
+  const sublyBuyerAddresses: ActorAddress[] = runResult
+    ? [
+        { label: "Owner", value: runResult.subly402.buyer },
+        { label: "ATA", value: runResult.subly402.buyerTokenAccount },
+      ]
+    : [];
+  const vaultAddresses: ActorAddress[] = runResult
+    ? [
+        {
+          label: "Config",
+          value: runResult.subly402.attestation?.vaultConfig,
+        },
+        { label: "ATA", value: runResult.subly402.vaultTokenAccount },
+      ]
+    : [];
+  const sublySellerAddresses: ActorAddress[] = runResult
+    ? [
+        { label: "Owner", value: sellerOwner },
+        { label: "ATA", value: runResult.subly402.sellerTokenAccount },
+      ]
+    : [];
 
   const directState: FlowState =
     x402Paid || (!isSubly && payoutActive)
@@ -1231,6 +1321,7 @@ function FlowLane({
             icon={Wallet}
             label="Buyer wallet"
             detail="Buyer"
+            addresses={sublyBuyerAddresses}
             active={depositState !== "idle"}
             tone="private"
           />
@@ -1240,11 +1331,13 @@ function FlowLane({
             tone="private"
             status={sublyDeposited ? "deposit complete" : "vault deposit"}
             txSignature={runResult?.subly402.depositTx}
+            txLabel="Deposit tx"
           />
           <ActorNode
             icon={Landmark}
             label="Private Shared Vault"
             detail="Vault"
+            addresses={vaultAddresses}
             active={depositState !== "idle" || batchState !== "idle"}
             tone="private"
           />
@@ -1260,11 +1353,13 @@ function FlowLane({
                   : "seller payout"
             }
             txSignature={sublyPayoutTx}
+            txLabel="Payout tx"
           />
           <ActorNode
             icon={Store}
             label="Seller wallet"
             detail="Seller"
+            addresses={sublySellerAddresses}
             active={batchState === "complete" || batchState === "active"}
             pending={batchState === "pending"}
             tone="private"
@@ -1276,6 +1371,7 @@ function FlowLane({
             icon={Wallet}
             label="Buyer wallet"
             detail="Buyer"
+            addresses={x402BuyerAddresses}
             active={directState !== "idle"}
             tone="risk"
           />
@@ -1285,11 +1381,13 @@ function FlowLane({
             tone="risk"
             status={x402Paid ? "paid now" : "direct tx"}
             txSignature={runResult?.x402.settlementTx}
+            txLabel="Settle tx"
           />
           <ActorNode
             icon={Store}
             label="Seller wallet"
             detail="Seller"
+            addresses={x402SellerAddresses}
             active={directState === "complete" || directState === "active"}
             tone="risk"
           />
@@ -1465,6 +1563,7 @@ function ActorNode({
   icon: Icon,
   label,
   detail,
+  addresses = [],
   active = false,
   pending = false,
   tone = "neutral",
@@ -1472,6 +1571,7 @@ function ActorNode({
   icon: LucideIcon;
   label: string;
   detail: string;
+  addresses?: ActorAddress[];
   active?: boolean;
   pending?: boolean;
   tone?: FlowTone;
@@ -1499,7 +1599,7 @@ function ActorNode({
 
   return (
     <div
-      className={`flex h-full min-h-[180px] min-w-0 flex-col border p-4 transition-colors md:h-[200px] ${toneClass}`}
+      className={`flex h-full min-h-[204px] min-w-0 flex-col border p-4 transition-colors md:h-[236px] ${toneClass}`}
     >
       <div className="flex h-full flex-col justify-between gap-3">
         <span
@@ -1514,9 +1614,40 @@ function ActorNode({
           <div className="mt-2 break-words font-display text-[21px] font-semibold leading-none text-ink">
             {detail}
           </div>
+          {addresses.length > 0 && (
+            <div className="mt-3 grid gap-1.5">
+              {addresses.map((item) => (
+                <ActorAddressLine key={item.label} address={item} />
+              ))}
+            </div>
+          )}
         </div>
       </div>
     </div>
+  );
+}
+
+function ActorAddressLine({ address }: { address: ActorAddress }) {
+  if (!address.value) {
+    return null;
+  }
+
+  return (
+    <a
+      href={addressUrl(address.value)}
+      target="_blank"
+      rel="noreferrer"
+      className="group grid min-h-10 min-w-0 gap-1 font-mono text-[9px] uppercase tracking-[0.08em] text-ink-muted transition-colors hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-paper"
+      aria-label={`Open ${address.label} ${short(address.value)} in Solana Explorer`}
+    >
+      <span className="text-[8px] tracking-[0.14em] opacity-70">
+        {address.label}
+      </span>
+      <span className="inline-flex min-w-0 items-center gap-1 text-ink">
+        <span className="min-w-0 truncate">{shortCompact(address.value)}</span>
+        <ExternalLink className="h-3 w-3 shrink-0 opacity-45 transition-opacity group-hover:opacity-100" />
+      </span>
+    </a>
   );
 }
 
@@ -1526,12 +1657,14 @@ function FlowConnector({
   tone,
   status,
   txSignature,
+  txLabel = "Tx",
 }: {
   state: FlowState;
   label: string;
   tone: FlowTone;
   status: string;
   txSignature?: string | null;
+  txLabel?: string;
 }) {
   const active = state !== "idle";
   const stateClass =
@@ -1547,7 +1680,7 @@ function FlowConnector({
 
   return (
     <div
-      className={`flex h-full min-h-[80px] items-center justify-center gap-2 border px-2 text-center transition-colors md:h-[200px] md:flex-col ${stateClass}`}
+      className={`flex h-full min-h-[96px] items-center justify-center gap-2 border px-2 text-center transition-colors md:h-[236px] md:flex-col ${stateClass}`}
     >
       <ArrowRight
         className={`h-5 w-5 rotate-90 md:rotate-0 ${
@@ -1567,10 +1700,17 @@ function FlowConnector({
             target="_blank"
             rel="noreferrer"
             aria-label={`Open ${label} transaction in Solana Explorer`}
-            className="mt-1.5 inline-flex min-w-0 items-center justify-center gap-1 border-t border-current/20 pt-1.5 font-mono text-[10px] font-semibold leading-none transition-colors hover:underline"
+            className="mt-1.5 grid min-h-10 min-w-0 justify-items-center gap-1 border-t border-current/20 pt-1.5 font-mono text-[10px] font-semibold leading-none transition-colors hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-paper"
           >
-            <span className="min-w-0 truncate">{short(txSignature)}</span>
-            <ExternalLink className="h-3 w-3 shrink-0" />
+            <span className="text-[8px] uppercase tracking-[0.14em] opacity-70">
+              {txLabel}
+            </span>
+            <span className="inline-flex min-w-0 items-center justify-center gap-1">
+              <span className="min-w-0 truncate">
+                {shortCompact(txSignature)}
+              </span>
+              <ExternalLink className="h-3 w-3 shrink-0" />
+            </span>
           </a>
         )}
       </div>
@@ -1655,7 +1795,7 @@ function DataRow({
     </span>
   );
   return (
-    <div className="grid grid-cols-[92px_1fr] items-center gap-3 border-b border-paper/10 py-2.5 font-mono text-[11px] last:border-b-0">
+    <div className="grid grid-cols-[112px_minmax(0,1fr)] items-center gap-3 border-b border-paper/10 py-2.5 font-mono text-[11px] last:border-b-0">
       <span className="uppercase tracking-[0.16em] text-paper/45">{label}</span>
       <div className="flex min-w-0 items-center justify-end gap-2">
         {href ? (
@@ -1663,7 +1803,7 @@ function DataRow({
             href={href}
             target="_blank"
             rel="noreferrer"
-            className="min-w-0 text-paper transition-colors hover:text-glow"
+            className="min-w-0 text-paper transition-colors hover:text-glow focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-ink"
           >
             {content}
           </a>
@@ -1674,7 +1814,7 @@ function DataRow({
           <button
             type="button"
             onClick={() => onCopy(text, copyKey)}
-            className="text-paper/35 transition-colors hover:text-glow"
+            className="flex h-10 w-10 shrink-0 items-center justify-center text-paper/35 transition-colors hover:text-glow focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-ink"
             aria-label={`Copy ${label}`}
           >
             <Clipboard className="h-3.5 w-3.5" />
@@ -1696,14 +1836,14 @@ function TxRow({
     return <DataRow label={label} value="pending" />;
   }
   return (
-    <div className="grid grid-cols-[92px_1fr] items-start gap-3 border-b border-paper/10 py-2.5 font-mono text-[11px] last:border-b-0">
+    <div className="grid grid-cols-[112px_minmax(0,1fr)] items-start gap-3 border-b border-paper/10 py-2.5 font-mono text-[11px] last:border-b-0">
       <span className="uppercase tracking-[0.16em] text-paper/45">{label}</span>
       <a
         href={txUrl(signature)}
         target="_blank"
         rel="noreferrer"
         aria-label={`Open ${label} in Solana Explorer`}
-        className="group flex min-w-0 items-start justify-end gap-2 text-right text-paper transition-colors hover:text-glow"
+        className="group flex min-w-0 items-start justify-end gap-2 text-right text-paper transition-colors hover:text-glow focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-ink"
       >
         <span className="min-w-0 break-all text-[10px] leading-[1.45]">
           {signature}
@@ -1718,11 +1858,13 @@ function FlowPanel({
   title,
   subtitle,
   flow,
+  sellerWallet,
   onCopy,
 }: {
   title: string;
   subtitle: string;
   flow: FlowResult;
+  sellerWallet?: string | null;
   onCopy: (value: string, key: string) => void;
 }) {
   const delayed = flow.chainView.delayed?.[0];
@@ -1741,7 +1883,7 @@ function FlowPanel({
         <button
           type="button"
           onClick={() => onCopy(flow.route, `${flow.mode}-route`)}
-          className="text-paper/35 transition-colors hover:text-glow"
+          className="flex h-10 w-10 shrink-0 items-center justify-center text-paper/35 transition-colors hover:text-glow focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-ink"
           aria-label={`Copy ${title} route`}
         >
           <Clipboard className="h-3.5 w-3.5" />
@@ -1750,15 +1892,36 @@ function FlowPanel({
       <div className="p-3">
         <DataRow label="Amount" value={flow.amount} />
         <DataRow
+          label="Buyer owner"
+          value={flow.buyer}
+          href={addressUrl(flow.buyer)}
+        />
+        <DataRow
           label="Buyer ATA"
           value={flow.buyerTokenAccount}
           href={addressUrl(flow.buyerTokenAccount)}
+        />
+        <DataRow
+          label="Seller owner"
+          value={sellerWallet || flow.sellerWallet}
+          href={
+            sellerWallet || flow.sellerWallet
+              ? addressUrl(sellerWallet || flow.sellerWallet!)
+              : undefined
+          }
         />
         <DataRow
           label="Seller ATA"
           value={flow.sellerTokenAccount}
           href={addressUrl(flow.sellerTokenAccount)}
         />
+        {flow.attestation?.vaultConfig && (
+          <DataRow
+            label="Vault"
+            value={flow.attestation.vaultConfig}
+            href={addressUrl(flow.attestation.vaultConfig)}
+          />
+        )}
         {flow.vaultTokenAccount && (
           <DataRow
             label="Vault ATA"
@@ -1766,13 +1929,13 @@ function FlowPanel({
             href={addressUrl(flow.vaultTokenAccount)}
           />
         )}
-        <TxRow label="Fund tx" signature={flow.faucetTx} />
         {flow.settlementTx ? (
           <TxRow label="Settle tx" signature={flow.settlementTx} />
         ) : (
           <TxRow label="Deposit tx" signature={flow.depositTx} />
         )}
         {delayed && <TxRow label="Payout tx" signature={payoutTx} />}
+        <TxRow label="Demo fund tx" signature={flow.faucetTx} />
         <div className="mt-3 border-t border-paper/10 pt-3">
           <div className="font-mono text-[9px] uppercase tracking-[0.18em] text-paper/45">
             Chain excerpt
