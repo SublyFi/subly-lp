@@ -1201,9 +1201,6 @@ function FlowLane({
     runResult?.subly402.chainView.delayed?.[0]?.tx ||
     null;
   const sublyPayoutConfirmed = Boolean(sublyPayoutTx);
-  const sublyPayoutExact = Boolean(
-    runResult?.subly402.settlementStatus?.txSignature
-  );
   const sublyBatchPending =
     sublyDeposited &&
     !sublyPayoutConfirmed &&
@@ -1280,11 +1277,11 @@ function FlowLane({
         : "Waiting for direct payment";
 
   const payoutValue = runResult?.subly402.settlementStatus?.txSignature
-    ? "Payout tx confirmed"
+    ? "Payout tx returned by facilitator"
     : runResult?.subly402.settlementStatus?.status === "SettledOffchain"
-      ? "Seller payout resolves from a Vault batch"
+      ? "Seller settlement is handled by a Vault batch"
     : payoutActive
-      ? "The Vault paying the seller as a batch"
+      ? "Seller settlement is handled by a Vault batch"
       : "Batch settlement";
 
   return (
@@ -1350,13 +1347,11 @@ function FlowLane({
             label="Vault -> Seller"
             tone="private"
             status={
-              sublyPayoutExact
-                ? "batch payout"
-                : sublyBatchPending
-                  ? "batch settlement"
-                  : "seller payout"
+              sublyDeposited || sublyBatchPending
+                ? "settles via batch"
+                : "seller payout"
             }
-            completeStatus="batch resolved"
+            completeStatus="payout tx linked"
             txSignature={sublyPayoutTx}
             txLabel="Payout tx"
           />
@@ -1492,19 +1487,19 @@ function PathFlowSummary({
     : directState;
 
   const title = isSubly
-    ? batchState === "complete"
-      ? "Vault pays Seller after the batch"
-      : depositState === "complete" || batchState === "pending"
+    ? depositState === "complete" ||
+      batchState === "pending" ||
+      batchState === "complete"
         ? "Buyer funds Vault for batching"
         : "Buyer funds Vault, then Vault pays Seller"
     : "Buyer pays Seller directly";
 
   const body = isSubly
-    ? batchState === "complete"
-      ? "The only buyer-facing transfer goes into the Vault. Once the batch succeeds, the Vault pays the seller in a separate transfer."
-      : depositState === "complete" || batchState === "pending"
-        ? "The visible buyer transaction stops at the Vault. The seller payout resolves from a later Vault batch."
-        : "The first highlighted step is the buyer depositing into the Vault. The seller payout only lights up once the Subly-x402 batch settles."
+    ? depositState === "complete" ||
+      batchState === "pending" ||
+      batchState === "complete"
+      ? "The visible buyer transaction stops at the Vault. Seller settlement is handled by a later Vault batch; check the Vault ATA after a short delay to verify it on-chain."
+      : "The first highlighted step is the buyer depositing into the Vault. Seller settlement is handled separately by Subly-x402 batching."
     : directState === "complete"
       ? "The highlighted step is the buyer paying the seller directly. That direct transfer is what stays visible onchain."
       : "When the proof runs, the buyer pays the seller directly. That direct transfer is what becomes visible onchain.";
@@ -1537,11 +1532,11 @@ function PathFlowSummary({
           tone={tone}
           label={
             isSubly
-              ? batchState === "complete"
-                ? "batch resolved"
-                : depositState === "complete" || batchState === "pending"
-                  ? "batched settlement"
-                  : undefined
+              ? depositState === "complete" ||
+                batchState === "pending" ||
+                batchState === "complete"
+                ? "batched settlement"
+                : undefined
               : undefined
           }
         />
