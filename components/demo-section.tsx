@@ -1333,6 +1333,7 @@ function FlowLane({
             label="Buyer -> Vault"
             tone="private"
             status={sublyDeposited ? "deposit complete" : "vault deposit"}
+            completeStatus="vault funded"
             txSignature={runResult?.subly402.depositTx}
             txLabel="Deposit tx"
           />
@@ -1355,6 +1356,7 @@ function FlowLane({
                   ? "batch settlement"
                   : "seller payout"
             }
+            completeStatus="batch resolved"
             txSignature={sublyPayoutTx}
             txLabel="Payout tx"
           />
@@ -1530,7 +1532,19 @@ function PathFlowSummary({
             {body}
           </p>
         </div>
-        <FlowStateBadge state={state} tone={tone} />
+        <FlowStateBadge
+          state={state}
+          tone={tone}
+          label={
+            isSubly
+              ? batchState === "complete"
+                ? "batch resolved"
+                : depositState === "complete" || batchState === "pending"
+                  ? "batched settlement"
+                  : undefined
+              : undefined
+          }
+        />
       </div>
     </div>
   );
@@ -1539,12 +1553,15 @@ function PathFlowSummary({
 function FlowStateBadge({
   state,
   tone,
+  label,
 }: {
   state: FlowState;
   tone: FlowTone;
+  label?: string;
 }) {
-  const label =
-    state === "complete" ? "complete" : state === "pending" ? "batched" : state;
+  const displayLabel =
+    label ||
+    (state === "complete" ? "complete" : state === "pending" ? "batched" : state);
   const toneClass =
     state === "idle"
       ? "border-ink/20 bg-paper-deep text-ink-muted"
@@ -1558,7 +1575,7 @@ function FlowStateBadge({
     <span
       className={`inline-flex w-fit items-center border px-3 py-2 font-mono text-[10px] uppercase tracking-[0.14em] ${toneClass}`}
     >
-      {label}
+      {displayLabel}
     </span>
   );
 }
@@ -1660,6 +1677,7 @@ function FlowConnector({
   label,
   tone,
   status,
+  completeStatus = "complete",
   txSignature,
   txLabel = "Tx",
 }: {
@@ -1667,6 +1685,7 @@ function FlowConnector({
   label: string;
   tone: FlowTone;
   status: string;
+  completeStatus?: string;
   txSignature?: string | null;
   txLabel?: string;
 }) {
@@ -1696,7 +1715,7 @@ function FlowConnector({
           {label}
         </span>
         <span className="font-mono text-[9px] uppercase tracking-[0.12em] opacity-70">
-          {state === "complete" ? "complete" : status}
+          {state === "complete" ? completeStatus : status}
         </span>
         {txSignature && (
           <a
