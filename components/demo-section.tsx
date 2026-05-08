@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import type { LucideIcon } from "lucide-react";
 import {
   ArrowRight,
@@ -246,20 +246,20 @@ const privacyDemoSteps = [
   },
   {
     n: "04",
-    label: "Payout",
+    label: "Settlement",
     phase: "Resolve",
-    title: "Seller gets paid.",
-    body: "Subly-x402 does not hide the payout from the seller. They get paid in full. What changes is the on-chain shape: the Vault pays sellers in batches, so the payout cannot be tied back to any single buyer's call.",
+    title: "Seller settlement is batched.",
+    body: "Subly-x402 does not hide seller settlement. Sellers get paid in full, but the on-chain shape changes: the Vault pays sellers in batches, so seller settlement is not presented as the result of one buyer's API call.",
     x402: "The request is already linkable to this seller.",
     subly402:
-      "The seller receives a batched payout from the Vault, separate from the buyer's deposit.",
+      "The seller is settled from a later Vault batch, separate from the buyer's deposit.",
     observer:
-      "The seller payout is visible, but it no longer shares an on-chain trail with the buyer's API call.",
+      "Vault activity can be inspected later, but the buyer's API call does not create a direct buyer-to-seller trail.",
   },
 ] as const;
 
-type FlowTone = "neutral" | "risk" | "private" | "resolve";
-type FlowState = "idle" | "active" | "pending" | "complete";
+type FlowTone = "neutral" | "risk" | "private";
+type FlowState = "idle" | "active" | "complete";
 
 function short(value?: string | number | null) {
   const text = String(value || "");
@@ -297,9 +297,6 @@ function flowStepForPath(
     return 3;
   }
   if (variant === "subly402") {
-    if (runResult.subly402.settlementStatus?.txSignature) {
-      return 3;
-    }
     if (runResult.subly402.depositTx) {
       return 3;
     }
@@ -355,139 +352,16 @@ export function DemoSection() {
   const [recipient, setRecipient] = useState("");
   const [faucetBusy, setFaucetBusy] = useState(false);
   const [runBusy, setRunBusy] = useState(false);
-  const [statusBusy, setStatusBusy] = useState(false);
   const [faucetResult, setFaucetResult] = useState<FaucetResult | null>(null);
   const [runResult, setRunResult] = useState<RunResult | null>(null);
   const [error, setError] = useState<ApiError | null>(null);
   const [copied, setCopied] = useState<string | null>(null);
-  const settlementPollInFlightRef = useRef(false);
-  const latestSettlementIdRef = useRef("");
-
-  const sublySettlementId = useMemo(() => {
-    const value = runResult?.subly402.paymentResponse?.settlementId;
-    return typeof value === "string" ? value : "";
-  }, [runResult]);
-
-  const settlementReady = Boolean(
-    runResult?.subly402.settlementStatus?.status === "BatchedOnchain" &&
-      runResult?.subly402.settlementStatus?.txSignature
-  );
   const demoBusy = runBusy;
+  const runButtonLabel = runResult ? "Run another demo" : "Run live demo";
 
   useEffect(() => {
     void refreshAttestation();
   }, []);
-
-  useEffect(() => {
-    latestSettlementIdRef.current = sublySettlementId;
-  }, [sublySettlementId]);
-
-  const refreshSettlementStatus = useCallback(
-    async ({ manual = true }: { manual?: boolean } = {}) => {
-      const providerId = runResult?.subly402.providerId;
-      if (
-        !sublySettlementId ||
-        !providerId ||
-        settlementPollInFlightRef.current
-      ) {
-        return;
-      }
-
-      if (manual) {
-        setError(null);
-        setStatusBusy(true);
-      }
-      settlementPollInFlightRef.current = true;
-
-      try {
-        const status = await postJson<SettlementStatus>(
-          "/api/demo/settlement-status",
-          {
-            settlementId: sublySettlementId,
-            providerId,
-          }
-        );
-
-        if (latestSettlementIdRef.current !== sublySettlementId) {
-          return;
-        }
-
-        setRunResult((current) => {
-          const currentSettlementId =
-            typeof current?.subly402.paymentResponse?.settlementId === "string"
-              ? current.subly402.paymentResponse.settlementId
-              : "";
-          if (!current || currentSettlementId !== sublySettlementId) {
-            return current;
-          }
-
-          return {
-            ...current,
-            subly402: {
-              ...current.subly402,
-              settlementStatus: status,
-              chainView: {
-                ...current.subly402.chainView,
-                delayed: current.subly402.chainView.delayed?.map(
-                  (edge, index) =>
-                    index === 0
-                      ? {
-                          ...edge,
-                          status: status.txSignature
-                            ? status.status || edge.status
-                            : "BatchSettlement",
-                          tx: status.txSignature || edge.tx,
-                        }
-                      : edge
-                ),
-              },
-            },
-          };
-        });
-
-        if (status.txSignature) {
-          setActiveStep(3);
-        }
-      } catch (err) {
-        if (manual) {
-          setError(err as ApiError);
-        }
-      } finally {
-        settlementPollInFlightRef.current = false;
-        if (manual) {
-          setStatusBusy(false);
-        }
-      }
-    },
-    [runResult?.subly402.providerId, sublySettlementId]
-  );
-
-  useEffect(() => {
-    if (
-      !sublySettlementId ||
-      !runResult?.subly402.providerId ||
-      settlementReady
-    ) {
-      return;
-    }
-
-    const initialPollId = window.setTimeout(() => {
-      void refreshSettlementStatus({ manual: false });
-    }, 5000);
-    const pollId = window.setInterval(() => {
-      void refreshSettlementStatus({ manual: false });
-    }, 10000);
-
-    return () => {
-      window.clearTimeout(initialPollId);
-      window.clearInterval(pollId);
-    };
-  }, [
-    refreshSettlementStatus,
-    runResult?.subly402.providerId,
-    settlementReady,
-    sublySettlementId,
-  ]);
 
   async function refreshAttestation() {
     setAttestationLoading(true);
@@ -528,12 +402,7 @@ export function DemoSection() {
     try {
       const result = await postJson<RunResult>("/api/demo/run");
       setRunResult(result);
-      setActiveStep(
-        result.subly402.settlementStatus?.txSignature ||
-          result.subly402.depositTx
-          ? 3
-          : 2
-      );
+      setActiveStep(result.subly402.depositTx ? 3 : 2);
     } catch (err) {
       setError(err as ApiError);
     } finally {
@@ -608,6 +477,7 @@ export function DemoSection() {
           onNextStep={advancePrivacyStep}
           onRunLive={runLivePayment}
           runBusy={demoBusy}
+          runButtonLabel={runButtonLabel}
           runResult={runResult}
         />
 
@@ -623,8 +493,8 @@ export function DemoSection() {
                   Press <span className="text-glow">Run live demo</span> to
                   fill the flow above with real Solana devnet transactions.
                   Below you can verify the Vault, Signer, and Policy this
-                  demo is using, plus the confirmed tx hashes once the run
-                  completes.
+                  demo is using, plus the confirmed direct/deposit tx hashes
+                  once the run completes.
                 </p>
               </div>
               <button
@@ -638,7 +508,7 @@ export function DemoSection() {
                 ) : (
                   <Play className="h-4 w-4" />
                 )}
-                Run live demo
+                {runButtonLabel}
               </button>
             </div>
 
@@ -648,8 +518,10 @@ export function DemoSection() {
               </div>
               <p className="mt-2 max-w-3xl text-[12px] leading-[1.6] text-paper/70">
                 This hosted proof targets an approximately 1 minute Subly-x402
-                batch so the Vault payout to the seller is visible during the
-                demo. Public deployments should use longer anonymity windows.
+                batch. The LP stops at the Buyer-to-Vault deposit because the
+                later seller settlement is a Vault batch, not a per-demo
+                completion signal. Public deployments should use longer
+                anonymity windows.
                 Low-volume 1 minute batches can make participant correlation
                 easier.
               </p>
@@ -794,7 +666,7 @@ export function DemoSection() {
                     />
                     <FlowPanel
                       title="Subly-x402"
-                      subtitle="vault deposit, batched payout"
+                      subtitle="vault deposit, batched settlement"
                       flow={runResult.subly402}
                       sellerWallet={
                         runResult.seller.wallet || runResult.x402.sellerWallet
@@ -805,7 +677,7 @@ export function DemoSection() {
                       <div className="mt-2 border border-paper/15 bg-paper/5 p-3 text-[12px] leading-[1.55] text-paper/65">
                         Subly-x402 settles the Seller from a later Vault batch,
                         so the visible Buyer transaction stops at the Vault.
-                        To verify the later payout, open the{" "}
+                        To verify the later settlement, open the{" "}
                         <a
                           href={addressUrl(runResult.subly402.vaultTokenAccount)}
                           target="_blank"
@@ -1060,6 +932,7 @@ function PrivacyStoryboard({
   onNextStep,
   onRunLive,
   runBusy,
+  runButtonLabel,
   runResult,
 }: {
   activeStep: number;
@@ -1067,6 +940,7 @@ function PrivacyStoryboard({
   onNextStep: () => void;
   onRunLive: () => void;
   runBusy: boolean;
+  runButtonLabel: string;
   runResult: RunResult | null;
 }) {
   const step = privacyDemoSteps[activeStep] || privacyDemoSteps[0];
@@ -1098,7 +972,7 @@ function PrivacyStoryboard({
               ) : (
                 <Play className="h-4 w-4" />
               )}
-              Run live demo
+              {runButtonLabel}
             </button>
             <button
               type="button"
@@ -1193,18 +1067,9 @@ function FlowLane({
   const step = privacyDemoSteps[pathStep] || privacyDemoSteps[0];
   const paymentActive = pathStep >= 1;
   const publicTrailActive = pathStep >= 2;
-  const payoutActive = pathStep >= 3;
+  const settlementStepActive = pathStep >= 3;
   const x402Paid = Boolean(runResult?.x402.settlementTx);
   const sublyDeposited = Boolean(runResult?.subly402.depositTx);
-  const sublyPayoutTx =
-    runResult?.subly402.settlementStatus?.txSignature ||
-    runResult?.subly402.chainView.delayed?.[0]?.tx ||
-    null;
-  const sublyPayoutConfirmed = Boolean(sublyPayoutTx);
-  const sublyBatchPending =
-    sublyDeposited &&
-    !sublyPayoutConfirmed &&
-    Boolean(runResult?.subly402.settlementStatus);
   const sellerOwner =
     runResult?.seller.wallet ||
     runResult?.x402.sellerWallet ||
@@ -1245,7 +1110,7 @@ function FlowLane({
     : [];
 
   const directState: FlowState =
-    x402Paid || (!isSubly && payoutActive)
+    x402Paid || (!isSubly && settlementStepActive)
       ? "complete"
       : paymentActive
         ? "active"
@@ -1256,13 +1121,8 @@ function FlowLane({
       : paymentActive
         ? "active"
         : "idle";
-  const batchState: FlowState = sublyPayoutConfirmed
-    ? "complete"
-    : sublyBatchPending
-      ? "pending"
-      : payoutActive
-        ? "active"
-        : "idle";
+  const batchState: FlowState =
+    sublyDeposited || settlementStepActive ? "active" : "idle";
 
   const visibleValue = isSubly
     ? runResult?.subly402.depositTx
@@ -1276,13 +1136,10 @@ function FlowLane({
         ? "A direct transfer from the buyer to the seller"
         : "Waiting for direct payment";
 
-  const payoutValue = runResult?.subly402.settlementStatus?.txSignature
-    ? "Payout tx returned by facilitator"
-    : runResult?.subly402.settlementStatus?.status === "SettledOffchain"
-      ? "Seller settlement is handled by a Vault batch"
-    : payoutActive
-      ? "Seller settlement is handled by a Vault batch"
-      : "Batch settlement";
+  const sellerSettlementValue =
+    sublyDeposited || settlementStepActive
+      ? "Seller settlement is handled by a later Vault batch. Check the Vault ATA after a short delay to verify it on-chain."
+      : "Batch settlement has not been queued yet";
 
   return (
     <div className="flex h-full flex-col bg-paper p-5">
@@ -1346,22 +1203,14 @@ function FlowLane({
             state={batchState}
             label="Vault -> Seller"
             tone="private"
-            status={
-              sublyDeposited || sublyBatchPending
-                ? "settles via batch"
-                : "seller payout"
-            }
-            completeStatus="payout tx linked"
-            txSignature={sublyPayoutTx}
-            txLabel="Payout tx"
+            status={sublyDeposited ? "settles via batch" : "seller batch"}
           />
           <ActorNode
             icon={Store}
             label="Seller wallet"
             detail="Seller"
             addresses={sublySellerAddresses}
-            active={batchState === "complete" || batchState === "active"}
-            pending={batchState === "pending"}
+            active={batchState === "active"}
             tone="private"
           />
         </div>
@@ -1428,8 +1277,8 @@ function FlowLane({
             />
             <EvidenceTile
               icon={Layers}
-              label="Seller payout"
-              value={payoutValue}
+              label="Seller settlement"
+              value={sellerSettlementValue}
               tone="neutral"
             />
           </>
@@ -1474,30 +1323,22 @@ function PathFlowSummary({
   batchState: FlowState;
 }) {
   const isSubly = variant === "subly402";
-  const tone: FlowTone = isSubly
-    ? batchState === "complete"
-      ? "resolve"
-      : "private"
-    : "risk";
+  const tone: FlowTone = isSubly ? "private" : "risk";
   const Icon = isSubly ? LockKeyhole : Eye;
   const state = isSubly
-    ? batchState === "complete" || batchState === "pending"
+    ? batchState === "active"
       ? batchState
       : depositState
     : directState;
 
   const title = isSubly
-    ? depositState === "complete" ||
-      batchState === "pending" ||
-      batchState === "complete"
+    ? depositState === "complete" || batchState === "active"
         ? "Buyer funds Vault for batching"
         : "Buyer funds Vault, then Vault pays Seller"
     : "Buyer pays Seller directly";
 
   const body = isSubly
-    ? depositState === "complete" ||
-      batchState === "pending" ||
-      batchState === "complete"
+    ? depositState === "complete" || batchState === "active"
       ? "The visible buyer transaction stops at the Vault. Seller settlement is handled by a later Vault batch; check the Vault ATA after a short delay to verify it on-chain."
       : "The first highlighted step is the buyer depositing into the Vault. Seller settlement is handled separately by Subly-x402 batching."
     : directState === "complete"
@@ -1510,11 +1351,7 @@ function PathFlowSummary({
         <div className="min-w-0">
           <div
             className={`flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.18em] ${
-              tone === "risk"
-                ? "text-alert"
-                : tone === "resolve"
-                  ? "text-ink"
-                  : "text-ok"
+              tone === "risk" ? "text-alert" : "text-ok"
             }`}
           >
             <Icon className="h-4 w-4 shrink-0" />
@@ -1532,9 +1369,7 @@ function PathFlowSummary({
           tone={tone}
           label={
             isSubly
-              ? depositState === "complete" ||
-                batchState === "pending" ||
-                batchState === "complete"
+              ? depositState === "complete" || batchState === "active"
                 ? "batched settlement"
                 : undefined
               : undefined
@@ -1554,17 +1389,13 @@ function FlowStateBadge({
   tone: FlowTone;
   label?: string;
 }) {
-  const displayLabel =
-    label ||
-    (state === "complete" ? "complete" : state === "pending" ? "batched" : state);
+  const displayLabel = label || (state === "complete" ? "complete" : state);
   const toneClass =
     state === "idle"
       ? "border-ink/20 bg-paper-deep text-ink-muted"
       : tone === "risk"
         ? "border-alert bg-alert/10 text-alert"
-        : tone === "resolve"
-          ? "border-glow bg-glow/20 text-ink"
-          : "border-ok bg-ok/10 text-ink";
+        : "border-ok bg-ok/10 text-ink";
 
   return (
     <span
@@ -1581,7 +1412,6 @@ function ActorNode({
   detail,
   addresses = [],
   active = false,
-  pending = false,
   tone = "neutral",
 }: {
   icon: LucideIcon;
@@ -1589,29 +1419,20 @@ function ActorNode({
   detail: string;
   addresses?: ActorAddress[];
   active?: boolean;
-  pending?: boolean;
   tone?: FlowTone;
 }) {
   const toneClass =
-    pending
-      ? "border-glow bg-glow/10 text-ink"
-      : active && tone === "risk"
-        ? "border-alert bg-alert/10 text-alert"
-        : active && tone === "private"
-          ? "border-ok bg-ok/10 text-ink"
-          : active && tone === "resolve"
-            ? "border-glow bg-glow/20 text-ink"
-            : "border-ink/15 bg-white text-ink";
+    active && tone === "risk"
+      ? "border-alert bg-alert/10 text-alert"
+      : active && tone === "private"
+        ? "border-ok bg-ok/10 text-ink"
+        : "border-ink/15 bg-white text-ink";
   const iconClass =
-    pending
-      ? "border-glow bg-glow/20 text-ink"
-      : active && tone === "risk"
-        ? "border-alert bg-alert text-paper"
-        : active && tone === "private"
-          ? "border-ok bg-ok text-paper"
-          : active && tone === "resolve"
-            ? "border-glow bg-glow text-ink"
-            : "border-ink/20 bg-paper-deep text-ink";
+    active && tone === "risk"
+      ? "border-alert bg-alert text-paper"
+      : active && tone === "private"
+        ? "border-ok bg-ok text-paper"
+        : "border-ink/20 bg-paper-deep text-ink";
 
   return (
     <div
@@ -1688,13 +1509,9 @@ function FlowConnector({
   const stateClass =
     state === "idle"
       ? "border-ink/15 bg-paper-deep text-ink-muted"
-      : state === "pending"
-        ? "border-glow bg-glow/15 text-ink"
-        : tone === "risk"
-          ? "border-alert bg-alert/10 text-alert"
-          : tone === "resolve"
-            ? "border-glow bg-glow/20 text-ink"
-            : "border-ok bg-ok/10 text-ink";
+      : tone === "risk"
+        ? "border-alert bg-alert/10 text-alert"
+        : "border-ok bg-ok/10 text-ink";
 
   return (
     <div
@@ -1851,7 +1668,7 @@ function TxRow({
   signature?: string | null;
 }) {
   if (!signature) {
-    return <DataRow label={label} value="settles in batch" />;
+    return <DataRow label={label} value="not returned" />;
   }
   return (
     <div className="grid grid-cols-[112px_minmax(0,1fr)] items-start gap-3 border-b border-paper/10 py-2.5 font-mono text-[11px] last:border-b-0">
@@ -1885,11 +1702,6 @@ function FlowPanel({
   sellerWallet?: string | null;
   onCopy: (value: string, key: string) => void;
 }) {
-  const delayed = flow.chainView.delayed?.[0];
-  const payoutTx =
-    flow.settlementStatus?.txSignature ||
-    delayed?.tx ||
-    null;
   return (
     <div className="border border-paper/15 bg-ink/35">
       <div className="flex items-start justify-between gap-3 border-b border-paper/10 p-3">
@@ -1955,7 +1767,6 @@ function FlowPanel({
         ) : (
           <TxRow label="Deposit tx" signature={flow.depositTx} />
         )}
-        {delayed && <TxRow label="Payout tx" signature={payoutTx} />}
         <TxRow label="Demo fund tx" signature={flow.faucetTx} />
         <div className="mt-3 border-t border-paper/10 pt-3">
           <div className="font-mono text-[9px] uppercase tracking-[0.18em] text-paper/45">
