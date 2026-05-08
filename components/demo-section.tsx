@@ -73,8 +73,6 @@ type SettlementStatus = {
   status?: string;
   batchId?: number | null;
   txSignature?: string | null;
-  observedPayoutTx?: string | null;
-  observedPayoutAt?: string | null;
 };
 
 type ChainEdge = {
@@ -303,7 +301,7 @@ function flowStepForPath(
       return 3;
     }
     if (runResult.subly402.depositTx) {
-      return 2;
+      return 3;
     }
   }
   return activeStep;
@@ -374,13 +372,7 @@ export function DemoSection() {
     runResult?.subly402.settlementStatus?.status === "BatchedOnchain" &&
       runResult?.subly402.settlementStatus?.txSignature
   );
-  const settlementPayoutObserved = Boolean(
-    runResult?.subly402.settlementStatus?.txSignature ||
-      runResult?.subly402.settlementStatus?.observedPayoutTx ||
-      runResult?.subly402.chainView.delayed?.[0]?.tx
-  );
-  const demoBusy =
-    runBusy || (Boolean(sublySettlementId) && !settlementPayoutObserved);
+  const demoBusy = runBusy;
 
   useEffect(() => {
     void refreshAttestation();
@@ -413,7 +405,6 @@ export function DemoSection() {
           {
             settlementId: sublySettlementId,
             providerId,
-            observedPayoutSinceTx: runResult?.subly402.depositTx,
           }
         );
 
@@ -444,13 +435,8 @@ export function DemoSection() {
                           ...edge,
                           status: status.txSignature
                             ? status.status || edge.status
-                            : status.observedPayoutTx
-                              ? "ObservedOnchain"
-                              : status.status || edge.status,
-                          tx:
-                            status.txSignature ||
-                            status.observedPayoutTx ||
-                            edge.tx,
+                            : "BatchSettlement",
+                          tx: status.txSignature || edge.tx,
                         }
                       : edge
                 ),
@@ -459,7 +445,7 @@ export function DemoSection() {
           };
         });
 
-        if (status.txSignature || status.observedPayoutTx) {
+        if (status.txSignature) {
           setActiveStep(3);
         }
       } catch (err) {
@@ -473,11 +459,7 @@ export function DemoSection() {
         }
       }
     },
-    [
-      runResult?.subly402.depositTx,
-      runResult?.subly402.providerId,
-      sublySettlementId,
-    ]
+    [runResult?.subly402.providerId, sublySettlementId]
   );
 
   useEffect(() => {
@@ -548,8 +530,7 @@ export function DemoSection() {
       setRunResult(result);
       setActiveStep(
         result.subly402.settlementStatus?.txSignature ||
-          result.subly402.settlementStatus?.observedPayoutTx ||
-          result.subly402.chainView.delayed?.[0]?.tx
+          result.subly402.depositTx
           ? 3
           : 2
       );
@@ -820,27 +801,21 @@ export function DemoSection() {
                       }
                       onCopy={copy}
                     />
-                    {!settlementReady && sublySettlementId && (
-                      <div className="mt-2 flex flex-col gap-2 sm:flex-row sm:items-center">
-                        <button
-                          type="button"
-                          onClick={() =>
-                            void refreshSettlementStatus({ manual: true })
-                          }
-                          disabled={statusBusy}
-                          className="inline-flex h-10 items-center gap-2 border border-paper/25 px-3 font-mono text-[10px] uppercase tracking-[0.18em] text-paper transition-colors hover:border-glow hover:text-glow disabled:opacity-60"
+                    {runResult.subly402.vaultTokenAccount && (
+                      <div className="mt-2 border border-paper/15 bg-paper/5 p-3 text-[12px] leading-[1.55] text-paper/65">
+                        Subly-x402 settles the Seller from a later Vault batch,
+                        so the visible Buyer transaction stops at the Vault.
+                        To verify the later payout, open the{" "}
+                        <a
+                          href={addressUrl(runResult.subly402.vaultTokenAccount)}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="text-glow underline decoration-glow/40 underline-offset-4 transition-colors hover:text-paper focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-ink"
                         >
-                          {statusBusy ? (
-                            <Loader2 className="h-4 w-4 animate-spin" />
-                          ) : (
-                            <RefreshCw className="h-4 w-4" />
-                          )}
-                          Check seller payout
-                        </button>
-                        <div className="inline-flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.16em] text-paper/45">
-                          <RefreshCw className="h-3.5 w-3.5 animate-spin text-glow" />
-                          Auto-checking every 10s
-                        </div>
+                          Vault ATA
+                        </a>{" "}
+                        after a short delay and look for a SettleVault
+                        transaction to the Seller ATA.
                       </div>
                     )}
                   </div>
@@ -1223,17 +1198,11 @@ function FlowLane({
   const sublyDeposited = Boolean(runResult?.subly402.depositTx);
   const sublyPayoutTx =
     runResult?.subly402.settlementStatus?.txSignature ||
-    runResult?.subly402.settlementStatus?.observedPayoutTx ||
     runResult?.subly402.chainView.delayed?.[0]?.tx ||
     null;
   const sublyPayoutConfirmed = Boolean(sublyPayoutTx);
   const sublyPayoutExact = Boolean(
     runResult?.subly402.settlementStatus?.txSignature
-  );
-  const sublyPayoutObserved = Boolean(
-    !sublyPayoutExact &&
-      (runResult?.subly402.settlementStatus?.observedPayoutTx ||
-        runResult?.subly402.chainView.delayed?.[0]?.tx)
   );
   const sublyBatchPending =
     sublyDeposited &&
@@ -1312,13 +1281,11 @@ function FlowLane({
 
   const payoutValue = runResult?.subly402.settlementStatus?.txSignature
     ? "Payout tx confirmed"
-    : sublyPayoutObserved
-      ? "Vault payout observed on-chain"
     : runResult?.subly402.settlementStatus?.status === "SettledOffchain"
-      ? "Batch pending"
+      ? "Seller payout resolves from a Vault batch"
     : payoutActive
       ? "The Vault paying the seller as a batch"
-      : "Not paid out yet";
+      : "Batch settlement";
 
   return (
     <div className="flex h-full flex-col bg-paper p-5">
@@ -1384,10 +1351,8 @@ function FlowLane({
             status={
               sublyPayoutExact
                 ? "batch payout"
-                : sublyPayoutObserved
-                  ? "payout observed"
                 : sublyBatchPending
-                  ? "batch pending"
+                  ? "batch settlement"
                   : "seller payout"
             }
             txSignature={sublyPayoutTx}
@@ -1528,7 +1493,7 @@ function PathFlowSummary({
     ? batchState === "complete"
       ? "Vault pays Seller after the batch"
       : depositState === "complete" || batchState === "pending"
-        ? "Buyer funds Vault first"
+        ? "Buyer funds Vault for batching"
         : "Buyer funds Vault, then Vault pays Seller"
     : "Buyer pays Seller directly";
 
@@ -1536,7 +1501,7 @@ function PathFlowSummary({
     ? batchState === "complete"
       ? "The only buyer-facing transfer goes into the Vault. Once the batch succeeds, the Vault pays the seller in a separate transfer."
       : depositState === "complete" || batchState === "pending"
-        ? "The visible buyer transaction stops at the Vault. The seller payout stays pending until the batch settles."
+        ? "The visible buyer transaction stops at the Vault. The seller payout resolves from a later Vault batch."
         : "The first highlighted step is the buyer depositing into the Vault. The seller payout only lights up once the Subly-x402 batch settles."
     : directState === "complete"
       ? "The highlighted step is the buyer paying the seller directly. That direct transfer is what stays visible onchain."
@@ -1578,7 +1543,8 @@ function FlowStateBadge({
   state: FlowState;
   tone: FlowTone;
 }) {
-  const label = state === "complete" ? "complete" : state;
+  const label =
+    state === "complete" ? "complete" : state === "pending" ? "batched" : state;
   const toneClass =
     state === "idle"
       ? "border-ink/20 bg-paper-deep text-ink-muted"
@@ -1871,7 +1837,7 @@ function TxRow({
   signature?: string | null;
 }) {
   if (!signature) {
-    return <DataRow label={label} value="pending" />;
+    return <DataRow label={label} value="settles in batch" />;
   }
   return (
     <div className="grid grid-cols-[112px_minmax(0,1fr)] items-start gap-3 border-b border-paper/10 py-2.5 font-mono text-[11px] last:border-b-0">
@@ -1908,7 +1874,6 @@ function FlowPanel({
   const delayed = flow.chainView.delayed?.[0];
   const payoutTx =
     flow.settlementStatus?.txSignature ||
-    flow.settlementStatus?.observedPayoutTx ||
     delayed?.tx ||
     null;
   return (
