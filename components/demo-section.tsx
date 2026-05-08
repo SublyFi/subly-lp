@@ -258,7 +258,7 @@ const privacyDemoSteps = [
   },
 ] as const;
 
-type FlowTone = "neutral" | "risk" | "private";
+type FlowTone = "neutral" | "risk" | "private" | "batch";
 type FlowState = "idle" | "active" | "complete";
 
 function short(value?: string | number | null) {
@@ -1202,7 +1202,7 @@ function FlowLane({
           <FlowConnector
             state={batchState}
             label="Vault -> Seller"
-            tone="private"
+            tone="batch"
             status={sublyDeposited ? "settles via batch" : "seller batch"}
           />
           <ActorNode
@@ -1211,7 +1211,7 @@ function FlowLane({
             detail="Seller"
             addresses={sublySellerAddresses}
             active={batchState === "active"}
-            tone="private"
+            tone="batch"
           />
         </div>
       ) : (
@@ -1395,6 +1395,8 @@ function FlowStateBadge({
       ? "border-ink/20 bg-paper-deep text-ink-muted"
       : tone === "risk"
         ? "border-alert bg-alert/10 text-alert"
+        : tone === "batch"
+          ? "border-glow bg-glow/15 text-ink"
         : "border-ok bg-ok/10 text-ink";
 
   return (
@@ -1424,12 +1426,16 @@ function ActorNode({
   const toneClass =
     active && tone === "risk"
       ? "border-alert bg-alert/10 text-alert"
+      : active && tone === "batch"
+        ? "border-glow bg-glow/10 text-ink"
       : active && tone === "private"
         ? "border-ok bg-ok/10 text-ink"
         : "border-ink/15 bg-white text-ink";
   const iconClass =
     active && tone === "risk"
       ? "border-alert bg-alert text-paper"
+      : active && tone === "batch"
+        ? "border-glow bg-glow/20 text-ink"
       : active && tone === "private"
         ? "border-ok bg-ok text-paper"
         : "border-ink/20 bg-paper-deep text-ink";
@@ -1511,6 +1517,8 @@ function FlowConnector({
       ? "border-ink/15 bg-paper-deep text-ink-muted"
       : tone === "risk"
         ? "border-alert bg-alert/10 text-alert"
+        : tone === "batch"
+          ? "border-glow bg-glow/15 text-ink"
         : "border-ok bg-ok/10 text-ink";
 
   return (
