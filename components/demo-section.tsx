@@ -1204,6 +1204,17 @@ function FlowLane({
             label="Vault -> Seller"
             tone="batch"
             status={sublyDeposited ? "settles via batch" : "seller batch"}
+            note={
+              runResult?.subly402.vaultTokenAccount
+                ? "Later batch settles it. Check"
+                : "Later batch settles it. Check Vault ATA."
+            }
+            noteHref={
+              runResult?.subly402.vaultTokenAccount
+                ? addressUrl(runResult.subly402.vaultTokenAccount)
+                : undefined
+            }
+            noteLinkLabel="Vault ATA"
           />
           <ActorNode
             icon={Store}
@@ -1502,6 +1513,9 @@ function FlowConnector({
   completeStatus = "complete",
   txSignature,
   txLabel = "Tx",
+  note,
+  noteHref,
+  noteLinkLabel,
 }: {
   state: FlowState;
   label: string;
@@ -1510,6 +1524,9 @@ function FlowConnector({
   completeStatus?: string;
   txSignature?: string | null;
   txLabel?: string;
+  note?: string;
+  noteHref?: string;
+  noteLinkLabel?: string;
 }) {
   const active = state !== "idle";
   const stateClass =
@@ -1537,6 +1554,25 @@ function FlowConnector({
         <span className="font-mono text-[9px] uppercase tracking-[0.12em] opacity-70">
           {state === "complete" ? completeStatus : status}
         </span>
+        {note && (
+          <span className="mt-1.5 text-[9px] leading-[1.35] tracking-normal opacity-75">
+            {note}
+            {noteHref && noteLinkLabel ? (
+              <>
+                {" "}
+                <a
+                  href={noteHref}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-flex items-center justify-center gap-1 underline decoration-current/35 underline-offset-2 hover:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-paper"
+                >
+                  {noteLinkLabel}
+                  <ExternalLink className="h-2.5 w-2.5 shrink-0" />
+                </a>
+              </>
+            ) : null}
+          </span>
+        )}
         {txSignature && (
           <a
             href={txUrl(txSignature)}
