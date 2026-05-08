@@ -396,8 +396,10 @@ export function DemoSection() {
   }
 
   async function runLivePayment() {
+    const isRerun = Boolean(runResult);
     setError(null);
-    setActiveStep(1);
+    setRunResult(null);
+    setActiveStep(isRerun ? 0 : 1);
     setRunBusy(true);
     try {
       const result = await postJson<RunResult>("/api/demo/run");
