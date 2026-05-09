@@ -1,3 +1,17 @@
+import Image, { type StaticImageData } from "next/image";
+
+import humaLogo from "@/styles/img/huma_logo.png";
+import jupiterLogo from "@/styles/img/jupiter_logo.jpg";
+import kaminoLogo from "@/styles/img/kamino_logo.jpg";
+import perenaLogo from "@/styles/img/perena_logo.jpg";
+
+const YIELD_LOGOS: Array<{ name: string; src: StaticImageData }> = [
+  { name: "Huma", src: humaLogo },
+  { name: "Jupiter", src: jupiterLogo },
+  { name: "Kamino", src: kaminoLogo },
+  { name: "Perena", src: perenaLogo },
+];
+
 const FLOW_STEPS = [
   {
     n: "01",
@@ -10,7 +24,7 @@ const FLOW_STEPS = [
     n: "02",
     tag: "EARN",
     title: "Earn yield.",
-    body: "The vault routes capital into DeFi with a 10%+ APY target. Principal stays put, and yield funds the agent's calls.",
+    body: "The vault routes capital into DeFi with a 5-10% APY target. Principal stays put, and yield funds the agent's calls.",
     ornament: "%",
   },
   {
@@ -80,9 +94,10 @@ export function SolutionSection() {
             mid
             kicker="02 · Yield"
             title="Yield funds the payments."
-            body="Deposited capital earns yield in DeFi, with a 10%+ APY target. Yield, not principal, funds your agent's calls."
-            metric="10%+"
+            body="Deposited capital earns yield in DeFi, with a 5-10% APY target. Yield, not principal, funds your agent's calls."
+            metric="5-10%"
             metricLabel="APY target"
+            logos={YIELD_LOGOS}
           />
           <Pillar
             kicker="03 · Privacy"
@@ -122,6 +137,7 @@ function Pillar({
   body,
   metric,
   metricLabel,
+  logos,
   mid,
   accent,
 }: {
@@ -130,6 +146,7 @@ function Pillar({
   body: string;
   metric: string;
   metricLabel: string;
+  logos?: Array<{ name: string; src: StaticImageData }>;
   mid?: boolean;
   accent?: boolean;
 }) {
@@ -153,6 +170,24 @@ function Pillar({
         {title}
       </h3>
       <p className="text-[14px] leading-[1.75] text-ink-muted">{body}</p>
+      {logos ? (
+        <div className="grid grid-cols-4 gap-3" aria-label="Yield providers">
+          {logos.map((logo) => (
+            <div
+              key={logo.name}
+              className="flex aspect-square items-center justify-center border border-rule bg-paper p-2"
+            >
+              <Image
+                src={logo.src}
+                alt={`${logo.name} logo`}
+                width={40}
+                height={40}
+                className="h-full w-full object-contain"
+              />
+            </div>
+          ))}
+        </div>
+      ) : null}
       <div className="mt-auto border-t border-rule pt-4">
         <div
           className={`font-display text-[40px] font-semibold leading-none tracking-tight ${
