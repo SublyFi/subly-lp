@@ -45,7 +45,7 @@ export function HeroSection() {
         </h1>
 
         <p className="mt-8 font-feature text-[28px] leading-[1.2] text-ink md:text-[40px] lg:text-[48px]">
-          Privacy protocol for agents.
+          Private, yield-funded autopay for agents
         </p>
 
         <p className="mt-8 max-w-3xl font-feature text-[20px] leading-[1.4] text-ink-soft md:text-[24px]">
