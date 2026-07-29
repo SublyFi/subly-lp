@@ -189,7 +189,7 @@ export function ConnectSection() {
         </div>
 
         {/* Install paths */}
-        <div className="grid gap-6 lg:grid-cols-2">
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
           <InstallCard
             kicker="MCP · Claude Code"
             title="One command in the terminal."
@@ -252,7 +252,7 @@ export function ConnectSection() {
             </h3>
             <span className="hidden h-px flex-1 bg-paper/15 md:block" />
           </div>
-          <div className="grid gap-px border border-paper/15 bg-paper/15 md:grid-cols-2 lg:grid-cols-3">
+          <div className="grid grid-cols-1 gap-px border border-paper/15 bg-paper/15 md:grid-cols-2 lg:grid-cols-3">
             {MCP_TOOLS.map((tool) => (
               <div key={tool.name} className="bg-ink p-5 md:p-6">
                 <div className="break-words font-mono text-[13px] font-semibold text-subly-glow">
@@ -281,7 +281,7 @@ export function ConnectSection() {
               or a wallet signature. After that, the flow is hands-free.
             </p>
           </div>
-          <ol className="grid gap-px border border-paper/15 bg-paper/15 sm:grid-cols-2 lg:col-span-8">
+          <ol className="grid grid-cols-1 gap-px border border-paper/15 bg-paper/15 sm:grid-cols-2 lg:col-span-8">
             {FIRST_RUN.map((step) => (
               <li key={step.n} className="bg-ink p-5 md:p-6">
                 <span className="font-mono text-[10px] uppercase tracking-[0.28em] text-glow">
@@ -322,7 +322,7 @@ export function ConnectSection() {
               </p>
             </div>
           </div>
-          <div className="grid gap-px border border-paper/15 bg-paper/15 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="grid grid-cols-1 gap-px border border-paper/15 bg-paper/15 sm:grid-cols-2 lg:grid-cols-4">
             {GUARDRAILS.map((item) => (
               <div key={item.title} className="bg-ink p-5 md:p-6">
                 <item.icon className="h-5 w-5 text-glow" aria-hidden />
