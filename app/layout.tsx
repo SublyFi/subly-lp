@@ -49,9 +49,9 @@ export const metadata: Metadata = {
     siteName: "Subly",
     images: [
       {
-        url: "https://www.sublyfi.com/og-image.png?v=2",
-        width: 1200,
-        height: 630,
+        url: "https://www.sublyfi.com/og-image.png?v=3",
+        width: 2400,
+        height: 1260,
         type: "image/png",
         alt: "Subly: Use Now, Pay Never",
       },
@@ -64,7 +64,7 @@ export const metadata: Metadata = {
     title: "Subly: Use Now, Pay Never",
     description:
       "Your yield pays your AI agent's API bills. Deposit USDC once; x402 API calls settle from Kamino vault yield, never from principal.",
-    images: ["https://www.sublyfi.com/og-image.png?v=2"],
+    images: ["https://www.sublyfi.com/og-image.png?v=3"],
   },
 };
 
