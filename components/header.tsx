@@ -7,10 +7,9 @@ import { Menu, X } from "lucide-react";
 import { SublyLogo } from "./subly-logo";
 
 const NAV = [
-  { label: "Demo", href: "#demo" },
   { label: "Problem", href: "#problem" },
   { label: "Solution", href: "#solution" },
-  { label: "Privacy", href: "#privacy" },
+  { label: "Connect", href: "#connect" },
   { label: "Market", href: "#market" },
 ];
 
@@ -71,13 +70,13 @@ export function Header() {
             <Image src="/telegram.svg" alt="" width={26} height={26} />
           </a>
           <a
-            href="#demo"
+            href="#connect"
             className="group hidden items-center gap-2 border border-subly bg-subly px-3 py-2 text-white transition-colors hover:bg-subly-deep hover:border-subly-deep md:inline-flex"
           >
             <span className="relative inline-block h-1.5 w-1.5 rounded-full bg-glow">
               <span className="absolute inset-0 animate-ping rounded-full bg-glow/60" />
             </span>
-            Try demo
+            Connect agent
           </a>
 
           <button
@@ -136,14 +135,14 @@ export function Header() {
               <Image src="/telegram.svg" alt="" width={28} height={28} />
             </a>
             <a
-              href="#demo"
+              href="#connect"
               onClick={() => setOpen(false)}
               className="ml-auto inline-flex items-center gap-2 border border-subly bg-subly px-3 py-2 font-mono text-[11px] uppercase tracking-[0.2em] text-white"
             >
               <span className="relative inline-block h-1.5 w-1.5 rounded-full bg-glow">
                 <span className="absolute inset-0 animate-ping rounded-full bg-glow/60" />
               </span>
-              Try demo
+              Connect agent
             </a>
           </div>
         </nav>

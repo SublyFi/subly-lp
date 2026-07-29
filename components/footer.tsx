@@ -45,12 +45,13 @@ export function Footer() {
               </span>
               <span className="ml-2 inline-flex items-center gap-2 border border-subly-glow/40 px-2 py-0.5 font-mono text-[9px] uppercase tracking-[0.24em] text-subly-glow">
                 <span className="h-1 w-1 rounded-full bg-subly-glow blink" />
-                Live · devnet
+                Live · Solana mainnet
               </span>
             </div>
             <p className="mt-6 max-w-md font-feature text-[20px] leading-[1.4] text-paper">
-              A privacy-first PayFi protocol for AI agents that need durable
-              funding and payment privacy.
+              Use now, pay never. Deposit USDC once — your agent pays for
+              x402 APIs from vault yield, and principal isn&apos;t spent on
+              API calls.
             </p>
           </div>
 
@@ -62,7 +63,7 @@ export function Footer() {
               {[
                 ["#problem", "Problem"],
                 ["#solution", "Solution"],
-                ["#privacy", "Privacy"],
+                ["#connect", "Connect"],
                 ["#market", "Market"],
               ].map(([href, label]) => (
                 <li key={href}>
@@ -95,10 +96,22 @@ export function Footer() {
                 </a>
               ))}
             </div>
+            <a
+              href="https://www.npmjs.com/package/@subly_fi/pay"
+              target="_blank"
+              rel="noreferrer"
+              className="mt-6 inline-block font-mono text-[11px] uppercase tracking-[0.18em] text-paper/70 underline decoration-paper/30 underline-offset-4 transition-colors hover:text-subly-glow"
+            >
+              npm · @subly_fi/pay
+            </a>
           </div>
         </div>
 
-        <div className="mt-16 border-t border-paper/15 pt-8 font-mono text-[10px] uppercase tracking-[0.22em] text-paper/50">
+        <div className="mt-16 space-y-3 border-t border-paper/15 pt-8 font-mono text-[10px] uppercase tracking-[0.22em] text-paper/50">
+          <div className="normal-case tracking-[0.08em]">
+            No guarantee of principal or yield. Payments are made at use
+            time, and principal is not intentionally spent.
+          </div>
           <div>© 2026 SublyFi · All rights reserved</div>
         </div>
       </div>

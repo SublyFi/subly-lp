@@ -12,26 +12,35 @@ const YIELD_LOGOS: Array<{ name: string; src: StaticImageData }> = [
   { name: "Perena", src: perenaLogo },
 ];
 
+const X402_PROVIDERS = [
+  "CoinMarketCap",
+  "CoinGecko",
+  "Birdeye",
+  "Nansen",
+  "Messari",
+  "Zerion",
+];
+
 const FLOW_STEPS = [
   {
     n: "01",
     tag: "DEPOSIT",
     title: "Deposit once.",
-    body: "The agent makes one USDC transfer into the shared Subly vault. After that, payments can keep running without manual top-ups.",
+    body: "The agent makes one USDC transfer into the Subly vault on Kamino. No SOL needed — network fees are sponsored, and the principal stays withdrawable.",
     ornament: "$",
   },
   {
     n: "02",
     tag: "EARN",
     title: "Earn yield.",
-    body: "The vault routes capital into DeFi with a 5-10% APY target. Principal stays put, and yield funds the agent's calls.",
+    body: "The vault lends deposits in DeFi with a 5-10% APY target. Yield accrues continuously and becomes the agent's spendable payment budget.",
     ornament: "%",
   },
   {
     n: "03",
     tag: "PAY",
-    title: "Pay providers.",
-    body: "Buyers call providers through x402-style HTTP. A TEE keeps per-buyer accounting private and schedules batched vault payouts, so observers cannot link Buyer to Seller.",
+    title: "Pay per call.",
+    body: "The agent calls x402-enabled APIs — Birdeye at $0.003, CoinGecko or Nansen at $0.01 — and each call settles from yield with an on-chain receipt.",
     ornament: "→",
   },
 ];
@@ -62,21 +71,20 @@ export function SolutionSection() {
             <h2 className="mt-3 font-display text-[52px] font-semibold leading-[0.95] tracking-tight text-ink md:text-[72px]">
               Deposit once.{" "}
               <span className="text-subly">Earn yield.</span>{" "}
-              <span className="font-feature">Pay agents privately.</span>
+              <span className="font-feature">Pay never.</span>
             </h2>
             <p className="mt-8 max-w-xl font-feature text-[20px] leading-[1.4] text-ink md:text-[24px]">
-              Turn yield into agent payments without exposing who your agent
-              paid.
+              Yield keeps paying for paid APIs. Principal isn&apos;t spent on
+              API calls.
             </p>
           </div>
           <div className="md:col-span-5">
             <p className="font-sans text-[15px] leading-[1.75] text-ink-soft md:text-[16px]">
-              An agent deposits USDC into Subly once. The vault earns DeFi
-              yield that pays for x402 calls while the principal remains
-              withdrawable. Settlement flows through an on-chain shared vault,
-              and a TEE keeps per-buyer accounting private while scheduling
-              payouts. The direct Buyer-to-Seller link that x402 normally
-              exposes disappears.
+              An agent deposits USDC into the Subly vault once. The vault
+              earns DeFi yield on Kamino, and every x402 API call settles
+              from the yield that accrues. The relayer refuses any payment
+              beyond spendable yield, so the deposited principal is never
+              touched by a payment — and stays withdrawable at any time.
             </p>
           </div>
         </div>
@@ -86,7 +94,7 @@ export function SolutionSection() {
           <Pillar
             kicker="01 · Capital"
             title="One deposit, ongoing payments."
-            body="The agent transfers USDC into the Subly vault once. Principal stays in your custody and can be withdrawn at any time."
+            body="The agent transfers USDC into the Subly vault once. Principal stays in your custody and can be withdrawn at any time — a plain withdraw is the exit path."
             metric="1×"
             metricLabel="Deposit required"
           />
@@ -94,17 +102,17 @@ export function SolutionSection() {
             mid
             kicker="02 · Yield"
             title="Yield funds the payments."
-            body="Deposited capital earns yield in DeFi, with a 5-10% APY target. Yield, not principal, funds your agent's calls."
+            body="Deposited capital earns yield in DeFi through the Subly vault on Kamino, with a 5-10% APY target. Yield, not principal, funds your agent's calls."
             metric="5-10%"
             metricLabel="APY target"
             logos={YIELD_LOGOS}
           />
           <Pillar
-            kicker="03 · Privacy"
-            title="Buyer-to-Seller link removed."
-            body="Buyers and sellers still use x402-style HTTP. Payments flow into the on-chain shared vault first. The TEE keeps the per-buyer ledger off-chain and triggers delayed vault payouts, so the direct on-chain link disappears."
+            kicker="03 · Payments"
+            title="Principal is never spent."
+            body="Payments settle from spendable yield only. The relayer refuses anything the accrued yield cannot cover, so API calls cannot eat into the deposit."
             metric="0"
-            metricLabel="Buyer/Seller links"
+            metricLabel="Principal spent on calls"
             accent
           />
         </div>
@@ -125,6 +133,50 @@ export function SolutionSection() {
               <Step key={step.n} {...step} mid={i === 1} />
             ))}
           </ol>
+        </div>
+
+        {/* Coverage math */}
+        <div className="mt-16 border-2 border-ink bg-paper p-6 shadow-stamp-subly md:p-10">
+          <div className="grid gap-8 md:grid-cols-12 md:items-center">
+            <div className="md:col-span-8">
+              <div className="font-mono text-[10px] uppercase tracking-[0.28em] text-subly">
+                ▌ Coverage math
+              </div>
+              <p className="mt-4 font-display text-[30px] font-semibold leading-[1.08] tracking-tight text-ink md:text-[44px]">
+                1,000 USDC at 10% APY covers{" "}
+                <span className="text-subly">27 API calls a day</span> at
+                $0.01 each.
+              </p>
+            </div>
+            <div className="md:col-span-4">
+              <p className="font-sans text-[13px] leading-[1.7] text-ink-muted">
+                Before fees. Subly charges 10% of yield and 1% of each
+                payment — either way, the payment path never draws on
+                principal.
+              </p>
+            </div>
+          </div>
+
+          <div className="mt-8 border-t border-rule pt-6">
+            <div className="mb-3 font-mono text-[10px] uppercase tracking-[0.24em] text-ink-muted">
+              x402-enabled data providers
+            </div>
+            <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+              <div className="flex flex-wrap gap-2">
+                {X402_PROVIDERS.map((name) => (
+                  <span
+                    key={name}
+                    className="border border-rule bg-paper-deep px-2.5 py-1 font-mono text-[10px] uppercase tracking-[0.18em] text-ink"
+                  >
+                    {name}
+                  </span>
+                ))}
+              </div>
+              <div className="shrink-0 font-mono text-[10px] uppercase tracking-[0.2em] text-ink-muted">
+                22K seller payout wallets on x402 · last 30 days
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </section>

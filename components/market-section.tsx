@@ -1,3 +1,5 @@
+import type { CSSProperties } from "react";
+
 const MARKET = [
   {
     tier: "TAM",
@@ -67,8 +69,8 @@ export function MarketSection() {
             {MARKET.map((m) => (
               <div
                 key={m.tier}
-                className="relative flex items-stretch"
-                style={{ paddingRight: `${100 - m.weight}%` }}
+                className="relative flex items-stretch md:pr-[var(--bar-gap)]"
+                style={{ "--bar-gap": `${100 - m.weight}%` } as CSSProperties}
               >
                 <div
                   className={`flex w-full flex-wrap items-center justify-between gap-4 border-2 px-5 py-6 md:flex-nowrap md:px-8 md:py-8 ${

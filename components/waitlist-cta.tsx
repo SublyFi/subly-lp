@@ -1,5 +1,10 @@
 "use client";
 
+const TRACTION = [
+  { value: "310+", label: "Waitlist sign-ups" },
+  { value: "590+", label: "X followers" },
+];
+
 export function WaitlistCTA() {
   return (
     <section
@@ -26,8 +31,26 @@ export function WaitlistCTA() {
             <span className="font-feature text-subly">waitlist.</span>
           </h2>
           <p className="mt-6 mx-auto max-w-xl font-feature text-[20px] leading-[1.4] text-ink md:text-[24px]">
-            Join early access for AI agent builders.
+            We&apos;re onboarding the first 100 users who run AI agents for
+            financial research.
           </p>
+
+          <div className="mx-auto mt-10 grid max-w-md grid-cols-2 gap-4">
+            {TRACTION.map((stat) => (
+              <div
+                key={stat.label}
+                className="border-2 border-ink bg-paper px-4 py-6 shadow-stamp"
+              >
+                <div className="font-display text-[36px] font-semibold leading-none tracking-tight text-subly md:text-[44px]">
+                  {stat.value}
+                </div>
+                <div className="mt-2 font-mono text-[10px] uppercase tracking-[0.2em] text-ink-muted">
+                  {stat.label}
+                </div>
+              </div>
+            ))}
+          </div>
+
           <div className="mt-10 flex justify-center">
             <div className="w-full max-w-[600px]">
               <div

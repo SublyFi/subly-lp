@@ -439,6 +439,16 @@
     }
   }
 
+  @media (prefers-reduced-motion: reduce) {
+    .blink,
+    .marquee,
+    .pulse-purple,
+    .scanline,
+    .animate-ping {
+      animation: none;
+    }
+  }
+
   .shadow-stamp {
     box-shadow: 6px 6px 0 0 var(--ink);
   }
